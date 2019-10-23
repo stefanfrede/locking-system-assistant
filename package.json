@@ -17,7 +17,10 @@
     ]
   },
   "scripts": {
-    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json"
+    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "lint": "eslint packages/**/*.js && stylelint packages/**/*.js",
+    "validate": "yarn run lint",
+    "setup": "yarn install && yarn run validate"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

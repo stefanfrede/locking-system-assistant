@@ -1,0 +1,9 @@
+image: node:13
+
+cache:
+  paths:
+    - node_modules/
+
+  test_async:
+    script:
+      - npm run setup
