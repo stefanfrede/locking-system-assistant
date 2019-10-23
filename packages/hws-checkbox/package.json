@@ -21,7 +21,7 @@
     "directory": "packages/hws-checkbox"
   },
   "engines": {
-    "node": "13.x.x",
+    "node": "12.x.x",
     "npm": "6.x.x"
   },
   "dependencies": {
