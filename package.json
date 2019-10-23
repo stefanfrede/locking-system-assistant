@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devEngines": {
+    "node": "13.x"
+  },
+  "browserslist": [
+    "default"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "stylelint --fix",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "fbjs-scripts": "^1.2.0",
+    "husky": "^3.0.9",
+    "lint-staged": "^9.4.2",
+    "prettier": "^1.18.2",
+    "stylelint": "^11.1.1",
+    "stylelint-config-prettier": "^6.0.0",
+    "stylelint-config-recommended": "^3.0.0",
+    "stylelint-order": "^3.1.1"
+  }
+}
