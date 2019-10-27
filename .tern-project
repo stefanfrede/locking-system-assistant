@@ -1,7 +1,7 @@
 {
   "ecmaVersion": 10,
   "libs": [
-    "browser",
+    "browser"
   ],
   "loadEagerly": [
     "packages/**/*.js"

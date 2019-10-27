@@ -1,0 +1,36 @@
+{
+  "name": "hws-data-table",
+  "description": "hws-data-table is a table to configure locking system data.",
+  "keywords": [
+    "table",
+    "data-table",
+    "locking-system",
+    "Bootstrap"
+  ],
+  "version": "0.0.0",
+  "homepage": "https://lsa.frede.io/",
+  "bugs": "https://gitlab.com/stefanfrede/locking-system-assistant/issues",
+  "license": "MIT",
+  "files": [
+    "LICENSE.md",
+    "README.md",
+    "index.js"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/stefanfrede/locking-system-assistant",
+    "directory": "packages/hws-data-table"
+  },
+  "engines": {
+    "node": "12.x.x",
+    "npm": "6.x.x"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "lit-element": "^2.1.0"
+  },
+  "devDependencies": {
+    "hws-checkbox": "0.0.0"
+  }
+}
