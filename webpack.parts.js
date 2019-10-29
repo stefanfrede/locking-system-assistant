@@ -4,7 +4,7 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const postcssNormalize = require('postcss-normalize');
 const postcssPresetEnv = require('postcss-preset-env');
-const TerserPlugin = require('terser-webpack-plugin');
+const TerserJSPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
 exports.attachRevision = () => ({
@@ -97,6 +97,7 @@ exports.loadSCSS = ({ include, exclude } = {}) => ({
         include,
         exclude,
 
+        // use: [`style-loader`, 'css-loader', 'sass-loader'],
         use: ['css-loader', 'sass-loader'],
       },
     ],
@@ -131,7 +132,7 @@ exports.minifyCSS = ({ options }) => ({
 
 exports.minifyJavaScript = () => ({
   optimization: {
-    minimizer: [new TerserPlugin({ sourceMap: true })],
+    minimizer: [new TerserJSPlugin({ sourceMap: true })],
   },
 });
 

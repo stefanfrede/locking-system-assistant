@@ -65,7 +65,7 @@ class HwsCheckbox extends LitElement {
       input:focus + label {
         border-color: var(input-focus-border-color, hsl(211, 100%, 75%));
         box-shadow: 0 0 0 0.2rem
-          var(--input-focus-box-shadow, hsl(211, 100%, 50%));
+          var(--input-focus-box-shadow, rgba(0, 123, 255, 0.25));
         outline: 0;
       }
 

@@ -9,7 +9,7 @@ const path = require('path');
 const parts = require('./webpack.parts');
 
 const PATHS = {
-  app: path.resolve(__dirname, './packages/hws-app/index.js'),
+  app: path.join(__dirname, 'packages'),
 };
 
 const commonConfig = merge([
@@ -34,7 +34,7 @@ const commonConfig = merge([
   },
   parts.loadSCSS(),
   parts.loadJavaScript({
-    include: [PATHS.app],
+    include: PATHS.app,
   }),
   {
     optimization: {
@@ -59,14 +59,6 @@ const productionConfig = merge([
     },
   },
   parts.clean(),
-  parts.minifyCSS({
-    options: {
-      discardComments: {
-        removeAll: true,
-      },
-      safe: true,
-    },
-  }),
   parts.minifyJavaScript(),
   parts.generateSourceMaps({ type: 'source-map' }),
   {
