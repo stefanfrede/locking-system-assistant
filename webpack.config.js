@@ -9,7 +9,7 @@ const path = require('path');
 const parts = require('./webpack.parts');
 
 const PATHS = {
-  app: path.join(__dirname, 'packages'),
+  app: path.join(__dirname, 'packages/hws-data-table'),
 };
 
 const commonConfig = merge([
