@@ -10,7 +10,7 @@
   "version": "0.0.0",
   "homepage": "https://lsa.frede.io/",
   "bugs": "https://gitlab.com/stefanfrede/locking-system-assistant/issues",
-  "license": "MIT",
+  "license": "CC",
   "files": [
     "LICENSE.md",
     "README.md",
@@ -29,8 +29,5 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "lit-element": "^2.1.0"
-  },
-  "devDependencies": {
-    "hws-checkbox": "0.0.0"
   }
 }

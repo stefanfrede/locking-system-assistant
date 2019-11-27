@@ -1,9 +1,11 @@
-image: node:12
+image: node:10
 
-cache:
-  paths:
-    - node_modules/
-
-test_async:
+test:
+  stage: test
+  cache:
+    paths:
+      - node_modules/
+  only:
+    - master
   script:
     - npm run setup
