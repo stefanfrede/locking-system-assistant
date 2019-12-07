@@ -189,7 +189,18 @@
       "node_modules/css-loader/dist/cjs.js!node_modules/sass-loader/dist/cjs.js!packages/hws-data-table/bootstrap.scss": 1,
       "node_modules/babel-loader/lib/index.js!packages/index.js f565393eab46d4e4334ba365033baa31": 0,
       "node_modules/lit-element/lit-element.js 0dfa2ed4ffe8e4ae01e78cdb8ba9ed5a": 0,
-      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/index.js 78bdb677742102ba58651762f887a288": 1
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/index.js 78bdb677742102ba58651762f887a288": 1,
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/actions/index.js": 1,
+      "node_modules/redux/es/redux.js": 2,
+      "node_modules/symbol-observable/es/index.js": 3,
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/store/index.js": 4,
+      "node_modules/symbol-observable/es/ponyfill.js": 5,
+      "node_modules/redux-thunk/es/index.js": 6,
+      "node_modules/pwa-helpers/pwa-helpers.js 3c9e53b27aa00bbc4394cf018959a5c0": 7,
+      "node_modules/webpack/buildin/harmony-module.js": 8,
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/index.js c84d9cb941ed2a3209864443379b6bad": 9,
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/store/configure-store-prod.js 14288c723c2a2772c8ea3a0c0a99aac8": 10,
+      "node_modules/babel-loader/lib/index.js!packages/hws-data-table/index.js e2f0429ac35c9cab81fcc8da10c7e0e1": 9
     },
     "usedIds": {
       "0": 0,

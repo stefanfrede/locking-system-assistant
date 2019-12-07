@@ -18,6 +18,12 @@ export const forms = css`
     width: 100%;
   }
 
+  select {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     input,
     select {
@@ -46,30 +52,35 @@ export const forms = css`
   input::-webkit-input-placeholder,
   select::-webkit-input-placeholder {
     color: var(--input-placeholder-color, hsl(208, 7%, 46%));
+    font-style: italic;
     opacity: 1;
   }
 
   input::-moz-placeholder,
   select::-moz-placeholder {
     color: var(--input-placeholder-color, hsl(208, 7%, 46%));
+    font-style: italic;
     opacity: 1;
   }
 
   input:-ms-input-placeholder,
   select:-ms-input-placeholder {
     color: var(--input-placeholder-color, hsl(208, 7%, 46%));
+    font-style: italic;
     opacity: 1;
   }
 
   input::-ms-input-placeholder,
   select::-ms-input-placeholder {
     color: var(--input-placeholder-color, hsl(208, 7%, 46%));
+    font-style: italic;
     opacity: 1;
   }
 
   input::placeholder,
   select::placeholder {
     color: var(--input-placeholder-color, hsl(208, 7%, 46%));
+    font-style: italic;
     opacity: 1;
   }
 
