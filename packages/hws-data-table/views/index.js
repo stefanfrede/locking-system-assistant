@@ -1,7 +1,7 @@
 import { html } from 'lit-element';
 
-export const table = ({ body, columns, head, loading, rows } = {}) => html`
-  <div class="table-responsive" data-loading="${loading}">
+export const table = ({ body, columns, head, isLoading, rows } = {}) => html`
+  <div class="table-responsive" data-loading="${isLoading}">
     <table>
       <thead>
         ${thead({ columns, head })}
@@ -83,10 +83,11 @@ export const tbody = ({ columns, rows, body } = {}) => {
           select: body.builds.select,
         })}
         ${selectLength({
-          inners: body.length.items[row] ? body.length.items[row].inner : [],
-          outers: body.length.items[row] ? body.length.items[row].outer : [],
+          inner: body.lengths.inner[row] ? body.lengths.inner[row] : [],
+          outer: body.lengths.outer[row] ? body.lengths.outer[row] : [],
           row,
-          selectInner: body.length.selectInner,
+          selectInner: body.lengths.selectInner,
+          selectOuter: body.lengths.selectOuter,
         })}
         ${inputNumber({
           id: `quantity-model-${row}`,
@@ -221,33 +222,40 @@ export const selectBuild = ({ items, row, select }) => html`
   </td>
 `;
 
-export const selectLength = ({ inners, outers, row, selectInner }) => html`
+export const selectLength = ({
+  inner,
+  outer,
+  row,
+  selectInner,
+  selectOuter,
+}) => html`
   <td class="lsa__length">
     <div class="lsa__length__inner">
       <select
         @change="${selectInner}"
-        ?disabled=${!inners.length}
+        ?disabled=${!inner.length}
         data-row="${row}"
         id="cylinder-length-inner-${row}"
         name="cylinder-length-inner-${row}"
       >
         <option selected hidden value>innen</option>
-        ${inners.map(
-          inner => html`
-            <option value="${inner}">${inner}</option>
+        ${inner.map(
+          length => html`
+            <option value="${length}">${length}</option>
           `,
         )}
       </select>
       <select
+        @change="${selectOuter}"
+        ?disabled=${!outer.length}
         id="cylinder-length-outer-${row}"
         name="cylinder-length-outer-${row}"
         data-row="${row}"
-        ?disabled=${!outers.length}
       >
         <option selected hidden value>außen</option>
-        ${outers.map(
-          outer => html`
-            <option value="${outer}">${outer}</option>
+        ${outer.map(
+          length => html`
+            <option value="${length}">${length}</option>
           `,
         )}
       </select>
