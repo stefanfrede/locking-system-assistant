@@ -1,75 +1,63 @@
+import { handleActions, combineActions } from 'redux-actions';
+
 import {
-  ADD_BUILDS,
-  ADD_COLUMNS,
-  REMOVE_COLUMNS,
-  ADD_ROWS,
-  REMOVE_ROWS,
-  SHOW_LOADING,
-  UPDATE_LENGTH,
+  HIDE_LOADER,
+  SHOW_LOADER,
+  INCREMENT_COLUMNS,
+  DECRENENT_COLUMNS,
+  INCREMENT_ROWS,
+  DECRENENT_ROWS,
   UPDATE_MODEL,
-  UPDATE_URL,
+  LOAD_BUILDS,
+  LOAD_LENGTHS,
+  UPDATE_INNER_LENGTHS,
+  UPDATE_OUTER_LENGTHS,
 } from '../actions';
 
 const INITIAL_STATE = {
   builds: [],
+  data: [],
   columns: 5,
-  length: {},
-  loading: false,
+  isLoading: true,
+  lengths: {},
+  innerLengths: {},
+  outerLengths: {},
   model: 'R9Plus',
   rows: 5,
-  url: 'https://www.schweisthal.de/de/api/products/',
 };
 
-const app = (state = INITIAL_STATE, action = null) => {
-  switch (action.type) {
-    case ADD_BUILDS:
+export default handleActions(
+  {
+    [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
+      return { ...state, isLoading: action.payload };
+    },
+    [combineActions(INCREMENT_COLUMNS, DECRENENT_COLUMNS)]: (state, action) => {
+      return { ...state, columns: state.columns + action.payload.amount };
+    },
+    [combineActions(INCREMENT_ROWS, DECRENENT_ROWS)]: (state, action) => {
+      return { ...state, rows: state.rows + action.payload.amount };
+    },
+    [LOAD_BUILDS]: (state, action) => {
+      return { ...state, builds: action.payload };
+    },
+    [LOAD_LENGTHS]: (state, action) => {
+      return { ...state, lengths: { ...state.lengths, ...action.payload } };
+    },
+    [UPDATE_MODEL]: (state, action) => {
+      return { ...state, model: action.payload };
+    },
+    [UPDATE_INNER_LENGTHS]: (state, action) => {
       return {
         ...state,
-        builds: action.builds,
+        innerLengths: { ...state.innerLengths, ...action.payload },
       };
-    case ADD_COLUMNS:
+    },
+    [UPDATE_OUTER_LENGTHS]: (state, action) => {
       return {
         ...state,
-        columns: state.columns + action.columns,
+        outerLengths: { ...state.outerLengths, ...action.payload },
       };
-    case REMOVE_COLUMNS:
-      return {
-        ...state,
-        columns: state.columns - action.columns,
-      };
-    case ADD_ROWS:
-      return {
-        ...state,
-        rows: state.rows + action.rows,
-      };
-    case REMOVE_ROWS:
-      return {
-        ...state,
-        rows: state.rows - action.rows,
-      };
-    case SHOW_LOADING:
-      return {
-        ...state,
-        loading: action.loading,
-      };
-    case UPDATE_LENGTH:
-      return {
-        ...state,
-        length: { ...state.length, ...action.length },
-      };
-    case UPDATE_MODEL:
-      return {
-        ...state,
-        model: action.model,
-      };
-    case UPDATE_URL:
-      return {
-        ...state,
-        url: action.url,
-      };
-    default:
-      return state;
-  }
-};
-
-export default app;
+    },
+  },
+  INITIAL_STATE,
+);

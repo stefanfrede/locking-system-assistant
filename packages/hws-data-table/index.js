@@ -7,24 +7,11 @@ import { stylesheet } from './styles/index.js';
 import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
-import {
-  addBuilds,
-  cacheBuilds,
-  cacheLength,
-  showLoading,
-  updateLength,
-} from './actions';
+import { fetchBuilds, fetchLengths, fetchOuterLengths } from './actions';
 
-import {
-  getCachedBuilds,
-  getCachedLength,
-  getColumns,
-  getModel,
-  getRows,
-  getUrl,
-} from './reducers/selectors';
+import { getColumns, getModel, getRows } from './reducers/selectors';
 
-import { GET, POST, deselectOption, getSelectedOption } from './utils';
+import { deselectOption, getSelectedOption } from './lib/helpers';
 
 const store = configureStore();
 
@@ -35,167 +22,84 @@ class HwsDataTable extends connect(store)(LitElement) {
 
   static get properties() {
     return {
+      builds: { type: Object },
       columns: { type: Number, reflect: true },
-      length: { type: Object },
-      loading: { type: Boolean },
+      isLoading: { type: Boolean },
+      innerLengths: { type: Object },
+      outerLengths: { type: Object },
       model: { type: String, reflect: true },
       rows: { type: Number, reflect: true },
-      builds: { type: Object },
-      url: { type: String },
     };
   }
 
   stateChanged(state) {
     this.builds = state.app.builds;
     this.columns = state.app.columns;
-    this.length = state.app.length;
-    this.loading = state.app.loading;
+    this.isLoading = state.app.isLoading;
+    this.innerLengths = state.app.innerLengths;
+    this.outerLengths = state.app.outerLengths;
     this.model = state.app.model;
     this.rows = state.app.rows;
-    this.url = state.app.url;
   }
 
   constructor() {
     super();
 
-    this.init();
-  }
-
-  async init() {
-    store.dispatch(showLoading(true));
-
-    this.url = getUrl(store.getState());
-    this.model = getModel(store.getState());
-
     this.columns = getColumns(store.getState());
+    this.model = getModel(store.getState());
     this.rows = getRows(store.getState());
 
-    const body = JSON.stringify({
-      filter: [
-        { name: 'Hersteller', value: 'Iseo' },
-        { name: 'Serie', value: this.model },
-      ],
-      selector: 'Bauart',
-    });
-
-    const cachedBuilds = getCachedBuilds(store.getState());
-
-    if (cachedBuilds[body]) {
-      const data = cachedBuilds[body]['data'];
-
-      store.dispatch(addBuilds(data));
-    } else {
-      const data = await POST({
-        body,
-        url: this.url,
-      });
-
-      store.dispatch(cacheBuilds({ [body]: { data } }));
-      store.dispatch(addBuilds(data));
-    }
-
-    store.dispatch(showLoading(false));
+    fetchBuilds(this.model)(store.dispatch);
   }
 
-  async selectBuild(e) {
+  selectBuild(e) {
     const build = getSelectedOption(e.target);
     const row = e.target.dataset.row;
 
-    const selectedInnerLength = this.shadowRoot.getElementById(
-      `cylinder-length-inner-${row}`,
+    deselectOption(
+      this.shadowRoot.getElementById(`cylinder-length-inner-${row}`),
     );
 
-    deselectOption(selectedInnerLength);
+    deselectOption(
+      this.shadowRoot.getElementById(`cylinder-length-outer-${row}`),
+    );
 
-    const body = JSON.stringify({
-      filter: [
-        { name: 'Hersteller', value: 'Iseo' },
-        { name: 'Serie', value: this.model },
-        { name: 'Bauart', value: build },
-      ],
-      selector: 'reference',
-    });
-
-    const cachedLength = getCachedLength(store.getState());
-
-    if (cachedLength[body]) {
-      const data = cachedLength[body]['data'];
-
-      store.dispatch(
-        updateLength({
-          [row]: {
-            data,
-            inner: Object.keys(data).map(Number),
-            outer: [],
-          },
-        }),
-      );
-    } else {
-      store.dispatch(showLoading(true));
-
-      const references = await POST({
-        body,
-        url: this.url,
-      });
-
-      Promise.all(
-        references.map(reference => GET({ reference, url: this.url })),
-      ).then(products => {
-        const data = {};
-
-        products.forEach(product => {
-          const [{ value: length }] = product.specifications.filter(
-            specification => specification.name === 'Teillänge (C+D)',
-          );
-
-          const [inner, outer] = length
-            .split('+')
-            .map(str => Number(str.trim().replace('mm', '')));
-
-          if (data[inner]) {
-            data[inner].push(outer);
-          } else {
-            data[inner] = [outer];
-          }
-        });
-
-        store.dispatch(cacheLength({ [body]: { data } }));
-
-        store.dispatch(
-          updateLength({
-            [row]: {
-              data,
-              inner: Object.keys(data).map(Number),
-              outer: [],
-            },
-          }),
-        );
-      });
-
-      store.dispatch(showLoading(false));
-    }
+    fetchLengths(build, this.model, row)(store);
   }
 
   selectInnerLength(e) {
-    const length = getSelectedOption(e.target);
     const row = e.target.dataset.row;
+    const selected = getSelectedOption(e.target);
 
-    store.dispatch(
-      updateLength({
-        [row]: {
-          inner: this.length[row].inner,
-          outer: this.length[row].data[length].sort((a, b) => a - b),
-        },
-      }),
+    deselectOption(
+      this.shadowRoot.getElementById(`cylinder-length-outer-${row}`),
     );
+
+    fetchOuterLengths(row, selected)(store);
+  }
+
+  selectOuterLength(e) {
+    const selected = getSelectedOption(e.target);
+    console.log('outer length: ', selected);
   }
 
   render() {
     return html`
       ${table({
+        body: {
+          builds: {
+            items: this.builds,
+            select: this.selectBuild,
+          },
+          lengths: {
+            inner: this.innerLengths,
+            outer: this.outerLengths,
+            selectInner: this.selectInnerLength,
+            selectOuter: this.selectOuterLength,
+          },
+        },
         columns: this.columns,
-        rows: this.rows,
-        loading: this.loading,
+        isLoading: this.isLoading,
         head: {
           id: 'Bezeichnung',
           key: 'Schlüssel',
@@ -203,16 +107,7 @@ class HwsDataTable extends connect(store)(LitElement) {
           type: 'Zylindertyp',
           unit: 'Stück',
         },
-        body: {
-          builds: {
-            items: this.builds,
-            select: this.selectBuild,
-          },
-          length: {
-            items: this.length,
-            selectInner: this.selectInnerLength,
-          },
-        },
+        rows: this.rows,
       })}
     `;
   }

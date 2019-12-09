@@ -6,6 +6,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const path = require('path');
 
+const dotenv = require('dotenv').config();
+
+if (dotenv.error) {
+  throw dotenv.error;
+}
+
 const parts = require('./webpack.parts');
 
 const PATHS = {
@@ -41,6 +47,7 @@ const commonConfig = merge([
       noEmitOnErrors: true,
     },
   },
+  parts.setFreeVariable('PRODUCTS_API_URL', process.env.PRODUCTS_API_URL),
 ]);
 
 const productionConfig = merge([
