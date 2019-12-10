@@ -4,9 +4,9 @@ import {
   HIDE_LOADER,
   SHOW_LOADER,
   INCREMENT_COLUMNS,
-  DECRENENT_COLUMNS,
+  DECREMENT_COLUMNS,
   INCREMENT_ROWS,
-  DECRENENT_ROWS,
+  DECREMENT_ROWS,
   UPDATE_MODEL,
   LOAD_BUILDS,
   LOAD_LENGTHS,
@@ -31,10 +31,10 @@ export default handleActions(
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
       return { ...state, isLoading: action.payload };
     },
-    [combineActions(INCREMENT_COLUMNS, DECRENENT_COLUMNS)]: (state, action) => {
+    [combineActions(INCREMENT_COLUMNS, DECREMENT_COLUMNS)]: (state, action) => {
       return { ...state, columns: state.columns + action.payload.amount };
     },
-    [combineActions(INCREMENT_ROWS, DECRENENT_ROWS)]: (state, action) => {
+    [combineActions(INCREMENT_ROWS, DECREMENT_ROWS)]: (state, action) => {
       return { ...state, rows: state.rows + action.payload.amount };
     },
     [LOAD_BUILDS]: (state, action) => {

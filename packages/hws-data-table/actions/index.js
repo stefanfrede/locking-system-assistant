@@ -5,9 +5,9 @@ import { getBuilds, getData, getReferences } from '../lib/products';
 export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
 export const INCREMENT_COLUMNS = 'INCREMENT_COLUMNS';
-export const DECRENENT_COLUMNS = 'DECRENENT_COLUMNS';
+export const DECREMENT_COLUMNS = 'DECREMENT_COLUMNS';
 export const INCREMENT_ROWS = 'INCREMENT_ROWS';
-export const DECRENENT_ROWS = 'DECRENENT_ROWS';
+export const DECREMENT_ROWS = 'DECREMENT_ROWS';
 export const UPDATE_MODEL = 'UPDATE_MODEL';
 export const LOAD_BUILDS = 'LOAD_BUILDS';
 export const LOAD_LENGTHS = 'LOAD_LENGTHS';
@@ -32,9 +32,9 @@ export const {
     HIDE_LOADER: () => false,
     SHOW_LOADER: () => true,
     INCREMENT_COLUMNS: (amount = 1) => ({ amount }),
-    DECRENENT_COLUMNS: (amount = 1) => ({ amount: -amount }),
+    DECREMENT_COLUMNS: (amount = 1) => ({ amount: -amount }),
     INCREMENT_ROWS: (amount = 1) => ({ amount }),
-    DECRENENT_ROWS: (amount = 1) => ({ amount: -amount }),
+    DECREMENT_ROWS: (amount = 1) => ({ amount: -amount }),
   },
   LOAD_BUILDS,
   LOAD_LENGTHS,
