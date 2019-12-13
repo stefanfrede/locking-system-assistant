@@ -49,37 +49,5 @@ export const stylesheet = [
       height: 1.5rem;
       width: 1.5rem;
     }
-
-    .is-loading {
-      align-items: center;
-      background-color: rgba(234, 237, 240, 0.35);
-      display: none;
-      justify-content: center;
-    }
-
-    @keyframes spinner {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .spinner {
-      animation: spinner 1s linear infinite;
-      height: 4rem;
-      width: 4rem;
-    }
-
-    [data-loading='true'] {
-      position: relative;
-    }
-
-    [data-loading='true'] .is-loading {
-      bottom: 3.5rem;
-      display: flex;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: 2rem;
-    }
   `,
 ];

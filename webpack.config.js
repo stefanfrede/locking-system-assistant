@@ -15,7 +15,7 @@ if (dotenv.error) {
 const parts = require('./webpack.parts');
 
 const PATHS = {
-  app: path.join(__dirname, 'packages/hws-data-table'),
+  app: path.join(__dirname, 'packages/hws-lsa'),
 };
 
 const commonConfig = merge([

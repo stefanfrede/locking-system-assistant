@@ -1,6 +1,6 @@
 import { createActions } from 'redux-actions';
 
-import { getBuilds, getData, getReferences } from '../lib/products';
+import { getBuilds, getData, getReferences } from './lib/products';
 
 export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
@@ -43,9 +43,13 @@ export const {
   UPDATE_OUTER_LENGTHS,
 );
 
-export const fetchBuilds = model => {
-  return async dispatch => {
+export const fetchBuilds = () => {
+  return async ({ dispatch, getState }) => {
     dispatch(showLoader());
+
+    const {
+      app: { model },
+    } = getState();
 
     const builds = await getBuilds(model);
 
