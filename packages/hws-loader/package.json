@@ -1,10 +1,9 @@
 {
-  "name": "hws-data-table",
-  "description": "hws-data-table is a table to configure a locking system.",
+  "name": "hws-loader",
+  "description": "hws-loader is a loading indicator.",
   "keywords": [
-    "table",
-    "data-table",
-    "locking-system"
+    "loading",
+    "indicator"
   ],
   "version": "0.0.0",
   "homepage": "https://lsa.frede.io/",

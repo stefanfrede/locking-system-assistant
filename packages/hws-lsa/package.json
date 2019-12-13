@@ -1,9 +1,8 @@
 {
-  "name": "hws-data-table",
-  "description": "hws-data-table is a table to configure a locking system.",
+  "name": "hws-lsa",
+  "description": "hws-lsa provides a table to configure a locking system.",
   "keywords": [
-    "table",
-    "data-table",
+    "assistant",
     "locking-system"
   ],
   "version": "0.0.0",
@@ -26,6 +25,13 @@
     "npm": "6.x.x"
   },
   "dependencies": {
-    "lit-element": "^2.1.0"
+    "lit-element": "^2.1.0",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.4",
+    "redux-actions": "^2.6.5",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "redux-logger": "^3.0.6"
   }
 }
