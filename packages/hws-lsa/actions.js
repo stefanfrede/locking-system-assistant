@@ -14,6 +14,8 @@ export const LOAD_LENGTHS = 'LOAD_LENGTHS';
 export const UPDATE_LENGTHS = 'UPDATE_LENGTHS';
 export const UPDATE_INNER_LENGTHS = 'UPDATE_INNER_LENGTHS';
 export const UPDATE_OUTER_LENGTHS = 'UPDATE_OUTER_LENGTHS';
+export const CACHE_BUILDS = 'CACHE_BUILDS';
+export const CACHE_LENGTHS = 'CACHE_LENGTHS';
 
 export const {
   hideLoader,
@@ -27,6 +29,8 @@ export const {
   updateModel,
   updateInnerLengths,
   updateOuterLengths,
+  cacheBuilds,
+  cacheLengths,
 } = createActions(
   {
     HIDE_LOADER: () => false,
@@ -41,6 +45,8 @@ export const {
   UPDATE_MODEL,
   UPDATE_INNER_LENGTHS,
   UPDATE_OUTER_LENGTHS,
+  CACHE_BUILDS,
+  CACHE_LENGTHS,
 );
 
 export const fetchBuilds = () => {
@@ -51,7 +57,16 @@ export const fetchBuilds = () => {
       app: { model },
     } = getState();
 
-    const builds = await getBuilds(model);
+    let {
+      cache: { builds },
+    } = getState();
+
+    if (builds.model && Array.isArray(builds.model)) {
+      builds = builds.model;
+    } else {
+      builds = await getBuilds(model);
+      dispatch(cacheBuilds({ [model]: builds }));
+    }
 
     dispatch(loadBuilds(builds));
     dispatch(hideLoader());
@@ -62,40 +77,67 @@ export const fetchLengths = (build, model, row) => {
   return async ({ dispatch, getState }) => {
     dispatch(showLoader());
 
-    const references = await getReferences(build, model);
+    let {
+      cache: { lengths },
+    } = getState();
 
-    Promise.all(references.map(reference => getData(reference))).then(
-      products => {
-        const lengths = {};
+    if (lengths[`${model}-${build}`]) {
+      lengths = lengths[`${model}-${build}`];
 
-        products.forEach(product => {
-          const [{ value: length }] = product.specifications.filter(
-            specification => specification.name === 'Teillänge (C+D)',
+      dispatch(
+        loadLengths({
+          [row]: {
+            ...lengths,
+          },
+        }),
+      );
+
+      fetchInnerLengths(row)({ dispatch, getState });
+      dispatch(hideLoader());
+    } else {
+      const references = await getReferences(build, model);
+
+      Promise.all(references.map(reference => getData(reference))).then(
+        products => {
+          const lengths = {};
+
+          products.forEach(product => {
+            const [{ value: length }] = product.specifications.filter(
+              specification => specification.name === 'Teillänge (C+D)',
+            );
+
+            const [inner, outer] = length
+              .split('+')
+              .map(str => Number(str.trim().replace('mm', '')));
+
+            if (lengths[inner]) {
+              lengths[inner].push(outer);
+            } else {
+              lengths[inner] = [outer];
+            }
+          });
+
+          dispatch(
+            cacheLengths({
+              [`${model}-${build}`]: {
+                ...lengths,
+              },
+            }),
           );
 
-          const [inner, outer] = length
-            .split('+')
-            .map(str => Number(str.trim().replace('mm', '')));
+          dispatch(
+            loadLengths({
+              [row]: {
+                ...lengths,
+              },
+            }),
+          );
 
-          if (lengths[inner]) {
-            lengths[inner].push(outer);
-          } else {
-            lengths[inner] = [outer];
-          }
-        });
-
-        dispatch(
-          loadLengths({
-            [row]: {
-              ...lengths,
-            },
-          }),
-        );
-
-        fetchInnerLengths(row)({ dispatch, getState });
-        dispatch(hideLoader());
-      },
-    );
+          fetchInnerLengths(row)({ dispatch, getState });
+          dispatch(hideLoader());
+        },
+      );
+    }
   };
 };
 
