@@ -16,7 +16,6 @@ import {
 
 const INITIAL_STATE = {
   builds: [],
-  data: [],
   columns: 5,
   isLoading: true,
   lengths: {},
