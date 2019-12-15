@@ -8,9 +8,10 @@ export const INCREMENT_COLUMNS = 'INCREMENT_COLUMNS';
 export const DECREMENT_COLUMNS = 'DECREMENT_COLUMNS';
 export const INCREMENT_ROWS = 'INCREMENT_ROWS';
 export const DECREMENT_ROWS = 'DECREMENT_ROWS';
-export const UPDATE_MODEL = 'UPDATE_MODEL';
 export const LOAD_BUILDS = 'LOAD_BUILDS';
 export const LOAD_LENGTHS = 'LOAD_LENGTHS';
+export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
+export const UPDATE_MODEL = 'UPDATE_MODEL';
 export const UPDATE_LENGTHS = 'UPDATE_LENGTHS';
 export const UPDATE_INNER_LENGTHS = 'UPDATE_INNER_LENGTHS';
 export const UPDATE_OUTER_LENGTHS = 'UPDATE_OUTER_LENGTHS';
@@ -26,6 +27,7 @@ export const {
   decrementRows,
   loadBuilds,
   loadLengths,
+  updateMessage,
   updateModel,
   updateInnerLengths,
   updateOuterLengths,
@@ -39,15 +41,22 @@ export const {
     DECREMENT_COLUMNS: (amount = 1) => ({ amount: -amount }),
     INCREMENT_ROWS: (amount = 1) => ({ amount }),
     DECREMENT_ROWS: (amount = 1) => ({ amount: -amount }),
+    LOAD_BUILDS: [x => x, (_, msgType) => ({ msgType })],
+    LOAD_LENGTHS: [x => x, (_, msgType) => ({ msgType })],
+    UPDATE_MESSAGE: [x => x, (_, msgType) => ({ msgType })],
   },
-  LOAD_BUILDS,
-  LOAD_LENGTHS,
   UPDATE_MODEL,
   UPDATE_INNER_LENGTHS,
   UPDATE_OUTER_LENGTHS,
   CACHE_BUILDS,
   CACHE_LENGTHS,
 );
+
+export const dismissMessage = () => {
+  return ({ dispatch }) => {
+    dispatch(updateMessage('', 'info'));
+  };
+};
 
 export const fetchBuilds = () => {
   return async ({ dispatch, getState }) => {
@@ -62,13 +71,18 @@ export const fetchBuilds = () => {
     } = getState();
 
     if (builds.model && Array.isArray(builds.model)) {
-      builds = builds.model;
+      dispatch(loadBuilds(builds.model));
     } else {
-      builds = await getBuilds(model);
-      dispatch(cacheBuilds({ [model]: builds }));
+      try {
+        builds = await getBuilds(model);
+
+        dispatch(cacheBuilds({ [model]: builds }));
+        dispatch(loadBuilds(builds));
+      } catch (err) {
+        dispatch(loadBuilds(err, 'danger'));
+      }
     }
 
-    dispatch(loadBuilds(builds));
     dispatch(hideLoader());
   };
 };
@@ -95,54 +109,59 @@ export const fetchLengths = (build, model, row) => {
       fetchInnerLengths(row)({ dispatch, getState });
       dispatch(hideLoader());
     } else {
-      const references = await getReferences(build, model);
+      try {
+        const references = await getReferences(build, model);
 
-      Promise.all(references.map(reference => getData(reference))).then(
-        products => {
-          const lengths = {};
+        Promise.all(references.map(reference => getData(reference))).then(
+          products => {
+            const lengths = {};
 
-          products.forEach(product => {
-            const [{ value: length }] = product.specifications.filter(
-              specification => specification.name === 'Teillänge (C+D)',
+            products.forEach(product => {
+              const [{ value: length }] = product.specifications.filter(
+                specification => specification.name === 'Teillänge (C+D)',
+              );
+
+              const [inner, outer] = length
+                .split('+')
+                .map(str => Number(str.trim().replace('mm', '')));
+
+              if (lengths[inner]) {
+                lengths[inner].push(outer);
+              } else {
+                lengths[inner] = [outer];
+              }
+            });
+
+            dispatch(
+              cacheLengths({
+                [`${model}-${build}`]: {
+                  ...lengths,
+                },
+              }),
             );
 
-            const [inner, outer] = length
-              .split('+')
-              .map(str => Number(str.trim().replace('mm', '')));
+            dispatch(
+              loadLengths({
+                [row]: {
+                  ...lengths,
+                },
+              }),
+            );
 
-            if (lengths[inner]) {
-              lengths[inner].push(outer);
-            } else {
-              lengths[inner] = [outer];
-            }
-          });
-
-          dispatch(
-            cacheLengths({
-              [`${model}-${build}`]: {
-                ...lengths,
-              },
-            }),
-          );
-
-          dispatch(
-            loadLengths({
-              [row]: {
-                ...lengths,
-              },
-            }),
-          );
-
-          fetchInnerLengths(row)({ dispatch, getState });
-          dispatch(hideLoader());
-        },
-      );
+            fetchInnerLengths(row)({ dispatch, getState });
+            dispatch(hideLoader());
+          },
+        );
+      } catch (err) {
+        dispatch(loadLengths(err, 'danger'));
+        dispatch(hideLoader());
+      }
     }
   };
 };
 
 export const fetchInnerLengths = row => {
-  return async ({ dispatch, getState }) => {
+  return ({ dispatch, getState }) => {
     dispatch(showLoader());
 
     const {
@@ -159,7 +178,7 @@ export const fetchInnerLengths = row => {
 };
 
 export const fetchOuterLengths = (row, selected) => {
-  return async ({ dispatch, getState }) => {
+  return ({ dispatch, getState }) => {
     dispatch(showLoader());
 
     const {

@@ -7,9 +7,10 @@ import {
   DECREMENT_COLUMNS,
   INCREMENT_ROWS,
   DECREMENT_ROWS,
-  UPDATE_MODEL,
   LOAD_BUILDS,
   LOAD_LENGTHS,
+  UPDATE_MESSAGE,
+  UPDATE_MODEL,
   UPDATE_INNER_LENGTHS,
   UPDATE_OUTER_LENGTHS,
 } from '../actions';
@@ -21,6 +22,8 @@ const INITIAL_STATE = {
   lengths: {},
   innerLengths: {},
   outerLengths: {},
+  message: '',
+  msgType: 'info',
   model: 'R9Plus',
   rows: 5,
 };
@@ -36,11 +39,36 @@ export default handleActions(
     [combineActions(INCREMENT_ROWS, DECREMENT_ROWS)]: (state, action) => {
       return { ...state, rows: state.rows + action.payload.amount };
     },
-    [LOAD_BUILDS]: (state, action) => {
-      return { ...state, builds: action.payload };
+    [LOAD_BUILDS]: {
+      next: (state, action) => {
+        return { ...state, builds: action.payload };
+      },
+      throw: (state, action) => {
+        return {
+          ...state,
+          message: action.payload.message,
+          msgType: action.meta.msgType,
+        };
+      },
     },
-    [LOAD_LENGTHS]: (state, action) => {
-      return { ...state, lengths: { ...state.lengths, ...action.payload } };
+    [LOAD_LENGTHS]: {
+      next: (state, action) => {
+        return { ...state, lengths: { ...state.lengths, ...action.payload } };
+      },
+      throw: (state, action) => {
+        return {
+          ...state,
+          message: action.payload.message,
+          msgType: action.meta.msgType,
+        };
+      },
+    },
+    [UPDATE_MESSAGE]: (state, action) => {
+      return {
+        ...state,
+        message: action.payload,
+        msgType: action.meta.msgType,
+      };
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };
