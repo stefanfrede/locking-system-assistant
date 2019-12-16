@@ -10,7 +10,7 @@ class HwsLoader extends LitElement {
       span {
         align-items: center;
         background-color: rgba(234, 237, 240, 0.35);
-        bottom: 3.5rem;
+        bottom: 6.5rem;
         display: flex;
         justify-content: center;
         left: 0;

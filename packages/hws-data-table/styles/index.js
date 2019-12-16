@@ -1,5 +1,6 @@
 import { css } from 'lit-element';
 
+import { buttons } from './buttons.js';
 import { forms } from './forms.js';
 import { reboot } from './reboot.js';
 import { tables } from './tables.js';
@@ -8,9 +9,14 @@ import { variables } from './variables.js';
 export const stylesheet = [
   variables,
   reboot,
+  buttons,
   forms,
   tables,
   css`
+    form {
+      text-align: right;
+    }
+
     .lsa__pos {
       width: 3rem;
     }
