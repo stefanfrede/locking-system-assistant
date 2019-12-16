@@ -40,6 +40,11 @@ export const tables = css`
     vertical-align: middle;
   }
 
+  tbody tr td,
+  tbody tr th {
+    padding-bottom: 0.1875rem;
+  }
+
   tfoot tr td {
     border-bottom: none;
   }

@@ -21,7 +21,7 @@
         "byName": {},
         "bySource": {},
         "usedIds": [
-          0
+          1
         ]
       }
     }
@@ -228,7 +228,8 @@
       "node_modules/just-curry-it/index.js": 31,
       "node_modules/redux-actions/es/createCurriedAction.js": 32,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 58bbdde2b1c2fdc05d074db912fe83a8": 27,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 0d5079ed4f463cb297e4b24baff17d7a": 26
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 0d5079ed4f463cb297e4b24baff17d7a": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js e7afd79f52809af36358d208a7707f39": 26
     },
     "usedIds": {
       "0": 0,

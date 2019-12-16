@@ -21,7 +21,7 @@ import {
   getRows,
 } from './reducers/selectors';
 
-import { deselectOption, getSelectedOption } from './lib/helpers';
+import { deselectOption, getSelectedOption, serialize } from './lib/helpers';
 
 const store = configureStore();
 
@@ -78,6 +78,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.addEventListener('selectBuild', this._onSelectBuild);
     this.addEventListener('selectInnerLength', this._onSelectInnerLength);
     this.addEventListener('selectOuterLength', this._onSelectOuterLength);
+    this.addEventListener('submitForm', this._onSubmitForm);
 
     fetchBuilds()(store);
   }
@@ -117,10 +118,10 @@ class HwsLsa extends connect(store)(LitElement) {
     fetchOuterLengths(row, innerLength)(store);
   }
 
-  _onSelectOuterLength(e) {
-    const outerLength = getSelectedOption(e.detail);
+  _onSubmitForm(e) {
+    e.stopPropagation();
 
-    console.log(outerLength);
+    console.log(serialize(e.detail));
   }
 
   render() {

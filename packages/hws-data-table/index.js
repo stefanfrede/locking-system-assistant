@@ -47,9 +47,11 @@ class HwsDataTable extends LitElement {
     );
   }
 
-  selectOuterLength(e) {
+  submitForm(e) {
+    e.preventDefault();
+
     this.dispatchEvent(
-      new CustomEvent('selectOuterLength', {
+      new CustomEvent('submitForm', {
         bubbles: true,
         composed: true,
         detail: e.target,
@@ -91,9 +93,10 @@ class HwsDataTable extends LitElement {
           <div class="checkbox">
             <input
               aria-label="${label}"
-              class="checkbox__input"
+              class="checkbox__input js-form-field"
               data-row="${row}"
               id="${id}"
+              name="${id}"
               type="checkbox"
               value="${value}"
             />
@@ -143,6 +146,7 @@ class HwsDataTable extends LitElement {
           </th>
           <td>
             <input
+              class="js-form-field"
               data-row="${row}"
               id="door-${row}"
               type="text"
@@ -155,6 +159,7 @@ class HwsDataTable extends LitElement {
             <select
               @change="${this.selectBuild}"
               ?disabled=${!this.builds.length}
+              class="js-form-field"
               data-row="${row}"
               id="cylinder-build-${row}"
               name="cylinder-build-${row}"
@@ -177,6 +182,7 @@ class HwsDataTable extends LitElement {
               <select
                 @change="${this.selectInnerLength}"
                 ?disabled=${!inners.length}
+                class="js-form-field"
                 data-row="${row}"
                 id="cylinder-length-inner-${row}"
                 name="cylinder-length-inner-${row}"
@@ -193,8 +199,8 @@ class HwsDataTable extends LitElement {
                 )}
               </select>
               <select
-                @change="${this.selectOuterLength}"
                 ?disabled=${!outers.length}
+                class="js-form-field"
                 id="cylinder-length-outer-${row}"
                 name="cylinder-length-outer-${row}"
                 data-row="${row}"
@@ -214,6 +220,7 @@ class HwsDataTable extends LitElement {
           </td>
           <td>
             <input
+              class="js-form-field"
               id="quantity-model-${row}"
               max=""
               min="0"
@@ -243,6 +250,7 @@ class HwsDataTable extends LitElement {
       tds.push(html`
         <td class="lsa__unit">
           <input
+            class="js-form-field"
             data-key="${i + 1}"
             id="${id}"
             max=""
@@ -291,7 +299,7 @@ class HwsDataTable extends LitElement {
 
   render() {
     return html`
-      <div class="table-responsive">
+      <form @submit="${this.submitForm}" class="table-responsive">
         <table>
           ${this.colgroup(this.columns)}
           <thead>
@@ -325,7 +333,10 @@ class HwsDataTable extends LitElement {
           )}
           ${this.tfoot(this.columns)}
         </table>
-      </div>
+        <button class="btn btn-success">
+          In den Warenkorb legen
+        </button>
+      </form>
     `;
   }
 }
