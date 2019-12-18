@@ -27,7 +27,17 @@ class HwsDataTable extends LitElement {
     this.rows = 1;
   }
 
+  editIdentifier(e) {
+    if (e.target.value) {
+      e.target.classList.remove('is-invalid');
+    }
+  }
+
   selectBuild(e) {
+    if (e.target.value) {
+      e.target.classList.remove('is-invalid');
+    }
+
     this.dispatchEvent(
       new CustomEvent('selectBuild', {
         bubbles: true,
@@ -38,6 +48,10 @@ class HwsDataTable extends LitElement {
   }
 
   selectInnerLength(e) {
+    if (e.target.value) {
+      e.target.classList.remove('is-invalid');
+    }
+
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
         bubbles: true,
@@ -45,6 +59,34 @@ class HwsDataTable extends LitElement {
         detail: e.target,
       }),
     );
+  }
+
+  selectOuterLength(e) {
+    if (e.target.value) {
+      e.target.classList.remove('is-invalid');
+    }
+  }
+
+  editQuantity(e) {
+    if (
+      e.target.closest('tfoot') &&
+      e.target.classList.contains('is-invalid') &&
+      Number(e.target.value) === 0
+    ) {
+      e.target.classList.remove('is-invalid');
+    } else {
+      if (e.target.value > 0) {
+        e.target.classList.remove('is-invalid');
+      }
+    }
+  }
+
+  selectKey(e) {
+    if (e.target.checked) {
+      const tr = e.target.closest('tr');
+      const chks = tr.querySelectorAll('[type=checkbox]');
+      chks.forEach(chk => chk.classList.remove('is-invalid'));
+    }
   }
 
   submitForm(e) {
@@ -92,6 +134,7 @@ class HwsDataTable extends LitElement {
         <td>
           <div class="checkbox">
             <input
+              @change="${this.selectKey}"
               aria-label="${label}"
               class="checkbox__input js-form-field"
               data-row="${row}"
@@ -146,6 +189,7 @@ class HwsDataTable extends LitElement {
           </th>
           <td>
             <input
+              @blur="${this.editIdentifier}"
               class="js-form-field"
               data-row="${row}"
               id="door-${row}"
@@ -199,6 +243,7 @@ class HwsDataTable extends LitElement {
                 )}
               </select>
               <select
+                @change="${this.selectOuterLength}"
                 ?disabled=${!outers.length}
                 class="js-form-field"
                 id="cylinder-length-outer-${row}"
@@ -220,6 +265,7 @@ class HwsDataTable extends LitElement {
           </td>
           <td>
             <input
+              @change="${this.editQuantity}"
               class="js-form-field"
               id="quantity-model-${row}"
               max=""
@@ -250,6 +296,7 @@ class HwsDataTable extends LitElement {
       tds.push(html`
         <td class="lsa__unit">
           <input
+            @change="${this.editQuantity}"
             class="js-form-field"
             data-key="${i + 1}"
             id="${id}"

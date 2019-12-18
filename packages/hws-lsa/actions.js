@@ -193,3 +193,19 @@ export const fetchOuterLengths = (row, selected) => {
     dispatch(hideLoader());
   };
 };
+
+export const resetOuterLength = row => {
+  return ({ dispatch }) => {
+    const outerLengths = {
+      [row]: [],
+    };
+
+    dispatch(updateOuterLengths(outerLengths));
+  };
+};
+
+export const setMessage = (msg, status) => {
+  return ({ dispatch }) => {
+    dispatch(updateMessage(msg, status));
+  };
+};

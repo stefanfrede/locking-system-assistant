@@ -92,6 +92,17 @@ export const forms = css`
     opacity: 1;
   }
 
+  input.is-invalid,
+  select.is-invalid {
+    border-color: hsl(354, 70%, 54%);
+  }
+
+  input.is-invalid:focus,
+  select.is-invalid:focus {
+    border-color: hsl(354, 70%, 54%);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+
   .checkbox {
     align-items: center;
     display: inline-flex;
@@ -149,5 +160,14 @@ export const forms = css`
 
   .checkbox__input:checked + .checkbox__label > svg > path {
     fill: var(--input-color, hsl(210, 9%, 31%));
+  }
+
+  .checkbox__input.is-invalid + .checkbox__label {
+    border-color: hsl(354, 70%, 54%);
+  }
+
+  .checkbox__input.is-invalid:focus + .checkbox__label {
+    border-color: hsl(354, 70%, 54%);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
   }
 `;
