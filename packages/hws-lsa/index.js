@@ -144,12 +144,12 @@ class HwsLsa extends connect(store)(LitElement) {
 
   render() {
     return html`
+      <hws-message
+        .message="${this.message}"
+        .msgType="${this.msgType}"
+        ?hidden="${!this.message}"
+      ></hws-message>
       <div class="data-table-wrapper">
-        <hws-message
-          .message="${this.message}"
-          .msgType="${this.msgType}"
-          ?hidden="${!this.message}"
-        ></hws-message>
         <hws-data-table
           .builds="${this.builds}"
           .columns="${this.columns}"
