@@ -12,6 +12,8 @@ import {
   fetchBuilds,
   fetchLengths,
   fetchOuterLengths,
+  resetOuterLength,
+  setMessage,
 } from './actions';
 
 import {
@@ -97,9 +99,13 @@ class HwsLsa extends connect(store)(LitElement) {
 
     const [hwsDataTable] = e.composedPath();
     const root = hwsDataTable.shadowRoot;
+    const inner = root.getElementById(`cylinder-length-inner-${row}`);
+    const outer = root.getElementById(`cylinder-length-outer-${row}`);
 
-    deselectOption(root.getElementById(`cylinder-length-inner-${row}`));
-    deselectOption(root.getElementById(`cylinder-length-outer-${row}`));
+    deselectOption(inner);
+    deselectOption(outer);
+
+    resetOuterLength(row)(store);
 
     fetchLengths(build, this.model, row)(store);
   }
@@ -112,8 +118,9 @@ class HwsLsa extends connect(store)(LitElement) {
 
     const [hwsDataTable] = e.composedPath();
     const root = hwsDataTable.shadowRoot;
+    const outer = root.getElementById(`cylinder-length-outer-${row}`);
 
-    deselectOption(root.getElementById(`cylinder-length-outer-${row}`));
+    deselectOption(outer);
 
     fetchOuterLengths(row, innerLength)(store);
   }
@@ -121,7 +128,18 @@ class HwsLsa extends connect(store)(LitElement) {
   _onSubmitForm(e) {
     e.stopPropagation();
 
-    console.log(serialize(e.detail));
+    const { cylinders, keys } = serialize(e.detail);
+    let errors = cylinders.reduce((acc, cur) => [...acc, ...cur.errors], []);
+    errors = [...errors, ...keys.errors];
+
+    if (errors.length) {
+      errors.forEach(item => item.classList.add('is-invalid'));
+      setMessage('Bitte füllen Sie alle Felder aus', 'danger')(store);
+    } else {
+      cylinders.forEach(item => delete item.errors);
+      console.log(cylinders);
+      console.log(keys.quantities);
+    }
   }
 
   render() {
