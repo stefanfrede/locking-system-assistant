@@ -86,6 +86,10 @@ class HwsDataTable extends LitElement {
       const tr = e.target.closest('tr');
       const chks = tr.querySelectorAll('[type=checkbox]');
       chks.forEach(chk => chk.classList.remove('is-invalid'));
+
+      const [, column] = e.target.name.split('-');
+      const field = this.shadowRoot.getElementById(`quantity-keys-${column}`);
+      field.classList.remove('is-invalid');
     }
   }
 
