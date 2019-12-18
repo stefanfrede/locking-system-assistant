@@ -157,7 +157,10 @@ class HwsLsa extends connect(store)(LitElement) {
           .outerLengths="${this.outerLengths}"
           .rows="${this.rows}"
         ></hws-data-table>
-        <hws-loader ?hidden="${!this.isLoading}"></hws-loader>
+        <hws-loader
+          ?message="${this.message}"
+          ?hidden="${!this.isLoading}"
+        ></hws-loader>
       </div>
     `;
   }

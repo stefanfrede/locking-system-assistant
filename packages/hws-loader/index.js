@@ -19,6 +19,10 @@ class HwsLoader extends LitElement {
         top: 2rem;
       }
 
+      span.with-message {
+        top: 6rem;
+      }
+
       @keyframes spinner {
         to {
           transform: rotate(360deg);
@@ -33,9 +37,21 @@ class HwsLoader extends LitElement {
     `;
   }
 
+  static get properties() {
+    return {
+      message: { type: Boolean },
+    };
+  }
+
+  constructor() {
+    super();
+
+    this.message = false;
+  }
+
   render() {
     return html`
-      <span>
+      <span class="${this.message ? 'with-message' : ''}">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
           <path
             d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48
