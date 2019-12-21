@@ -5,7 +5,7 @@ export const buttons = css`
     background-color: transparent;
     border: 1px solid transparent;
     border-radius: 0.25rem;
-    color: #212529;
+    color: hsl(210, 11%, 15%);
     cursor: pointer;
     display: inline-block;
     font-size: 1rem;
@@ -20,19 +20,34 @@ export const buttons = css`
   }
 
   .btn:hover {
-    color: #212529;
+    color: hsl(210, 11%, 15%);
     text-decoration: none;
   }
 
+  .btn:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
   .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-    color: #fff;
+    background-color: hsl(134, 61%, 41%);
+    border-color: #hsl(134, 61%, 41%);
+    color: hsl(0, 0%, 100%);
   }
 
   .btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-    color: #fff;
+    background-color: hsl(133, 61%, 33%);
+    border-color: hsl(134, 62%, 31%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-light {
+    background-color: hsl(210, 17%, 98%);
+    border-color: hsl(210, 17%, 98%);
+  }
+
+  .btn-light:hover {
+    background-color: hsl(210, 16%, 90%);
+    border-color: hsl(207, 17%, 88%);
   }
 `;

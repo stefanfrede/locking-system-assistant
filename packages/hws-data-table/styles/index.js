@@ -51,6 +51,29 @@ export const stylesheet = [
       text-align: center;
     }
 
+    .lsa__controls {
+      display: flex;
+      padding-left: 3rem;
+    }
+
+    .lsa__control {
+      align-items: center;
+      display: flex;
+    }
+
+    .lsa__control + .lsa__control {
+      margin-left: 1rem;
+    }
+
+    .lsa__control > button {
+      margin-left: 0.5rem;
+    }
+
+    .lsa__control > button > svg {
+      height: 1rem;
+      width: 1rem;
+    }
+
     [data-icon='key'] {
       height: 1.5rem;
       width: 1.5rem;
