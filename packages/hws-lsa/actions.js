@@ -16,6 +16,7 @@ export const UPDATE_LENGTHS = 'UPDATE_LENGTHS';
 export const UPDATE_INNER_LENGTHS = 'UPDATE_INNER_LENGTHS';
 export const UPDATE_OUTER_LENGTHS = 'UPDATE_OUTER_LENGTHS';
 export const CACHE_BUILDS = 'CACHE_BUILDS';
+export const CACHE_DATA = 'CACHE_DATA';
 export const CACHE_LENGTHS = 'CACHE_LENGTHS';
 
 export const {
@@ -32,6 +33,7 @@ export const {
   updateInnerLengths,
   updateOuterLengths,
   cacheBuilds,
+  cacheData,
   cacheLengths,
 } = createActions(
   {
@@ -49,6 +51,7 @@ export const {
   UPDATE_INNER_LENGTHS,
   UPDATE_OUTER_LENGTHS,
   CACHE_BUILDS,
+  CACHE_DATA,
   CACHE_LENGTHS,
 );
 
@@ -114,9 +117,18 @@ export const fetchLengths = (build, model, row) => {
 
         Promise.all(references.map(reference => getData(reference))).then(
           products => {
+            const data = {};
             const lengths = {};
 
             products.forEach(product => {
+              const [{ value: model }] = product.specifications.filter(
+                specification => specification.name === 'Serie',
+              );
+
+              const [{ value: build }] = product.specifications.filter(
+                specification => specification.name === 'Bauart',
+              );
+
               const [{ value: length }] = product.specifications.filter(
                 specification => specification.name === 'Teillänge (C+D)',
               );
@@ -130,6 +142,13 @@ export const fetchLengths = (build, model, row) => {
               } else {
                 lengths[inner] = [outer];
               }
+
+              data[`${model}-${build}-${inner}-${outer}`] = {
+                name: product.name,
+                price: product.price ?? undefined,
+                reference: product.reference,
+                text: product.text,
+              };
             });
 
             dispatch(
@@ -137,6 +156,12 @@ export const fetchLengths = (build, model, row) => {
                 [`${model}-${build}`]: {
                   ...lengths,
                 },
+              }),
+            );
+
+            dispatch(
+              cacheData({
+                ...data,
               }),
             );
 

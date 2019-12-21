@@ -17,6 +17,7 @@ import {
 } from './actions';
 
 import {
+  getCachedData,
   getColumns,
   getMessage,
   getModel,
@@ -128,15 +129,29 @@ class HwsLsa extends connect(store)(LitElement) {
   _onSubmitForm(e) {
     e.stopPropagation();
 
-    const { cylinders, keys } = serialize(e.detail);
-    let errors = cylinders.reduce((acc, cur) => [...acc, ...cur.errors], []);
+    const { rows, keys } = serialize(e.detail);
+    let errors = rows.reduce((acc, cur) => [...acc, ...cur.errors], []);
     errors = [...errors, ...keys.errors];
 
     if (errors.length) {
       errors.forEach(item => item.classList.add('is-invalid'));
       setMessage('Bitte füllen Sie alle Felder aus', 'danger')(store);
     } else {
-      cylinders.forEach(item => delete item.errors);
+      const cylinders = rows.map(row => {
+        const data = getCachedData(store.getState());
+        const product =
+          data[
+            `${this.model}-${row.type}-${row.length.inner}-${row.length.outer}`
+          ];
+
+        return {
+          keys: row.keys,
+          name: row.name,
+          quantity: row.quantity,
+          reference: product.reference,
+        };
+      });
+
       console.log(cylinders);
       console.log(keys.quantities);
     }
