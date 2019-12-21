@@ -55,6 +55,34 @@ export const {
   CACHE_LENGTHS,
 );
 
+export const adjustTable = ({ action, type }) => {
+  return ({ dispatch, getState }) => {
+    const {
+      app: { columns, rows },
+    } = getState();
+
+    const guard = 4;
+
+    if (type === 'column') {
+      if (action === 'increment') {
+        dispatch(incrementColumns());
+      } else {
+        if (columns >= guard) {
+          dispatch(decrementColumns());
+        }
+      }
+    } else {
+      if (action === 'increment') {
+        dispatch(incrementRows());
+      } else {
+        if (rows >= guard) {
+          dispatch(decrementRows());
+        }
+      }
+    }
+  };
+};
+
 export const dismissMessage = () => {
   return ({ dispatch }) => {
     dispatch(updateMessage('', 'info'));

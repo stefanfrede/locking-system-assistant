@@ -27,9 +27,37 @@ class HwsDataTable extends LitElement {
     this.rows = 1;
   }
 
+  adjustTable(e) {
+    e.preventDefault();
+
+    const btn = e.target.closest('button');
+
+    this.dispatchEvent(
+      new CustomEvent('adjustTable', {
+        bubbles: true,
+        composed: true,
+        detail: btn,
+      }),
+    );
+  }
+
   editIdentifier(e) {
     if (e.target.value) {
       e.target.classList.remove('is-invalid');
+    }
+  }
+
+  editQuantity(e) {
+    if (
+      e.target.closest('tfoot') &&
+      e.target.classList.contains('is-invalid') &&
+      Number(e.target.value) === 0
+    ) {
+      e.target.classList.remove('is-invalid');
+    } else {
+      if (e.target.value > 0) {
+        e.target.classList.remove('is-invalid');
+      }
     }
   }
 
@@ -64,20 +92,6 @@ class HwsDataTable extends LitElement {
   selectOuterLength(e) {
     if (e.target.value) {
       e.target.classList.remove('is-invalid');
-    }
-  }
-
-  editQuantity(e) {
-    if (
-      e.target.closest('tfoot') &&
-      e.target.classList.contains('is-invalid') &&
-      Number(e.target.value) === 0
-    ) {
-      e.target.classList.remove('is-invalid');
-    } else {
-      if (e.target.value > 0) {
-        e.target.classList.remove('is-invalid');
-      }
     }
   }
 
@@ -317,7 +331,80 @@ class HwsDataTable extends LitElement {
     return html`
       <tfoot>
         <tr>
-          <td colspan="4"></td>
+          <td colspan="4">
+            <div class="lsa__controls">
+              <div class="lsa__control">
+                Zeile
+                <button
+                  @click="${this.adjustTable}"
+                  class="btn btn-light"
+                  data-type="row"
+                  data-action="increment"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path
+                      d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32
+                      14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67
+                      14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0
+                      32-14.33 32-32V304h144c17.67 0 32-14.33
+                      32-32v-32c0-17.67-14.33-32-32-32z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  @click="${this.adjustTable}"
+                  class="btn btn-light"
+                  data-type="row"
+                  data-action="decrement"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path
+                      d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32
+                      32 32h384c17.67 0 32-14.33
+                      32-32v-32c0-17.67-14.33-32-32-32z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div class="lsa__control">
+                Spalte
+                <button
+                  @click="${this.adjustTable}"
+                  class="btn btn-light"
+                  data-type="column"
+                  data-action="increment"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path
+                      d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32
+                      14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67
+                      14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0
+                      32-14.33 32-32V304h144c17.67 0 32-14.33
+                      32-32v-32c0-17.67-14.33-32-32-32z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  @click="${this.adjustTable}"
+                  class="btn btn-light"
+                  data-type="column"
+                  data-action="decrement"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path
+                      d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32
+                      32 32h384c17.67 0 32-14.33
+                      32-32v-32c0-17.67-14.33-32-32-32z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </td>
           <td class="lsa__key-icon">
             <svg
               aria-hidden="true"
@@ -389,6 +476,42 @@ class HwsDataTable extends LitElement {
         </button>
       </form>
     `;
+  }
+
+  updated(changedProperties) {
+    changedProperties.forEach((oldValue, propName) => {
+      if (propName === 'columns') {
+        const btn = this.shadowRoot.querySelector(
+          '[data-action=decrement][data-type=column]',
+        );
+
+        if (this.columns <= 3) {
+          btn.setAttribute('disabled', '');
+          btn.setAttribute('aria-disabled', 'true');
+        }
+
+        if (this.columns >= 4) {
+          btn.removeAttribute('disabled');
+          btn.removeAttribute('aria-disabled');
+        }
+      }
+
+      if (propName === 'rows') {
+        const btn = this.shadowRoot.querySelector(
+          '[data-action=decrement][data-type=row]',
+        );
+
+        if (this.rows <= 3) {
+          btn.setAttribute('disabled', '');
+          btn.setAttribute('aria-disabled', 'true');
+        }
+
+        if (this.rows >= 4) {
+          btn.removeAttribute('disabled');
+          btn.removeAttribute('aria-disabled');
+        }
+      }
+    });
   }
 }
 

@@ -8,6 +8,7 @@ import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
 import {
+  adjustTable,
   dismissMessage,
   fetchBuilds,
   fetchLengths,
@@ -77,6 +78,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.model = getModel(store.getState());
     this.rows = getRows(store.getState());
 
+    this.addEventListener('adjustTable', this._onAdjustTable);
     this.addEventListener('dismissMessage', this._onDismissMessage);
     this.addEventListener('selectBuild', this._onSelectBuild);
     this.addEventListener('selectInnerLength', this._onSelectInnerLength);
@@ -84,6 +86,17 @@ class HwsLsa extends connect(store)(LitElement) {
     this.addEventListener('submitForm', this._onSubmitForm);
 
     fetchBuilds()(store);
+  }
+
+  _onAdjustTable(e) {
+    e.stopPropagation();
+
+    const item = {
+      action: e.detail.dataset.action,
+      type: e.detail.dataset.type,
+    };
+
+    adjustTable(item)(store);
   }
 
   _onDismissMessage(e) {
