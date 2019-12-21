@@ -17,7 +17,7 @@ export const getSelectedOption = target => {
 
 export const serialize = form => {
   const serialized = {
-    cylinders: [],
+    rows: [],
     keys: {
       errors: [],
       quantities: [],
@@ -104,10 +104,10 @@ export const serialize = form => {
       data.errors = [...data.errors, ...keys];
     }
 
-    serialized.cylinders.push(data);
+    serialized.rows.push(data);
   }
 
-  const keys = serialized.cylinders.map(row => row.keys);
+  const keys = serialized.rows.map(row => row.keys);
 
   for (let i = 0; i < footerFields.length; i++) {
     const field = footerFields[i];
