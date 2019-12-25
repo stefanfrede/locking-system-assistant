@@ -9,22 +9,50 @@ class HwsDataTable extends LitElement {
 
   static get properties() {
     return {
+      guard: { type: Number },
+      model: { type: String },
       builds: { type: Object },
-      columns: { type: Number },
       innerLengths: { type: Object },
       outerLengths: { type: Object },
-      rows: { type: Number },
+      selection: { type: Object },
     };
   }
 
   constructor() {
     super();
 
-    this.builds = [];
-    this.columns = 1;
+    this.model = '';
+    this.builds = {};
+    this.guard = 3;
     this.innerLengths = {};
     this.outerLengths = {};
-    this.rows = 1;
+    this.selection = [];
+  }
+
+  get keys() {
+    let keys;
+
+    if (this.selection.length) {
+      keys = Array.isArray(this.selection[0].keys)
+        ? this.selection[0].keys.length
+        : 1;
+    } else {
+      keys = 1;
+    }
+
+    return keys;
+  }
+
+  get rows() {
+    let rows;
+
+    if (this.selection.length) {
+      rows = this.selection.length;
+    } else {
+      rows = 1;
+    }
+
+    return rows;
   }
 
   adjustTable(e) {
@@ -45,6 +73,14 @@ class HwsDataTable extends LitElement {
     if (e.target.value) {
       e.target.classList.remove('is-invalid');
     }
+
+    this.dispatchEvent(
+      new CustomEvent('editIdentifier', {
+        bubbles: true,
+        composed: true,
+        detail: e.target,
+      }),
+    );
   }
 
   editQuantity(e) {
@@ -57,6 +93,16 @@ class HwsDataTable extends LitElement {
     } else {
       if (e.target.value > 0) {
         e.target.classList.remove('is-invalid');
+      }
+
+      if (e.target.closest('tbody')) {
+        this.dispatchEvent(
+          new CustomEvent('editQuantity', {
+            bubbles: true,
+            composed: true,
+            detail: e.target,
+          }),
+        );
       }
     }
   }
@@ -93,18 +139,38 @@ class HwsDataTable extends LitElement {
     if (e.target.value) {
       e.target.classList.remove('is-invalid');
     }
+
+    this.dispatchEvent(
+      new CustomEvent('selectOuterLength', {
+        bubbles: true,
+        composed: true,
+        detail: e.target,
+      }),
+    );
   }
 
   selectKey(e) {
-    if (e.target.checked) {
+    const checked = e.target.checked;
+    const [, key] = e.target.name.split('-');
+    const row = e.target.dataset.row;
+
+    if (checked) {
       const tr = e.target.closest('tr');
       const chks = tr.querySelectorAll('[type=checkbox]');
       chks.forEach(chk => chk.classList.remove('is-invalid'));
 
-      const [, column] = e.target.name.split('-');
-      const field = this.shadowRoot.getElementById(`quantity-keys-${column}`);
+      const field = this.shadowRoot.getElementById(`quantity-keys-${key}`);
+
       field.classList.remove('is-invalid');
     }
+
+    this.dispatchEvent(
+      new CustomEvent('selectKey', {
+        bubbles: true,
+        composed: true,
+        detail: { checked, key: key - 1, row: row - 1 },
+      }),
+    );
   }
 
   submitForm(e) {
@@ -119,10 +185,10 @@ class HwsDataTable extends LitElement {
     );
   }
 
-  colgroup(columns) {
+  colgroup(keys) {
     const cols = [];
 
-    for (let i = 0; i < columns; i++) {
+    for (let i = 0; i < keys; i++) {
       cols.push(html`
         <col class="lsa__key" />
       `);
@@ -140,10 +206,37 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  checkboxes(columns, row) {
+  thead(keys) {
+    return html`
+      <thead>
+        <tr>
+          <th scope="col">
+            #
+          </th>
+          <th scope="col">
+            Bezeichnung
+          </th>
+          <th scope="col">
+            Zylindertyp
+          </th>
+          <th scope="col">
+            Zylinderlänge (mm)
+          </th>
+          <th scope="col">
+            Stück
+          </th>
+          <th colspan="${keys}" scope="col">
+            Schlüssel
+          </th>
+        </tr>
+      </thead>
+    `;
+  }
+
+  checkboxes(keys, row) {
     const tds = [];
 
-    for (let i = 0; i < columns; i++) {
+    for (let i = 0; i < keys; i++) {
       const id = `key-${i + 1}-${row}`;
       const label = `Schlüssel ${i + 1} für Zeile ${row}`;
       const value = `${i + 1}-${row}`;
@@ -182,8 +275,10 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tbody(builds, columns, innerLengths, outerLengths, rows) {
+  tbody(model, builds, innerLengths, outerLengths, keys, rows) {
     const trs = [];
+
+    const types = Array.isArray(builds[model]) ? builds[model] : [];
 
     for (let i = 0; i < rows; i++) {
       const row = i + 1;
@@ -220,7 +315,7 @@ class HwsDataTable extends LitElement {
           <td>
             <select
               @change="${this.selectBuild}"
-              ?disabled=${!this.builds.length}
+              ?disabled=${!types.length}
               class="js-form-field"
               data-row="${row}"
               id="cylinder-build-${row}"
@@ -229,7 +324,7 @@ class HwsDataTable extends LitElement {
               <option selected hidden value>
                 Bitte auswählen
               </option>
-              ${builds.map(
+              ${types.map(
                 build =>
                   html`
                     <option value="${build}">
@@ -291,9 +386,10 @@ class HwsDataTable extends LitElement {
               name="quantity-model-${row}"
               type="number"
               value="0"
+              data-row="${row}"
             />
           </td>
-          ${this.checkboxes(columns, row)}
+          ${this.checkboxes(keys, row)}
         </tr>
       `);
     }
@@ -305,10 +401,10 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tfoot(columns) {
+  tfoot(keys) {
     const tds = [];
 
-    for (let i = 0; i < columns; i++) {
+    for (let i = 0; i < keys; i++) {
       const id = `quantity-keys-${i + 1}`;
 
       tds.push(html`
@@ -369,11 +465,11 @@ class HwsDataTable extends LitElement {
                 </button>
               </div>
               <div class="lsa__control">
-                Spalte
+                Schlüssel
                 <button
                   @click="${this.adjustTable}"
                   class="btn btn-light"
-                  data-type="column"
+                  data-type="key"
                   data-action="increment"
                   type="button"
                 >
@@ -390,7 +486,7 @@ class HwsDataTable extends LitElement {
                 <button
                   @click="${this.adjustTable}"
                   class="btn btn-light"
-                  data-type="column"
+                  data-type="key"
                   data-action="decrement"
                   type="button"
                 >
@@ -439,37 +535,16 @@ class HwsDataTable extends LitElement {
     return html`
       <form @submit="${this.submitForm}" class="table-responsive">
         <table>
-          ${this.colgroup(this.columns)}
-          <thead>
-            <tr>
-              <th scope="col">
-                #
-              </th>
-              <th scope="col">
-                Bezeichnung
-              </th>
-              <th scope="col">
-                Zylindertyp
-              </th>
-              <th scope="col">
-                Zylinderlänge (mm)
-              </th>
-              <th scope="col">
-                Stück
-              </th>
-              <th colspan="${this.columns}" scope="col">
-                Schlüssel
-              </th>
-            </tr>
-          </thead>
+          ${this.colgroup(this.keys)} ${this.thead(this.keys)}
           ${this.tbody(
+            this.model,
             this.builds,
-            this.columns,
             this.innerLengths,
             this.outerLengths,
+            this.keys,
             this.rows,
           )}
-          ${this.tfoot(this.columns)}
+          ${this.tfoot(this.keys)}
         </table>
         <button class="btn btn-success">
           In den Warenkorb legen
@@ -480,35 +555,33 @@ class HwsDataTable extends LitElement {
 
   updated(changedProperties) {
     changedProperties.forEach((oldValue, propName) => {
-      if (propName === 'columns') {
-        const btn = this.shadowRoot.querySelector(
-          '[data-action=decrement][data-type=column]',
+      if (propName === 'selection') {
+        const btnKey = this.shadowRoot.querySelector(
+          '[data-action=decrement][data-type=key]',
         );
 
-        if (this.columns <= 3) {
-          btn.setAttribute('disabled', '');
-          btn.setAttribute('aria-disabled', 'true');
-        }
-
-        if (this.columns >= 4) {
-          btn.removeAttribute('disabled');
-          btn.removeAttribute('aria-disabled');
-        }
-      }
-
-      if (propName === 'rows') {
-        const btn = this.shadowRoot.querySelector(
+        const btnRow = this.shadowRoot.querySelector(
           '[data-action=decrement][data-type=row]',
         );
 
-        if (this.rows <= 3) {
-          btn.setAttribute('disabled', '');
-          btn.setAttribute('aria-disabled', 'true');
+        if (this.keys <= this.guard) {
+          btnKey.setAttribute('disabled', '');
+          btnKey.setAttribute('aria-disabled', 'true');
         }
 
-        if (this.rows >= 4) {
-          btn.removeAttribute('disabled');
-          btn.removeAttribute('aria-disabled');
+        if (this.keys > this.guard) {
+          btnKey.removeAttribute('disabled');
+          btnKey.removeAttribute('aria-disabled');
+        }
+
+        if (this.rows <= this.guard) {
+          btnRow.setAttribute('disabled', '');
+          btnRow.setAttribute('aria-disabled', 'true');
+        }
+
+        if (this.rows > this.guard) {
+          btnRow.removeAttribute('disabled');
+          btnRow.removeAttribute('aria-disabled');
         }
       }
     });

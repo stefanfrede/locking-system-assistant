@@ -3,21 +3,20 @@ import { handleActions, combineActions } from 'redux-actions';
 import {
   HIDE_LOADER,
   SHOW_LOADER,
-  INCREMENT_COLUMNS,
-  DECREMENT_COLUMNS,
-  INCREMENT_ROWS,
-  DECREMENT_ROWS,
   LOAD_BUILDS,
+  LOAD_DATA,
   LOAD_LENGTHS,
   UPDATE_MESSAGE,
   UPDATE_MODEL,
   UPDATE_INNER_LENGTHS,
   UPDATE_OUTER_LENGTHS,
+  UPDATE_SELECTION,
 } from '../actions';
 
 const INITIAL_STATE = {
-  builds: [],
-  columns: 5,
+  builds: {},
+  data: {},
+  guard: 3,
   isLoading: true,
   lengths: {},
   innerLengths: {},
@@ -25,7 +24,7 @@ const INITIAL_STATE = {
   message: '',
   msgType: 'info',
   model: 'R9Plus',
-  rows: 5,
+  selection: [],
 };
 
 export default handleActions(
@@ -33,15 +32,9 @@ export default handleActions(
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
       return { ...state, isLoading: action.payload };
     },
-    [combineActions(INCREMENT_COLUMNS, DECREMENT_COLUMNS)]: (state, action) => {
-      return { ...state, columns: state.columns + action.payload.amount };
-    },
-    [combineActions(INCREMENT_ROWS, DECREMENT_ROWS)]: (state, action) => {
-      return { ...state, rows: state.rows + action.payload.amount };
-    },
     [LOAD_BUILDS]: {
       next: (state, action) => {
-        return { ...state, builds: action.payload };
+        return { ...state, builds: { ...state.builds, ...action.payload } };
       },
       throw: (state, action) => {
         return {
@@ -50,6 +43,9 @@ export default handleActions(
           msgType: action.meta.msgType,
         };
       },
+    },
+    [LOAD_DATA]: (state, action) => {
+      return { ...state, data: { ...state.data, ...action.payload } };
     },
     [LOAD_LENGTHS]: {
       next: (state, action) => {
@@ -84,6 +80,9 @@ export default handleActions(
         ...state,
         outerLengths: { ...state.outerLengths, ...action.payload },
       };
+    },
+    [UPDATE_SELECTION]: (state, action) => {
+      return { ...state, selection: action.payload };
     },
   },
   INITIAL_STATE,

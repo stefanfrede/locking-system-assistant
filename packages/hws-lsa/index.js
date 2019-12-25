@@ -15,14 +15,15 @@ import {
   fetchOuterLengths,
   resetOuterLength,
   setMessage,
+  setSelection,
 } from './actions';
 
 import {
-  getCachedData,
-  getColumns,
+  getBuilds,
+  getData,
+  getGuard,
   getMessage,
   getModel,
-  getRows,
 } from './reducers/selectors';
 
 import { deselectOption, getSelectedOption, serialize } from './lib/helpers';
@@ -46,57 +47,117 @@ class HwsLsa extends connect(store)(LitElement) {
   static get properties() {
     return {
       builds: { type: Object },
-      columns: { type: Number },
+      guard: { type: Number },
       isLoading: { type: Boolean },
       innerLengths: { type: Object },
       outerLengths: { type: Object },
       message: { type: String },
       msgType: { type: String },
       model: { type: String },
-      rows: { type: Number },
       store: { type: Object },
+      selection: { type: Object },
     };
   }
 
   stateChanged(state) {
     this.builds = state.app.builds;
-    this.columns = state.app.columns;
+    this.guard = state.app.guard;
     this.isLoading = state.app.isLoading;
     this.innerLengths = state.app.innerLengths;
     this.outerLengths = state.app.outerLengths;
     this.message = state.app.message;
     this.msgType = state.app.msgType;
     this.model = state.app.model;
-    this.rows = state.app.rows;
+    this.selection = state.app.selection;
   }
 
   constructor() {
     super();
 
-    this.columns = getColumns(store.getState());
+    this.builds = getBuilds(store.getState());
+    this.guard = getGuard(store.getState());
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
-    this.rows = getRows(store.getState());
+    this.selection = getSelection(store.getState());
 
     this.addEventListener('adjustTable', this._onAdjustTable);
+    this.addEventListener('editIdentifier', this._onEditIdentifier);
+    this.addEventListener('editQuantity', this._onEditQuantity);
     this.addEventListener('dismissMessage', this._onDismissMessage);
     this.addEventListener('selectBuild', this._onSelectBuild);
     this.addEventListener('selectInnerLength', this._onSelectInnerLength);
     this.addEventListener('selectOuterLength', this._onSelectOuterLength);
+    this.addEventListener('selectKey', this._onSelectKey);
     this.addEventListener('submitForm', this._onSubmitForm);
 
+    this._initSelection(5, 5);
+
     fetchBuilds()(store);
+  }
+
+  get keys() {
+    let keys;
+
+    if (this.selection.length) {
+      keys = Array.isArray(this.selection[0].keys)
+        ? this.selection[0].keys.length
+        : 1;
+    } else {
+      keys = 1;
+    }
+
+    return keys;
+  }
+
+  get rows() {
+    let rows;
+
+    if (this.selection.length) {
+      rows = this.selection.length;
+    } else {
+      rows = 1;
+    }
+
+    return rows;
+  }
+
+  _initSelection(keys, rows) {
+    const selection = [];
+
+    for (let i = 0; i < rows; i++) {
+      selection.push(this._getSelectionItem(keys));
+    }
+
+    setSelection(selection)(store);
+  }
+
+  _getSelectionItem(num) {
+    const keys = [];
+
+    for (let i = 0; i < num; i++) {
+      keys.push(false);
+    }
+
+    return {
+      name: '',
+      type: '',
+      innerLength: 0,
+      outerLength: 0,
+      units: 0,
+      keys,
+    };
   }
 
   _onAdjustTable(e) {
     e.stopPropagation();
 
-    const item = {
-      action: e.detail.dataset.action,
-      type: e.detail.dataset.type,
-    };
+    const action = e.detail.dataset.action;
+    const guard = this.guard;
+    const selectionItem = this._getSelectionItem(this.keys);
+    const selection = [...this.selection];
+    const type = e.detail.dataset.type;
 
-    adjustTable(item)(store);
+    adjustTable({ action, guard, selection, selectionItem, type })(store);
   }
 
   _onDismissMessage(e) {
@@ -105,11 +166,37 @@ class HwsLsa extends connect(store)(LitElement) {
     dismissMessage()(store);
   }
 
+  _onEditIdentifier(e) {
+    e.stopPropagation();
+
+    const index = e.detail.dataset.row - 1;
+    const selection = [...this.selection];
+    const value = e.detail.value;
+
+    selection[index].name = value;
+
+    setSelection(selection)(store);
+  }
+
+  _onEditQuantity(e) {
+    e.stopPropagation();
+
+    const index = e.detail.dataset.row - 1;
+    const selection = [...this.selection];
+    const value = Number(e.detail.value);
+
+    selection[index].units = value;
+
+    setSelection(selection)(store);
+  }
+
   _onSelectBuild(e) {
     e.stopPropagation();
 
     const build = getSelectedOption(e.detail);
+    const index = e.detail.dataset.row - 1;
     const row = e.detail.dataset.row;
+    const selection = [...this.selection];
 
     const [hwsDataTable] = e.composedPath();
     const root = hwsDataTable.shadowRoot;
@@ -119,24 +206,67 @@ class HwsLsa extends connect(store)(LitElement) {
     deselectOption(inner);
     deselectOption(outer);
 
+    selection[index].innerLength = 0;
+    selection[index].outerLength = 0;
+
     resetOuterLength(row)(store);
 
+    selection[index].type = build;
+
+    setSelection(selection)(store);
     fetchLengths(build, this.model, row)(store);
   }
 
   _onSelectInnerLength(e) {
     e.stopPropagation();
 
-    const innerLength = getSelectedOption(e.detail);
+    const selectedInnerLength = getSelectedOption(e.detail);
+    const index = e.detail.dataset.row - 1;
     const row = e.detail.dataset.row;
+    const selection = [...this.selection];
 
     const [hwsDataTable] = e.composedPath();
     const root = hwsDataTable.shadowRoot;
     const outer = root.getElementById(`cylinder-length-outer-${row}`);
+    const builds = root.getElementById(`cylinder-build-${row}`);
+    const selectedBuild = getSelectedOption(builds);
 
     deselectOption(outer);
 
-    fetchOuterLengths(row, innerLength)(store);
+    selection[index].innerLength = Number(selectedInnerLength);
+    selection[index].outerLength = 0;
+
+    setSelection(selection)(store);
+
+    fetchOuterLengths(
+      selectedBuild,
+      this.model,
+      row,
+      selectedInnerLength,
+    )(store);
+  }
+
+  _onSelectOuterLength(e) {
+    e.stopPropagation();
+
+    const selectedOuterLength = getSelectedOption(e.detail);
+    const index = e.detail.dataset.row - 1;
+    const selection = [...this.selection];
+
+    selection[index].outerLength = Number(selectedOuterLength);
+
+    setSelection(selection)(store);
+  }
+
+  _onSelectKey(e) {
+    e.stopPropagation();
+
+    const { checked, key, row } = e.detail;
+    const selection = [...this.selection];
+
+    selection[row].keys[key] = checked;
+
+    setSelection(selection)(store);
   }
 
   _onSubmitForm(e) {
@@ -151,7 +281,7 @@ class HwsLsa extends connect(store)(LitElement) {
       setMessage('Bitte füllen Sie alle Felder aus', 'danger')(store);
     } else {
       const cylinders = rows.map(row => {
-        const data = getCachedData(store.getState());
+        const data = getData(store.getState());
         const product =
           data[
             `${this.model}-${row.type}-${row.length.inner}-${row.length.outer}`
@@ -179,11 +309,12 @@ class HwsLsa extends connect(store)(LitElement) {
           ?hidden="${!this.message}"
         ></hws-message>
         <hws-data-table
+          .model="${this.model}"
           .builds="${this.builds}"
-          .columns="${this.columns}"
+          .guard="${this.guard}"
           .innerLengths="${this.innerLengths}"
           .outerLengths="${this.outerLengths}"
-          .rows="${this.rows}"
+          .selection="${this.selection}"
         ></hws-data-table>
         <hws-loader
           ?message="${this.message}"
