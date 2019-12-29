@@ -1,9 +1,10 @@
 {
-  "name": "hws-lsa",
-  "description": "hws-lsa provides a table to configure a locking system.",
+  "name": "hws-checkbox",
+  "description": "hws-checkbox is a customised checkbox.",
   "keywords": [
-    "assistant",
-    "locking-system"
+    "checkbox",
+    "form",
+    "input"
   ],
   "version": "0.0.0",
   "homepage": "https://lsa.frede.io/",
@@ -18,20 +19,13 @@
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/stefanfrede/locking-system-assistant",
-    "directory": "packages/hws-lsa"
+    "directory": "packages/hws-checkbox"
   },
   "engines": {
     "node": "10.x.x",
     "npm": "6.x.x"
   },
   "dependencies": {
-    "lit-element": "^2.1.0",
-    "pwa-helpers": "^0.9.1",
-    "redux": "^4.0.4",
-    "redux-actions": "^2.6.5",
-    "redux-thunk": "^2.3.0"
-  },
-  "devDependencies": {
-    "redux-logger": "^3.0.6"
+    "lit-element": "^2.1.0"
   }
 }

@@ -78,6 +78,27 @@ export const adjustTable = ({
   };
 };
 
+export const deleteRow = row => {
+  return ({ dispatch, getState }) => {
+    const {
+      app: { innerLengths, outerLengths, selection },
+    } = getState();
+
+    const i = JSON.parse(JSON.stringify(innerLengths));
+    const o = JSON.parse(JSON.stringify(outerLengths));
+    const s = JSON.parse(JSON.stringify(selection));
+
+    delete i[row];
+    dispatch(updateInnerLengths(selection));
+
+    delete o[row];
+    dispatch(updateOuterLengths(selection));
+
+    s.splice(row, 1);
+    dispatch(updateSelection(s));
+  };
+};
+
 export const dismissMessage = () => {
   return ({ dispatch }) => {
     dispatch(updateMessage('', 'info'));

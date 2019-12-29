@@ -21,7 +21,7 @@
         "byName": {},
         "bySource": {},
         "usedIds": [
-          1
+          0
         ]
       }
     }
@@ -229,7 +229,21 @@
       "node_modules/redux-actions/es/createCurriedAction.js": 32,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 58bbdde2b1c2fdc05d074db912fe83a8": 27,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 0d5079ed4f463cb297e4b24baff17d7a": 26,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js e7afd79f52809af36358d208a7707f39": 26
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js e7afd79f52809af36358d208a7707f39": 26,
+      "node_modules/lit-element/lit-element.js f26178dca125b9512844e68876011069": 0,
+      "node_modules/lit-html/lib/template.js": 33,
+      "node_modules/lit-html/lit-html.js 39bb4099fbca27eb750110acb6ea41df": 34,
+      "node_modules/lit-html/lib/parts.js": 35,
+      "node_modules/lit-html/lib/part.js": 36,
+      "node_modules/lit-html/lib/dom.js": 37,
+      "node_modules/lit-html/lib/template-factory.js": 38,
+      "node_modules/lit-html/lib/directive.js": 39,
+      "node_modules/lit-html/lib/render.js": 40,
+      "node_modules/lit-html/lib/template-result.js": 41,
+      "node_modules/lit-html/lib/template-instance.js": 42,
+      "node_modules/lit-html/directives/repeat.js": 43,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 06a49ffffafb690556843d153c84e372": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 15fdd4906b3f6361fdc7e097723147b7": 26
     },
     "usedIds": {
       "0": 0,
