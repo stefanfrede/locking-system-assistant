@@ -50,4 +50,19 @@ export const buttons = css`
     background-color: hsl(210, 16%, 90%);
     border-color: hsl(207, 17%, 88%);
   }
+
+  .btn-outline-danger {
+    border-color: hsl(354, 70%, 54%);
+    color: hsl(354, 70%, 54%);
+  }
+
+  .btn-outline-danger:hover {
+    background-color: hsl(354, 70%, 54%);
+    border-color: hsl(354, 70%, 54%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-outline-danger:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
+  }
 `;

@@ -42,6 +42,7 @@ export const stylesheet = [
       width: 5rem;
     }
 
+    .lsa__actions,
     .lsa__key,
     .lsa__unit {
       width: 4rem;
@@ -67,11 +68,22 @@ export const stylesheet = [
 
     .lsa__control > button {
       margin-left: 0.5rem;
+      padding: 0.1875rem 0.4375rem;
     }
 
     .lsa__control > button > svg {
       height: 1rem;
       width: 1rem;
+    }
+
+    td > .btn {
+      padding: 0.1875rem 0.5rem;
+    }
+
+    td > .btn > svg {
+      fill: currentcolor;
+      height: 0.875rem;
+      width: 0.875rem;
     }
 
     [data-icon='key'] {

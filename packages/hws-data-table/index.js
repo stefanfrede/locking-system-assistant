@@ -1,4 +1,9 @@
 import { LitElement, html } from 'lit-element';
+import { repeat } from 'lit-html/directives/repeat';
+
+import 'hws-checkbox';
+import 'hws-input';
+import 'hws-select';
 
 import { stylesheet } from './styles/index.js';
 
@@ -70,10 +75,6 @@ class HwsDataTable extends LitElement {
   }
 
   editIdentifier(e) {
-    if (e.target.value) {
-      e.target.classList.remove('is-invalid');
-    }
-
     this.dispatchEvent(
       new CustomEvent('editIdentifier', {
         bubbles: true,
@@ -84,34 +85,38 @@ class HwsDataTable extends LitElement {
   }
 
   editQuantity(e) {
-    if (
-      e.target.closest('tfoot') &&
-      e.target.classList.contains('is-invalid') &&
-      Number(e.target.value) === 0
-    ) {
-      e.target.classList.remove('is-invalid');
-    } else {
-      if (e.target.value > 0) {
-        e.target.classList.remove('is-invalid');
-      }
+    this.dispatchEvent(
+      new CustomEvent('editQuantity', {
+        bubbles: true,
+        composed: true,
+        detail: e.target,
+      }),
+    );
+  }
 
-      if (e.target.closest('tbody')) {
-        this.dispatchEvent(
-          new CustomEvent('editQuantity', {
-            bubbles: true,
-            composed: true,
-            detail: e.target,
-          }),
-        );
-      }
-    }
+  deleteRow(e) {
+    e.preventDefault();
+
+    const btn = e.target.closest('button');
+
+    this.dispatchEvent(
+      new CustomEvent('deleteRow', {
+        bubbles: true,
+        composed: true,
+        detail: btn,
+      }),
+    );
+  }
+
+  getOptions({ index, lengths }) {
+    return Object.keys(lengths).length
+      ? Array.isArray(lengths[index])
+        ? lengths[index]
+        : []
+      : [];
   }
 
   selectBuild(e) {
-    if (e.target.value) {
-      e.target.classList.remove('is-invalid');
-    }
-
     this.dispatchEvent(
       new CustomEvent('selectBuild', {
         bubbles: true,
@@ -122,10 +127,6 @@ class HwsDataTable extends LitElement {
   }
 
   selectInnerLength(e) {
-    if (e.target.value) {
-      e.target.classList.remove('is-invalid');
-    }
-
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
         bubbles: true,
@@ -136,39 +137,11 @@ class HwsDataTable extends LitElement {
   }
 
   selectOuterLength(e) {
-    if (e.target.value) {
-      e.target.classList.remove('is-invalid');
-    }
-
     this.dispatchEvent(
       new CustomEvent('selectOuterLength', {
         bubbles: true,
         composed: true,
         detail: e.target,
-      }),
-    );
-  }
-
-  selectKey(e) {
-    const checked = e.target.checked;
-    const [, key] = e.target.name.split('-');
-    const row = e.target.dataset.row;
-
-    if (checked) {
-      const tr = e.target.closest('tr');
-      const chks = tr.querySelectorAll('[type=checkbox]');
-      chks.forEach(chk => chk.classList.remove('is-invalid'));
-
-      const field = this.shadowRoot.getElementById(`quantity-keys-${key}`);
-
-      field.classList.remove('is-invalid');
-    }
-
-    this.dispatchEvent(
-      new CustomEvent('selectKey', {
-        bubbles: true,
-        composed: true,
-        detail: { checked, key: key - 1, row: row - 1 },
       }),
     );
   }
@@ -202,6 +175,7 @@ class HwsDataTable extends LitElement {
         <col class="lsa__length" />
         <col class="lsa__unit" />
         ${cols}
+        <col class="lsa__actions" />
       </colgroup>
     `;
   }
@@ -228,175 +202,109 @@ class HwsDataTable extends LitElement {
           <th colspan="${keys}" scope="col">
             Schlüssel
           </th>
+          <th scope="col"></th>
         </tr>
       </thead>
     `;
   }
 
-  checkboxes(keys, row) {
-    const tds = [];
-
-    for (let i = 0; i < keys; i++) {
-      const id = `key-${i + 1}-${row}`;
-      const label = `Schlüssel ${i + 1} für Zeile ${row}`;
-      const value = `${i + 1}-${row}`;
-
-      tds.push(html`
-        <td>
-          <div class="checkbox">
-            <input
-              @change="${this.selectKey}"
-              aria-label="${label}"
-              class="checkbox__input js-form-field"
-              data-row="${row}"
-              id="${id}"
-              name="${id}"
-              type="checkbox"
-              value="${value}"
-            />
-            <label for="${id}" class="checkbox__label">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path
-                  d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206
-                  0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192
-                  312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203
-                  36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998
-                  9.997-26.207 9.997-36.204-.001z"
-                />
-              </svg>
-            </label>
-          </div>
-        </td>
-      `);
-    }
-
-    return html`
-      ${tds}
-    `;
-  }
-
-  tbody(model, builds, innerLengths, outerLengths, keys, rows) {
-    const trs = [];
-
-    const types = Array.isArray(builds[model]) ? builds[model] : [];
-
-    for (let i = 0; i < rows; i++) {
-      const row = i + 1;
-
-      const inners = Object.keys(innerLengths).length
-        ? Array.isArray(innerLengths[row])
-          ? innerLengths[row]
-          : []
-        : [];
-
-      const outers = Object.keys(outerLengths).length
-        ? Array.isArray(outerLengths[row])
-          ? outerLengths[row]
-          : []
-        : [];
-
-      trs.push(html`
-        <tr>
-          <th scope="row">
-            ${row}
-          </th>
-          <td>
-            <input
-              @blur="${this.editIdentifier}"
-              class="js-form-field"
-              data-row="${row}"
-              id="door-${row}"
-              type="text"
-              name="door-${row}"
-              placeholder="Tür- oder Raumbezeichner"
-              value=""
-            />
-          </td>
-          <td>
-            <select
-              @change="${this.selectBuild}"
-              ?disabled=${!types.length}
-              class="js-form-field"
-              data-row="${row}"
-              id="cylinder-build-${row}"
-              name="cylinder-build-${row}"
-            >
-              <option selected hidden value>
-                Bitte auswählen
-              </option>
-              ${types.map(
-                build =>
-                  html`
-                    <option value="${build}">
-                      ${build}
-                    </option>
-                  `,
-              )}
-            </select>
-          </td>
-          <td>
-            <div class="lsa__length__inner">
-              <select
-                @change="${this.selectInnerLength}"
-                ?disabled=${!inners.length}
-                class="js-form-field"
-                data-row="${row}"
-                id="cylinder-length-inner-${row}"
-                name="cylinder-length-inner-${row}"
-              >
-                <option selected hidden value>
-                  innen
-                </option>
-                ${inners.map(
-                  length => html`
-                    <option value="${length}">
-                      ${length}
-                    </option>
-                  `,
-                )}
-              </select>
-              <select
-                @change="${this.selectOuterLength}"
-                ?disabled=${!outers.length}
-                class="js-form-field"
-                id="cylinder-length-outer-${row}"
-                name="cylinder-length-outer-${row}"
-                data-row="${row}"
-              >
-                <option selected hidden value>
-                  außen
-                </option>
-                ${outers.map(
-                  length => html`
-                    <option value="${length}">
-                      ${length}
-                    </option>
-                  `,
-                )}
-              </select>
-            </div>
-          </td>
-          <td>
-            <input
-              @change="${this.editQuantity}"
-              class="js-form-field"
-              id="quantity-model-${row}"
-              max=""
-              min="0"
-              name="quantity-model-${row}"
-              type="number"
-              value="0"
-              data-row="${row}"
-            />
-          </td>
-          ${this.checkboxes(keys, row)}
-        </tr>
-      `);
-    }
-
+  tbody({ builds, innerLengths, model, outerLengths, selection }) {
     return html`
       <tbody>
-        ${trs}
+        ${repeat(
+          selection,
+          item => item,
+          (item, index) => html`
+            <tr data-row="${index}">
+              <th scope="row">
+                ${index + 1}
+              </th>
+              <td>
+                <hws-input
+                  id="door-${index}"
+                  .event="${this.editIdentifier}"
+                  .value="${item.name}"
+                ></hws-input>
+              </td>
+              <td>
+                <hws-select
+                  id="cylinder-build-${index}"
+                  .onChange="${this.selectBuild}"
+                  .options="${Array.isArray(builds[model])
+                    ? builds[model]
+                    : []}"
+                  .selected="${item.build}"
+                ></hws-select>
+              </td>
+              <td>
+                <div class="lsa__length__inner">
+                  <hws-select
+                    id="cylinder-length-inner-${index}"
+                    option="Innen"
+                    width="5rem"
+                    .onChange="${this.selectInnerLength}"
+                    .options="${this.getOptions({
+                      index,
+                      lengths: innerLengths,
+                    })}"
+                    .selected="${item.innerLength}"
+                  ></hws-select>
+                  <hws-select
+                    id="cylinder-length-outer-${index}"
+                    option="Außen"
+                    width="5rem"
+                    .onChange="${this.selectOuterLength}"
+                    .options="${this.getOptions({
+                      index,
+                      lengths: outerLengths,
+                    })}"
+                    .selected="${item.outerLength}"
+                  ></hws-select>
+                </div>
+              </td>
+              <td>
+                <hws-input
+                  id="quantity-model-${index}"
+                  type="number"
+                  .event="${this.editQuantity}"
+                  .value="${item.units}"
+                ></hws-input>
+              </td>
+              ${repeat(
+                item.keys,
+                key => key,
+                (key, idx) => html`
+                  <td>
+                    <hws-checkbox
+                      .checked="${key}"
+                      .id="key-${index}-${idx}"
+                      .key="${idx}"
+                    ></hws-checkbox>
+                  </td>
+                `,
+              )}
+              <td>
+                <button
+                  @click="${this.deleteRow}"
+                  class="btn btn-outline-danger"
+                  type="button"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path
+                      d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0
+                         48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0
+                         1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32
+                         0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432
+                         32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72
+                         0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0
+                         0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `,
+        )}
       </tbody>
     `;
   }
@@ -405,14 +313,14 @@ class HwsDataTable extends LitElement {
     const tds = [];
 
     for (let i = 0; i < keys; i++) {
-      const id = `quantity-keys-${i + 1}`;
+      const id = `quantity-keys-${i}`;
 
       tds.push(html`
         <td class="lsa__unit">
           <input
             @change="${this.editQuantity}"
             class="js-form-field"
-            data-key="${i + 1}"
+            data-key="${i}"
             id="${id}"
             max=""
             min="0"
@@ -526,6 +434,7 @@ class HwsDataTable extends LitElement {
             </svg>
           </td>
           ${tds}
+          <td></td>
         </tr>
       </tfoot>
     `;
@@ -536,14 +445,13 @@ class HwsDataTable extends LitElement {
       <form @submit="${this.submitForm}" class="table-responsive">
         <table>
           ${this.colgroup(this.keys)} ${this.thead(this.keys)}
-          ${this.tbody(
-            this.model,
-            this.builds,
-            this.innerLengths,
-            this.outerLengths,
-            this.keys,
-            this.rows,
-          )}
+          ${this.tbody({
+            builds: this.builds,
+            innerLengths: this.innerLengths,
+            model: this.model,
+            outerLengths: this.outerLengths,
+            selection: this.selection,
+          })}
           ${this.tfoot(this.keys)}
         </table>
         <button class="btn btn-success">
