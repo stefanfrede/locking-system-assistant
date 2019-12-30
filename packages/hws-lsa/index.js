@@ -229,7 +229,7 @@ class HwsLsa extends connect(store)(LitElement) {
 
     const row = e.detail.closest('tr');
     const rowNum = Number(row.dataset.row);
-    const selectedBuild = this.selection[row].build;
+    const selectedBuild = this.selection[rowNum].build;
     const selectedInnerLength = e.detail.value;
     const selection = JSON.parse(JSON.stringify(this.selection));
 
