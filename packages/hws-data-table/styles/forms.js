@@ -102,4 +102,72 @@ export const forms = css`
     border-color: hsl(354, 70%, 54%);
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
   }
+
+  .chkb {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  .chkb__input {
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+    width: 1px !important;
+  }
+
+  .chkb__label {
+    align-items: center;
+    background-color: var(--input-bg, hsl(0, 0%, 100%));
+    border: 1px solid var(--input-border-color, hsl(210, 14%, 83%));
+    border-radius: 0.2rem;
+    cursor: pointer;
+    display: flex;
+    height: 1.5rem;
+    justify-content: center;
+    margin-bottom: 0;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    user-select: none;
+    width: 1.5rem;
+  }
+
+  .chkb__label:before {
+    content: '';
+  }
+
+  .chkb__label > svg {
+    pointer-events: none;
+    width: 1rem;
+  }
+
+  .chkb__label > svg > path {
+    fill: var(--input-bg, hsl(0, 0%, 100%));
+    transition: fill 0.15s ease-in-out;
+  }
+
+  .chkb__input:focus + .chkb__label {
+    border-color: var(--input-focus-border-color, hsl(215, 98%, 77%));
+    box-shadow: 0 0 0 0.2rem
+      var(--input-focus-box-shadow, rgba(13, 110, 253, 0.25));
+    outline: 0;
+  }
+
+  .chkb__input:checked + .chkb__label > svg > path {
+    fill: var(--input-color, hsl(210, 9%, 31%));
+  }
+
+  .chkb__input.is-invalid + .chkb__label {
+    border-color: hsl(354, 70%, 54%);
+  }
+
+  .chkb__input.is-invalid:focus + .chkb__label {
+    border-color: hsl(354, 70%, 54%);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
 `;

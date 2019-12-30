@@ -1,10 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import { repeat } from 'lit-html/directives/repeat';
 
-import 'hws-checkbox';
-import 'hws-input';
-import 'hws-select';
-
 import { stylesheet } from './styles/index.js';
 
 class HwsDataTable extends LitElement {
@@ -108,12 +104,14 @@ class HwsDataTable extends LitElement {
     );
   }
 
-  getOptions({ index, lengths }) {
-    return Object.keys(lengths).length
-      ? Array.isArray(lengths[index])
-        ? lengths[index]
-        : []
-      : [];
+  getSelectOptions({ index, object }) {
+    return Array.isArray(object[index]) ? object[index] : [];
+
+    // return Object.keys(lengths).length
+    //   ? Array.isArray(lengths[index])
+    //     ? lengths[index]
+    //     : []
+    //   : [];
   }
 
   selectBuild(e) {
@@ -129,6 +127,16 @@ class HwsDataTable extends LitElement {
   selectInnerLength(e) {
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
+        bubbles: true,
+        composed: true,
+        detail: e.target,
+      }),
+    );
+  }
+
+  selectKey(e) {
+    this.dispatchEvent(
+      new CustomEvent('selectKey', {
         bubbles: true,
         composed: true,
         detail: e.target,
@@ -220,66 +228,149 @@ class HwsDataTable extends LitElement {
                 ${index + 1}
               </th>
               <td>
-                <hws-input
+                <input
+                  @blur="${this.editIdentifier}"
+                  class="js-form-field"
                   id="door-${index}"
-                  .event="${this.editIdentifier}"
-                  .value="${item.name}"
-                ></hws-input>
+                  type="text"
+                  name="door-${index}"
+                  placeholder="Tür- oder Raumbezeichner"
+                  value="${item.name}"
+                />
               </td>
               <td>
-                <hws-select
+                <select
+                  @change="${this.selectBuild}"
+                  ?disabled=${!this.getSelectOptions({
+                    index: model,
+                    object: builds,
+                  }).length}
+                  class="js-form-field"
                   id="cylinder-build-${index}"
-                  .onChange="${this.selectBuild}"
-                  .options="${Array.isArray(builds[model])
-                    ? builds[model]
-                    : []}"
-                  .selected="${item.build}"
-                ></hws-select>
+                  name="cylinder-build-${index}"
+                >
+                  <option selected hidden value>
+                    Bitte auswählen
+                  </option>
+                  ${this.getSelectOptions({ index: model, object: builds }).map(
+                    option =>
+                      html`
+                        <option
+                          ?selected="${option === item.build}"
+                          value="${option}"
+                        >
+                          ${option}
+                        </option>
+                      `,
+                  )}
+                </select>
               </td>
               <td>
                 <div class="lsa__length__inner">
-                  <hws-select
+                  <select
+                    @change="${this.selectInnerLength}"
+                    ?disabled=${!this.getSelectOptions({
+                      index,
+                      object: innerLengths,
+                    }).length}
+                    class="js-form-field"
                     id="cylinder-length-inner-${index}"
-                    option="Innen"
-                    width="5rem"
-                    .onChange="${this.selectInnerLength}"
-                    .options="${this.getOptions({
+                    name="cylinder-length-inner-${index}"
+                  >
+                    <option selected hidden value>
+                      Innen
+                    </option>
+                    ${this.getSelectOptions({
                       index,
-                      lengths: innerLengths,
-                    })}"
-                    .selected="${item.innerLength}"
-                  ></hws-select>
-                  <hws-select
+                      object: innerLengths,
+                    }).map(
+                      option =>
+                        html`
+                          <option
+                            ?selected="${option === item.innerLength}"
+                            value="${option}"
+                          >
+                            ${option}
+                          </option>
+                        `,
+                    )}
+                  </select>
+                  <select
+                    @change="${this.selectOuterLength}"
+                    ?disabled=${!this.getSelectOptions({
+                      index,
+                      object: outerLengths,
+                    }).length}
+                    class="js-form-field"
                     id="cylinder-length-outer-${index}"
-                    option="Außen"
-                    width="5rem"
-                    .onChange="${this.selectOuterLength}"
-                    .options="${this.getOptions({
+                    name="cylinder-length-outer-${index}"
+                  >
+                    <option selected hidden value>
+                      Außen
+                    </option>
+                    ${this.getSelectOptions({
                       index,
-                      lengths: outerLengths,
-                    })}"
-                    .selected="${item.outerLength}"
-                  ></hws-select>
+                      object: outerLengths,
+                    }).map(
+                      option =>
+                        html`
+                          <option
+                            ?selected="${option === item.outerLength}"
+                            value="${option}"
+                          >
+                            ${option}
+                          </option>
+                        `,
+                    )}
+                  </select>
                 </div>
               </td>
               <td>
-                <hws-input
+                <input
+                  @change="${this.editQuantity}"
+                  class="js-form-field"
                   id="quantity-model-${index}"
+                  max=""
+                  min="0"
+                  name="quantity-model-${index}"
                   type="number"
-                  .event="${this.editQuantity}"
-                  .value="${item.units}"
-                ></hws-input>
+                  value="${item.units}"
+                />
               </td>
               ${repeat(
                 item.keys,
                 key => key,
                 (key, idx) => html`
                   <td>
-                    <hws-checkbox
-                      .checked="${key}"
-                      .id="key-${index}-${idx}"
-                      .key="${idx}"
-                    ></hws-checkbox>
+                    <div class="chkb">
+                      <input
+                        @change="${this.selectKey}"
+                        ?checked="${key}"
+                        aria-label="${`Schlüssel ${key + 1} in Zeile ${idx +
+                          1}`}"
+                        class="chkb__input js-form-field"
+                        id="key-${index}-${idx}"
+                        name="key-${index}-${idx}"
+                        type="checkbox"
+                        value="${idx}"
+                      />
+                      <label for="key-${index}-${idx}" class="chkb__label">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 512 512"
+                        >
+                          <path
+                            d="M173.898
+                            439.404l-166.4-166.4c-9.997-9.997-9.997-26.206
+                            0-36.204l36.203-36.204c9.997-9.998 26.207-9.998
+                            36.204 0L192 312.69 432.095 72.596c9.997-9.997
+                            26.207-9.997 36.204 0l36.203 36.204c9.997 9.997
+                            9.997 26.206 0 36.204l-294.4 294.401c-9.998
+                            9.997-26.207 9.997-36.204-.001z"
+                          />
+                        </svg>
+                      </label>
+                    </div>
                   </td>
                 `,
               )}
