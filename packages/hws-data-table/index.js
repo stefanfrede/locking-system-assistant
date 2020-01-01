@@ -337,9 +337,7 @@ class HwsDataTable extends LitElement {
                   value="${item.units}"
                 />
               </td>
-              ${repeat(
-                item.keys,
-                key => key,
+              ${item.keys.map(
                 (key, idx) => html`
                   <td>
                     <div class="chkb">
