@@ -227,7 +227,7 @@
       "node_modules/redux-actions/es/combineActions.js fb88fbfd14edbbe92d982c4713bdf798": 30,
       "node_modules/just-curry-it/index.js": 31,
       "node_modules/redux-actions/es/createCurriedAction.js": 32,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 58bbdde2b1c2fdc05d074db912fe83a8": 27,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 58bbdde2b1c2fdc05d074db912fe83a8": 44,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 0d5079ed4f463cb297e4b24baff17d7a": 26,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js e7afd79f52809af36358d208a7707f39": 26,
       "node_modules/lit-element/lit-element.js f26178dca125b9512844e68876011069": 0,
@@ -245,7 +245,10 @@
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 06a49ffffafb690556843d153c84e372": 26,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 15fdd4906b3f6361fdc7e097723147b7": 26,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js e001104ae42c3c2c3e1c4ce216477dea": 26,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 50d14199ef70cf3fb5ba356d07446fc2": 26
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 50d14199ef70cf3fb5ba356d07446fc2": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/lib/helpers.js": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 7521d4c3d418988e2c6fb9a870ee922d": 27,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 4d904a2152afc24e42353e53a83f1206": 44
     },
     "usedIds": {
       "0": 0,
