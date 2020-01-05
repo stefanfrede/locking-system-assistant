@@ -1,7 +1,9 @@
+import { fetchWithTimeout } from './helpers';
+
 const productsUrl = PRODUCTS_API_URL; // eslint-disable-line no-undef
 
 export const getBuilds = async model => {
-  const response = await fetch(productsUrl, {
+  const response = await fetchWithTimeout(productsUrl, {
     method: 'POST',
     mode: 'cors',
     headers: {
@@ -26,7 +28,7 @@ export const getData = async reference => {
 };
 
 export const getReferences = async (build, model) => {
-  const response = await fetch(productsUrl, {
+  const response = await fetchWithTimeout(productsUrl, {
     method: 'POST',
     mode: 'cors',
     headers: {

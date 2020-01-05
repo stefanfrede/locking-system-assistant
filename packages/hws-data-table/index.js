@@ -10,62 +10,42 @@ class HwsDataTable extends LitElement {
 
   static get properties() {
     return {
-      guard: { type: Number },
-      model: { type: String },
       builds: { type: Object },
+      groups: { type: Array },
+      guard: { type: Number },
       innerLengths: { type: Object },
+      items: { type: Object },
+      keys: { type: Number },
+      model: { type: String },
       outerLengths: { type: Object },
-      selection: { type: Object },
+      rows: { type: Number },
+      rowIds: { type: Array },
     };
   }
 
   constructor() {
     super();
 
-    this.model = '';
     this.builds = {};
+    this.groups = [];
     this.guard = 3;
     this.innerLengths = {};
+    this.items = {};
+    this.keys = 5;
+    this.model = '';
     this.outerLengths = {};
-    this.selection = [];
+    this.rows = 5;
+    this.rowIds = [];
   }
 
-  get keys() {
-    let keys;
-
-    if (this.selection.length) {
-      keys = Array.isArray(this.selection[0].keys)
-        ? this.selection[0].keys.length
-        : 1;
-    } else {
-      keys = 1;
-    }
-
-    return keys;
-  }
-
-  get rows() {
-    let rows;
-
-    if (this.selection.length) {
-      rows = this.selection.length;
-    } else {
-      rows = 1;
-    }
-
-    return rows;
-  }
-
-  adjustTable(e) {
+  deleteRow(e) {
     e.preventDefault();
 
-    const btn = e.target.closest('button');
-
     this.dispatchEvent(
-      new CustomEvent('adjustTable', {
+      new CustomEvent('deleteRow', {
         bubbles: true,
         composed: true,
-        detail: btn,
+        detail: e.target.closest('tr').dataset.rowId,
       }),
     );
   }
@@ -80,6 +60,18 @@ class HwsDataTable extends LitElement {
     );
   }
 
+  editKeys(e) {
+    e.preventDefault();
+
+    this.dispatchEvent(
+      new CustomEvent('editKeys', {
+        bubbles: true,
+        composed: true,
+        detail: e.target.closest('button'),
+      }),
+    );
+  }
+
   editQuantity(e) {
     this.dispatchEvent(
       new CustomEvent('editQuantity', {
@@ -90,28 +82,20 @@ class HwsDataTable extends LitElement {
     );
   }
 
-  deleteRow(e) {
+  editRows(e) {
     e.preventDefault();
 
-    const btn = e.target.closest('button');
-
     this.dispatchEvent(
-      new CustomEvent('deleteRow', {
+      new CustomEvent('editRows', {
         bubbles: true,
         composed: true,
-        detail: btn,
+        detail: e.target.closest('button'),
       }),
     );
   }
 
   getSelectOptions({ index, object }) {
     return Array.isArray(object[index]) ? object[index] : [];
-
-    // return Object.keys(lengths).length
-    //   ? Array.isArray(lengths[index])
-    //     ? lengths[index]
-    //     : []
-    //   : [];
   }
 
   selectBuild(e) {
@@ -216,14 +200,14 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tbody({ builds, innerLengths, model, outerLengths, selection }) {
+  tbody({ builds, innerLengths, items, model, outerLengths, rowIds }) {
     return html`
       <tbody>
         ${repeat(
-          selection,
-          item => item,
-          (item, index) => html`
-            <tr data-row="${index}">
+          rowIds,
+          rowId => rowId,
+          (rowId, index) => html`
+            <tr data-row-id="${rowId}">
               <th scope="row">
                 ${index + 1}
               </th>
@@ -231,11 +215,11 @@ class HwsDataTable extends LitElement {
                 <input
                   @blur="${this.editIdentifier}"
                   class="js-form-field"
-                  id="door-${index}"
+                  id="name-${index}"
                   type="text"
-                  name="door-${index}"
+                  name="name-${index}"
                   placeholder="Tür- oder Raumbezeichner"
-                  value="${item.name}"
+                  value="${items[rowId].name}"
                 />
               </td>
               <td>
@@ -246,8 +230,8 @@ class HwsDataTable extends LitElement {
                     object: builds,
                   }).length}
                   class="js-form-field"
-                  id="cylinder-build-${index}"
-                  name="cylinder-build-${index}"
+                  id="build-${index}"
+                  name="build-${index}"
                 >
                   <option selected hidden value>
                     Bitte auswählen
@@ -256,7 +240,7 @@ class HwsDataTable extends LitElement {
                     option =>
                       html`
                         <option
-                          ?selected="${option === item.build}"
+                          ?selected="${option === items[rowId].build}"
                           value="${option}"
                         >
                           ${option}
@@ -270,24 +254,24 @@ class HwsDataTable extends LitElement {
                   <select
                     @change="${this.selectInnerLength}"
                     ?disabled=${!this.getSelectOptions({
-                      index,
+                      index: rowId,
                       object: innerLengths,
                     }).length}
                     class="js-form-field"
-                    id="cylinder-length-inner-${index}"
-                    name="cylinder-length-inner-${index}"
+                    id="inner-length-${index}"
+                    name="inner-length-${index}"
                   >
                     <option selected hidden value>
                       Innen
                     </option>
                     ${this.getSelectOptions({
-                      index,
+                      index: rowId,
                       object: innerLengths,
                     }).map(
                       option =>
                         html`
                           <option
-                            ?selected="${option === item.innerLength}"
+                            ?selected="${option === items[rowId].innerLength}"
                             value="${option}"
                           >
                             ${option}
@@ -298,24 +282,24 @@ class HwsDataTable extends LitElement {
                   <select
                     @change="${this.selectOuterLength}"
                     ?disabled=${!this.getSelectOptions({
-                      index,
+                      index: rowId,
                       object: outerLengths,
                     }).length}
                     class="js-form-field"
-                    id="cylinder-length-outer-${index}"
-                    name="cylinder-length-outer-${index}"
+                    id="outer-length-${index}"
+                    name="outer-length-${index}"
                   >
                     <option selected hidden value>
                       Außen
                     </option>
                     ${this.getSelectOptions({
-                      index,
+                      index: rowId,
                       object: outerLengths,
                     }).map(
                       option =>
                         html`
                           <option
-                            ?selected="${option === item.outerLength}"
+                            ?selected="${option === items[rowId].outerLength}"
                             value="${option}"
                           >
                             ${option}
@@ -329,22 +313,23 @@ class HwsDataTable extends LitElement {
                 <input
                   @change="${this.editQuantity}"
                   class="js-form-field"
-                  id="quantity-model-${index}"
+                  data-type="cylinder"
+                  id="quantity-${index}"
                   max=""
                   min="0"
-                  name="quantity-model-${index}"
+                  name="quantity-${index}"
                   type="number"
-                  value="${item.units}"
+                  value="${items[rowId].quantity}"
                 />
               </td>
-              ${item.keys.map(
+              ${items[rowId].keys.map(
                 (key, idx) => html`
                   <td>
                     <div class="chkb">
                       <input
                         @change="${this.selectKey}"
                         ?checked="${key}"
-                        aria-label="${`Schlüssel ${key + 1} in Zeile ${idx +
+                        aria-label="${`Schlüssel ${key + 1} in Zeile ${index +
                           1}`}"
                         class="chkb__input js-form-field"
                         id="key-${index}-${idx}"
@@ -398,24 +383,22 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tfoot(keys) {
+  tfoot(groups, keys) {
     const tds = [];
 
     for (let i = 0; i < keys; i++) {
-      const id = `quantity-keys-${i}`;
-
       tds.push(html`
         <td class="lsa__unit">
           <input
             @change="${this.editQuantity}"
             class="js-form-field"
-            data-key="${i}"
-            id="${id}"
+            data-type="group"
+            id="groups-${i}"
             max=""
             min="0"
-            name="${id}"
+            name="groups-${i}"
             type="number"
-            value="0"
+            value="${groups[i]}"
           />
         </td>
       `);
@@ -429,10 +412,10 @@ class HwsDataTable extends LitElement {
               <div class="lsa__control">
                 Zeile
                 <button
-                  @click="${this.adjustTable}"
+                  @click="${this.editRows}"
                   class="btn btn-light"
-                  data-type="row"
                   data-action="increment"
+                  data-type="row"
                   type="button"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -446,10 +429,10 @@ class HwsDataTable extends LitElement {
                   </svg>
                 </button>
                 <button
-                  @click="${this.adjustTable}"
+                  @click="${this.editRows}"
                   class="btn btn-light"
-                  data-type="row"
                   data-action="decrement"
+                  data-type="row"
                   type="button"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -464,10 +447,10 @@ class HwsDataTable extends LitElement {
               <div class="lsa__control">
                 Schlüssel
                 <button
-                  @click="${this.adjustTable}"
+                  @click="${this.editKeys}"
                   class="btn btn-light"
-                  data-type="key"
                   data-action="increment"
+                  data-type="key"
                   type="button"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -481,10 +464,10 @@ class HwsDataTable extends LitElement {
                   </svg>
                 </button>
                 <button
-                  @click="${this.adjustTable}"
+                  @click="${this.editKeys}"
                   class="btn btn-light"
-                  data-type="key"
                   data-action="decrement"
+                  data-type="key"
                   type="button"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -537,11 +520,12 @@ class HwsDataTable extends LitElement {
           ${this.tbody({
             builds: this.builds,
             innerLengths: this.innerLengths,
+            items: this.items,
             model: this.model,
             outerLengths: this.outerLengths,
-            selection: this.selection,
+            rowIds: this.rowIds,
           })}
-          ${this.tfoot(this.keys)}
+          ${this.tfoot(this.groups, this.keys)}
         </table>
         <button class="btn btn-success">
           In den Warenkorb legen
@@ -552,13 +536,9 @@ class HwsDataTable extends LitElement {
 
   updated(changedProperties) {
     changedProperties.forEach((oldValue, propName) => {
-      if (propName === 'selection') {
+      if (propName === 'keys') {
         const btnKey = this.shadowRoot.querySelector(
           '[data-action=decrement][data-type=key]',
-        );
-
-        const btnRow = this.shadowRoot.querySelector(
-          '[data-action=decrement][data-type=row]',
         );
 
         if (this.keys <= this.guard) {
@@ -570,6 +550,12 @@ class HwsDataTable extends LitElement {
           btnKey.removeAttribute('disabled');
           btnKey.removeAttribute('aria-disabled');
         }
+      }
+
+      if (propName === 'rows') {
+        const btnRow = this.shadowRoot.querySelector(
+          '[data-action=decrement][data-type=row]',
+        );
 
         if (this.rows <= this.guard) {
           btnRow.setAttribute('disabled', '');

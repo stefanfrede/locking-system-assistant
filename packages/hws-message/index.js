@@ -38,7 +38,6 @@ class HwsMessage extends LitElement {
           @click="${this.dismissMessage}"
           type="button"
           class="close"
-          data-dismiss="alert"
           aria-label="Close"
         >
           <span aria-hidden="true">

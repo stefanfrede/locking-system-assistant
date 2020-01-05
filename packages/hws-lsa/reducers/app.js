@@ -3,36 +3,48 @@ import { handleActions, combineActions } from 'redux-actions';
 import {
   HIDE_LOADER,
   SHOW_LOADER,
-  LOAD_BUILDS,
-  LOAD_DATA,
-  LOAD_LENGTHS,
+  ADD_BUILDS,
+  ADD_GROUP,
+  DELETE_GROUP,
+  UPDATE_GROUPS,
+  ADD_ITEM,
+  DELETE_ITEM,
+  UPDATE_ITEM,
+  ADD_INNER_LENGTH,
+  DELETE_INNER_LENGTH,
+  ADD_OUTER_LENGTH,
+  DELETE_OUTER_LENGTH,
+  ADD_ROW_ID,
+  DELETE_ROW_ID,
   UPDATE_MESSAGE,
   UPDATE_MODEL,
-  UPDATE_INNER_LENGTHS,
-  UPDATE_OUTER_LENGTHS,
-  UPDATE_SELECTION,
 } from '../actions';
 
 const INITIAL_STATE = {
   builds: {},
-  data: {},
+  groups: [],
   guard: 3,
-  isLoading: true,
-  lengths: {},
   innerLengths: {},
-  outerLengths: {},
+  items: {},
+  keys: 5,
+  loading: true,
   message: '',
-  msgType: 'info',
   model: 'R9Plus',
-  selection: [],
+  msgType: 'info',
+  outerLengths: {},
+  rowIds: [],
+  rows: 5,
 };
 
 export default handleActions(
   {
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
-      return { ...state, isLoading: action.payload };
+      return { ...state, loading: action.payload };
     },
-    [LOAD_BUILDS]: {
+    [combineActions(ADD_ITEM, UPDATE_ITEM)]: (state, action) => {
+      return { ...state, items: { ...state.items, ...action.payload } };
+    },
+    [ADD_BUILDS]: {
       next: (state, action) => {
         return { ...state, builds: { ...state.builds, ...action.payload } };
       },
@@ -44,20 +56,91 @@ export default handleActions(
         };
       },
     },
-    [LOAD_DATA]: (state, action) => {
-      return { ...state, data: { ...state.data, ...action.payload } };
+    [ADD_GROUP]: (state, action) => {
+      return {
+        ...state,
+        groups: [...state.groups, action.payload],
+        keys: action.meta.keys,
+      };
     },
-    [LOAD_LENGTHS]: {
-      next: (state, action) => {
-        return { ...state, lengths: { ...state.lengths, ...action.payload } };
-      },
-      throw: (state, action) => {
-        return {
-          ...state,
-          message: action.payload.message,
-          msgType: action.meta.msgType,
-        };
-      },
+    [DELETE_GROUP]: (state, action) => {
+      return {
+        ...state,
+        groups: [
+          ...state.groups.slice(0, action.payload),
+          ...state.groups.slice(action.payload + 1),
+        ],
+        keys: action.meta.keys,
+      };
+    },
+    [UPDATE_GROUPS]: (state, action) => {
+      return {
+        ...state,
+        groups: [...action.payload],
+      };
+    },
+    [DELETE_ITEM]: (state, action) => {
+      return {
+        ...state,
+        items: Object.keys(state.items).reduce(
+          (acc, cur) =>
+            cur !== action.payload ? ((acc[cur] = state.items[cur]), acc) : acc,
+          {},
+        ),
+      };
+    },
+    [ADD_INNER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        innerLengths: { ...state.innerLengths, ...action.payload },
+      };
+    },
+    [DELETE_INNER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        innerLengths: Object.keys(state.innerLengths).reduce(
+          (acc, cur) =>
+            cur !== action.payload
+              ? ((acc[cur] = state.innerLengths[cur]), acc)
+              : acc,
+          {},
+        ),
+      };
+    },
+    [ADD_OUTER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        outerLengths: { ...state.outerLengths, ...action.payload },
+      };
+    },
+    [DELETE_OUTER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        outerLengths: Object.keys(state.outerLengths).reduce(
+          (acc, cur) =>
+            cur !== action.payload
+              ? ((acc[cur] = state.outerLengths[cur]), acc)
+              : acc,
+          {},
+        ),
+      };
+    },
+    [ADD_ROW_ID]: (state, action) => {
+      return {
+        ...state,
+        rowIds: [...state.rowIds, action.payload],
+        rows: action.meta.rows,
+      };
+    },
+    [DELETE_ROW_ID]: (state, action) => {
+      return {
+        ...state,
+        rowIds: [
+          ...state.rowIds.slice(0, action.payload),
+          ...state.rowIds.slice(action.payload + 1),
+        ],
+        rows: action.meta.rows,
+      };
     },
     [UPDATE_MESSAGE]: (state, action) => {
       return {
@@ -68,21 +151,6 @@ export default handleActions(
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };
-    },
-    [UPDATE_INNER_LENGTHS]: (state, action) => {
-      return {
-        ...state,
-        innerLengths: { ...state.innerLengths, ...action.payload },
-      };
-    },
-    [UPDATE_OUTER_LENGTHS]: (state, action) => {
-      return {
-        ...state,
-        outerLengths: { ...state.outerLengths, ...action.payload },
-      };
-    },
-    [UPDATE_SELECTION]: (state, action) => {
-      return { ...state, selection: action.payload };
     },
   },
   INITIAL_STATE,

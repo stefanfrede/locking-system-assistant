@@ -13,6 +13,10 @@ export const stylesheet = [
   forms,
   tables,
   css`
+    :host {
+      contain: content;
+    }
+
     form {
       text-align: right;
     }

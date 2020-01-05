@@ -15,6 +15,31 @@ export const getSelectedOption = target => {
   return selected.value;
 };
 
+export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
+  const controller = new AbortController();
+  const config = { ...options, signal: controller.signal };
+
+  setTimeout(() => {
+    controller.abort();
+  }, time);
+
+  return fetch(uri, config)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+
+      return response;
+    })
+    .catch(error => {
+      if (error.name === 'AbortError') {
+        throw new Error('Response timed out');
+      }
+
+      throw new Error(error.message);
+    });
+};
+
 export const serialize = form => {
   const serialized = {
     rows: [],
@@ -131,3 +156,11 @@ export const serialize = form => {
 
   return serialized;
 };
+
+export const uuidv4 = () =>
+  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16),
+  );
