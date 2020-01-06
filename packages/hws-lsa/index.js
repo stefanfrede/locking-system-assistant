@@ -102,18 +102,6 @@ class HwsLsa extends connect(store)(LitElement) {
     this.rows = getRows(store.getState());
     this.rowIds = getRowIds(store.getState());
 
-    this.addEventListener('editIdentifier', this._onEditIdentifier);
-    this.addEventListener('editKeys', this._onEditKeys);
-    this.addEventListener('editQuantity', this._onEditQuantity);
-    this.addEventListener('editRows', this._onEditRows);
-    this.addEventListener('dismissMessage', this._onDismissMessage);
-    this.addEventListener('deleteRow', this._onDeleteRow);
-    this.addEventListener('selectBuild', this._onSelectBuild);
-    this.addEventListener('selectInnerLength', this._onSelectInnerLength);
-    this.addEventListener('selectOuterLength', this._onSelectOuterLength);
-    this.addEventListener('selectKey', this._onSelectKey);
-    this.addEventListener('submitForm', this._onSubmitForm);
-
     this._initGroups(this.keys);
     this._initRows(this.keys, this.rows);
 
@@ -158,7 +146,7 @@ class HwsLsa extends connect(store)(LitElement) {
     e.stopPropagation();
 
     const rowIdx = this.rowIds.indexOf(e.detail);
-    const rows = this.rowIds.length - 1;
+    const rows = this.rows - 1;
 
     store.dispatch(deleteItem(e.detail));
     store.dispatch(deleteRowId(rowIdx, rows));
@@ -185,7 +173,7 @@ class HwsLsa extends connect(store)(LitElement) {
     e.stopPropagation();
 
     if (e.detail.dataset.action === 'increment') {
-      const keys = this.groups.length + 1;
+      const keys = this.keys + 1;
 
       store.dispatch(addGroup(0, keys));
 
@@ -196,7 +184,7 @@ class HwsLsa extends connect(store)(LitElement) {
         store.dispatch(updateItem({ [rowId]: item }));
       });
     } else {
-      const index = this.groups.length - 1;
+      const index = this.keys - 1;
 
       store.dispatch(deleteGroup(index, index));
 
@@ -233,15 +221,15 @@ class HwsLsa extends connect(store)(LitElement) {
 
     if (e.detail.dataset.action === 'increment') {
       const rowId = uuidv4();
-      const rows = this.rowIds.length + 1;
+      const rows = this.rows + 1;
       const item = this._getItem(this.keys);
 
       store.dispatch(addItem({ [rowId]: item }));
       store.dispatch(addRowId(rowId, rows));
     } else {
-      const rowId = this.rowIds[this.rowIds.length - 1];
+      const rowId = this.rowIds[this.rows - 1];
       const rowIdx = this.rowIds.indexOf(rowId);
-      const rows = this.rowIds.length - 1;
+      const rows = this.rows - 1;
 
       store.dispatch(deleteItem(rowId));
       store.dispatch(deleteRowId(rowIdx, rows));
@@ -303,14 +291,15 @@ class HwsLsa extends connect(store)(LitElement) {
 
     const item = this.items[rowId];
 
+    item.outerLength = Number(e.detail.value);
+
     const details = fetchDetails({
-      build: this.items[rowId].build,
+      build: item.build,
       model: this.model,
-      innerLength: this.items[rowId].innerLength,
-      outerLength: Number(e.detail.value),
+      innerLength: item.innerLength,
+      outerLength: item.outerLength,
     })(store);
 
-    item.outerLength = Number(e.detail.value);
     item.details = details;
 
     store.dispatch(updateItem({ [rowId]: item }));
@@ -338,11 +327,22 @@ class HwsLsa extends connect(store)(LitElement) {
     return html`
       <div class="data-table-wrapper">
         <hws-message
+          @dismissMessage="${this._onDismissMessage}"
           .message="${this.message}"
           .msgType="${this.msgType}"
           ?hidden="${!this.message}"
         ></hws-message>
         <hws-data-table
+          @editIdentifier="${this._onEditIdentifier}"
+          @editKeys="${this._onEditKeys}"
+          @editQuantity="${this._onEditQuantity}"
+          @editRows="${this._onEditRows}"
+          @deleteRow="${this._onDeleteRow}"
+          @selectBuild="${this._onSelectBuild}"
+          @selectInnerLength="${this._onSelectInnerLength}"
+          @selectOuterLength="${this._onSelectOuterLength}"
+          @selectKey="${this._onSelectKey}"
+          @submitForm="${this._onSubmitForm}"
           .builds="${this.builds}"
           .groups="${this.groups}"
           .guard="${this.guard}"
