@@ -65,4 +65,36 @@ export const buttons = css`
   .btn-outline-danger:focus {
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
   }
+
+  .btn-outline-dark {
+    background-color: transparent;
+    border-color: hsl(210, 10%, 23%);
+    color: hsl(210, 10%, 23%);
+  }
+
+  .btn-outline-dark:hover {
+    background-color: hsl(210, 10%, 23%);
+    border-color: hsl(210, 10%, 23%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-outline-dark:focus {
+    box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5);
+  }
+
+  .btn-outline-info {
+    background-color: transparent;
+    border-color: hsl(188, 78%, 41%);
+    color: hsl(188, 78%, 41%);
+  }
+
+  .btn-outline-info:hover {
+    background-color: hsl(188, 78%, 41%);
+    border-color: hsl(188, 78%, 41%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-outline-info:focus {
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5);
+  }
 `;

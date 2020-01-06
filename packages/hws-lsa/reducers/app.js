@@ -4,6 +4,8 @@ import {
   HIDE_LOADER,
   SHOW_LOADER,
   ADD_BUILDS,
+  ADD_DETAILS,
+  DELETE_DETAILS,
   ADD_GROUP,
   DELETE_GROUP,
   UPDATE_GROUPS,
@@ -22,6 +24,7 @@ import {
 
 const INITIAL_STATE = {
   builds: {},
+  details: {},
   groups: [],
   guard: 3,
   innerLengths: {},
@@ -55,6 +58,24 @@ export default handleActions(
           msgType: action.meta.msgType,
         };
       },
+    },
+    [ADD_DETAILS]: (state, action) => {
+      return {
+        ...state,
+        details: { ...state.details, ...action.payload },
+      };
+    },
+    [DELETE_DETAILS]: (state, action) => {
+      return {
+        ...state,
+        details: Object.keys(state.details).reduce(
+          (acc, cur) =>
+            cur !== action.payload
+              ? ((acc[cur] = state.details[cur]), acc)
+              : acc,
+          {},
+        ),
+      };
     },
     [ADD_GROUP]: (state, action) => {
       return {

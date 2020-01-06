@@ -11,6 +11,7 @@ class HwsDataTable extends LitElement {
   static get properties() {
     return {
       builds: { type: Object },
+      details: { type: Object },
       groups: { type: Array },
       guard: { type: Number },
       innerLengths: { type: Object },
@@ -27,6 +28,7 @@ class HwsDataTable extends LitElement {
     super();
 
     this.builds = {};
+    this.details = {};
     this.groups = [];
     this.guard = 3;
     this.innerLengths = {};
@@ -45,7 +47,7 @@ class HwsDataTable extends LitElement {
       new CustomEvent('deleteRow', {
         bubbles: true,
         composed: true,
-        detail: e.target.closest('tr').dataset.rowId,
+        detail: e.target.closest('tbody').dataset.rowId,
       }),
     );
   }
@@ -138,6 +140,13 @@ class HwsDataTable extends LitElement {
     );
   }
 
+  showDetails(e) {
+    e.preventDefault();
+
+    const tbody = e.target.closest('tbody');
+    tbody.classList.toggle('hide-details');
+  }
+
   submitForm(e) {
     e.preventDefault();
 
@@ -162,6 +171,7 @@ class HwsDataTable extends LitElement {
     return html`
       <colgroup>
         <col class="lsa__pos" />
+        <col class="lsa__actions" />
         <col class="lsa__id" />
         <col class="lsa__type" />
         <col class="lsa__length" />
@@ -179,6 +189,7 @@ class HwsDataTable extends LitElement {
           <th scope="col">
             #
           </th>
+          <th scope="col"></th>
           <th scope="col">
             Bezeichnung
           </th>
@@ -200,17 +211,61 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tbody({ builds, innerLengths, items, model, outerLengths, rowIds }) {
+  tbody({
+    builds,
+    details,
+    innerLengths,
+    items,
+    keys,
+    model,
+    outerLengths,
+    rowIds,
+  }) {
     return html`
-      <tbody>
-        ${repeat(
-          rowIds,
-          rowId => rowId,
-          (rowId, index) => html`
-            <tr data-row-id="${rowId}">
+      ${repeat(
+        rowIds,
+        rowId => rowId,
+        (rowId, index) => html`
+          <tbody class="hide-details" data-row-id="${rowId}">
+            <tr>
               <th scope="row">
                 ${index + 1}
               </th>
+              <td>
+                <button
+                  @click="${this.showDetails}"
+                  ?disabled=${!this.details[rowId]}
+                  class="btn btn-outline-info"
+                  type="button"
+                >
+                  <svg
+                    fill="currentcolor"
+                    class="down"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 320 512"
+                  >
+                    <path
+                      d="M143 352.3L7 216.3c-9.4-9.4-9.4-24.6
+                      0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4
+                      96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4
+                      24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z"
+                    />
+                  </svg>
+                  <svg
+                    fill="currentcolor"
+                    class="up"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 320 512"
+                  >
+                    <path
+                      d="M177 159.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6
+                      22.6c-9.4 9.4-24.6 9.4-33.9 0L160 255.9l-96.4 96.4c-9.4
+                      9.4-24.6 9.4-33.9 0L7 329.7c-9.4-9.4-9.4-24.6
+                      0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1z"
+                    />
+                  </svg>
+                </button>
+              </td>
               <td>
                 <input
                   @blur="${this.editIdentifier}"
@@ -363,23 +418,60 @@ class HwsDataTable extends LitElement {
                   class="btn btn-outline-danger"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg
+                    fill="currentcolor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                  >
                     <path
                       d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0
-                         48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0
-                         1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32
-                         0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432
-                         32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72
-                         0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0
-                         0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                          48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0
+                          1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32
+                          0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432
+                          32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72
+                          0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0
+                          0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
                     />
                   </svg>
                 </button>
               </td>
             </tr>
-          `,
-        )}
-      </tbody>
+            <tr class="details">
+              <td colspan="2"></td>
+              <td colspan="${4 + keys}">
+                <dl>
+                  <dt>
+                    Bestellnummer:
+                  </dt>
+                  <dd>
+                    ${details[rowId] ? details[rowId].reference : ''}
+                    (${details[rowId] ? details[rowId].subject : ''})
+                  </dd>
+                  <dt>
+                    Bezeichnung:
+                  </dt>
+                  <dd>
+                    ${details[rowId] ? details[rowId].name : ''}
+                  </dd>
+                  <dt>
+                    Beschreibung:
+                  </dt>
+                  <dd>
+                    ${details[rowId] ? details[rowId].text : ''}
+                  </dd>
+                  <dt>
+                    Preis:
+                  </dt>
+                  <dd>
+                    ${details[rowId] ? details[rowId].price : ''}
+                  </dd>
+                </dl>
+              </td>
+              <td colspan="2"></td>
+            </tr>
+          </tbody>
+        `,
+      )}
     `;
   }
 
@@ -407,18 +499,23 @@ class HwsDataTable extends LitElement {
     return html`
       <tfoot>
         <tr>
-          <td colspan="4">
+          <td colspan="2"></td>
+          <td colspan="3">
             <div class="lsa__controls">
               <div class="lsa__control">
                 Zeile
                 <button
                   @click="${this.editRows}"
-                  class="btn btn-light"
+                  class="btn btn-outline-dark"
                   data-action="increment"
                   data-type="row"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg
+                    fill="currentcolor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                  >
                     <path
                       d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32
                       14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67
@@ -430,12 +527,16 @@ class HwsDataTable extends LitElement {
                 </button>
                 <button
                   @click="${this.editRows}"
-                  class="btn btn-light"
+                  class="btn btn-outline-dark"
                   data-action="decrement"
                   data-type="row"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg
+                    fill="currentcolor "
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                  >
                     <path
                       d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32
                       32 32h384c17.67 0 32-14.33
@@ -448,12 +549,16 @@ class HwsDataTable extends LitElement {
                 Schlüssel
                 <button
                   @click="${this.editKeys}"
-                  class="btn btn-light"
+                  class="btn btn-outline-dark"
                   data-action="increment"
                   data-type="key"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg
+                    fill="currentcolor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                  >
                     <path
                       d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32
                       14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67
@@ -465,12 +570,16 @@ class HwsDataTable extends LitElement {
                 </button>
                 <button
                   @click="${this.editKeys}"
-                  class="btn btn-light"
+                  class="btn btn-outline-dark"
                   data-action="decrement"
                   data-type="key"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg
+                    fill="currentcolor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                  >
                     <path
                       d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32
                       32 32h384c17.67 0 32-14.33
@@ -519,8 +628,10 @@ class HwsDataTable extends LitElement {
           ${this.colgroup(this.keys)} ${this.thead(this.keys)}
           ${this.tbody({
             builds: this.builds,
+            details: this.details,
             innerLengths: this.innerLengths,
             items: this.items,
+            keys: this.keys,
             model: this.model,
             outerLengths: this.outerLengths,
             rowIds: this.rowIds,
@@ -528,7 +639,7 @@ class HwsDataTable extends LitElement {
           ${this.tfoot(this.groups, this.keys)}
         </table>
         <button class="btn btn-success">
-          In den Warenkorb legen
+          Schließplan ausdrucken
         </button>
       </form>
     `;

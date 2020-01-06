@@ -58,7 +58,7 @@ export const stylesheet = [
 
     .lsa__controls {
       display: flex;
-      padding-left: 3rem;
+      padding-left: calc(1px + 0.5rem);
     }
 
     .lsa__control {
@@ -80,6 +80,22 @@ export const stylesheet = [
       width: 1rem;
     }
 
+    .btn > .down {
+      display: none;
+    }
+
+    .hide-details .btn > .down {
+      display: inline;
+    }
+
+    .hide-details .btn > .up {
+      display: none;
+    }
+
+    .hide-details .details {
+      display: none;
+    }
+
     td > .btn {
       padding: 0.1875rem 0.5rem;
     }
@@ -93,6 +109,24 @@ export const stylesheet = [
     [data-icon='key'] {
       height: 1.5rem;
       width: 1.5rem;
+    }
+
+    dl {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+
+    dt {
+      flex: 0 0 15%;
+      font-weight: 700;
+      max-width: 15%;
+    }
+
+    dd {
+      flex: 0 0 75%;
+      margin-left: 0;
+      max-width: 75%;
     }
   `,
 ];
