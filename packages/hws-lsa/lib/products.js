@@ -21,7 +21,7 @@ export const getBuilds = async model => {
   return response.json();
 };
 
-export const getData = async reference => {
+export const getDetails = async reference => {
   const response = await fetch(`${productsUrl}${reference}/?verbose=3`);
 
   return response.json();

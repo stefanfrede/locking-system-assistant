@@ -1,10 +1,12 @@
 import { createActions } from 'redux-actions';
 
-import { getBuilds, getData, getReferences } from './lib/products';
+import { getBuilds, getDetails, getReferences } from './lib/products';
 
 export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
 export const ADD_BUILDS = 'ADD_BUILDS';
+export const ADD_DETAILS = 'ADD_DETAILS';
+export const DELETE_DETAILS = 'DELETE_DETAILS';
 export const ADD_GROUP = 'ADD_GROUP';
 export const DELETE_GROUP = 'DELETE_GROUP';
 export const UPDATE_GROUPS = 'UPDATE_GROUPS';
@@ -20,7 +22,7 @@ export const ADD_OUTER_LENGTH = 'ADD_OUTER_LENGTH';
 export const DELETE_OUTER_LENGTH = 'DELETE_OUTER_LENGTH';
 export const ADD_ROW_ID = 'ADD_ROW_ID';
 export const DELETE_ROW_ID = 'DELETE_ROW_ID';
-export const LOAD_DATA = 'LOAD_DATA';
+export const LOAD_DETAILS = 'LOAD_DETAILS';
 export const LOAD_LENGTHS = 'LOAD_LENGTHS';
 export const LOAD_MODELS = 'LOAD_MODELS';
 export const UPDATE_MODEL = 'UPDATE_MODEL';
@@ -30,6 +32,8 @@ export const {
   hideLoader,
   showLoader,
   addBuilds,
+  addDetails,
+  deleteDetails,
   addGroup,
   deleteGroup,
   updateGroups,
@@ -42,7 +46,7 @@ export const {
   deleteOuterLength,
   addRowId,
   deleteRowId,
-  loadData,
+  loadDetails,
   loadLengths,
   loadModels,
   updateMessage,
@@ -60,7 +64,8 @@ export const {
     LOAD_MODELS: [x => x, (_, msgType) => ({ msgType })],
     UPDATE_MESSAGE: [x => x, (_, msgType) => ({ msgType })],
   },
-  UPDATE_GROUPS,
+  ADD_DETAILS,
+  DELETE_DETAILS,
   ADD_ITEM,
   DELETE_ITEM,
   UPDATE_ITEM,
@@ -68,7 +73,8 @@ export const {
   DELETE_INNER_LENGTH,
   ADD_OUTER_LENGTH,
   DELETE_OUTER_LENGTH,
-  LOAD_DATA,
+  LOAD_DETAILS,
+  UPDATE_GROUPS,
   UPDATE_MODEL,
 );
 
@@ -111,9 +117,9 @@ export const fetchLengths = (build, model, rowId) => {
       try {
         const references = await getReferences(build, model);
 
-        Promise.all(references.map(reference => getData(reference))).then(
+        Promise.all(references.map(reference => getDetails(reference))).then(
           products => {
-            const data = {};
+            const details = {};
             const lengths = {};
 
             products.forEach(product => {
@@ -139,10 +145,11 @@ export const fetchLengths = (build, model, rowId) => {
                 lengths[inner] = [outer];
               }
 
-              data[`${model}-${build}-${inner}-${outer}`] = {
+              details[`${model}-${build}-${inner}-${outer}`] = {
                 name: product.name,
                 price: product.price ?? undefined,
                 reference: product.reference,
+                subject: product.subject,
                 text: product.text,
               };
             });
@@ -156,8 +163,8 @@ export const fetchLengths = (build, model, rowId) => {
             );
 
             dispatch(
-              loadData({
-                ...data,
+              loadDetails({
+                ...details,
               }),
             );
 
@@ -203,6 +210,29 @@ export const fetchOuterLengths = (build, model, rowId, innerLength) => {
     };
 
     dispatch(addOuterLength(outerLengths));
+    dispatch(hideLoader());
+  };
+};
+
+export const fetchDetails = ({
+  build,
+  model,
+  innerLength,
+  outerLength,
+  rowId,
+}) => {
+  return ({ dispatch, getState }) => {
+    dispatch(showLoader());
+
+    const {
+      cache: { details },
+    } = getState();
+
+    dispatch(
+      addDetails({
+        [rowId]: details[`${model}-${build}-${innerLength}-${outerLength}`],
+      }),
+    );
     dispatch(hideLoader());
   };
 };

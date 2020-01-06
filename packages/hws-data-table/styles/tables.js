@@ -29,11 +29,16 @@ export const tables = css`
   }
 
   tbody {
+    border-bottom: 1px solid var(--table-border-color, hsl(210, 14%, 89%));
     vertical-align: inherit;
   }
 
   tbody tr td {
     text-align: center;
+  }
+
+  tbody tr.details td {
+    text-align: left;
   }
 
   tbody tr th {
@@ -42,6 +47,7 @@ export const tables = css`
 
   tbody tr td,
   tbody tr th {
+    border-bottom: none;
     padding-bottom: 0.1875rem;
   }
 
@@ -53,7 +59,7 @@ export const tables = css`
    * Hover effect
    */
 
-  tbody tr:hover {
+  tbody:hover tr {
     background-color: var(--table-hover-bg, rgba(0, 0, 0, 0.075));
     color: var(--table-hover-color, hsl(210, 11%, 15%));
   }
