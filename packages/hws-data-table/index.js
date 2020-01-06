@@ -11,7 +11,6 @@ class HwsDataTable extends LitElement {
   static get properties() {
     return {
       builds: { type: Object },
-      details: { type: Object },
       groups: { type: Array },
       guard: { type: Number },
       innerLengths: { type: Object },
@@ -28,7 +27,6 @@ class HwsDataTable extends LitElement {
     super();
 
     this.builds = {};
-    this.details = {};
     this.groups = [];
     this.guard = 3;
     this.innerLengths = {};
@@ -211,16 +209,7 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tbody({
-    builds,
-    details,
-    innerLengths,
-    items,
-    keys,
-    model,
-    outerLengths,
-    rowIds,
-  }) {
+  tbody({ builds, innerLengths, items, keys, model, outerLengths, rowIds }) {
     return html`
       ${repeat(
         rowIds,
@@ -234,7 +223,7 @@ class HwsDataTable extends LitElement {
               <td>
                 <button
                   @click="${this.showDetails}"
-                  ?disabled=${!this.details[rowId]}
+                  ?disabled=${!Object.keys(items[rowId].details).length}
                   class="btn btn-outline-info"
                   type="button"
                 >
@@ -444,26 +433,32 @@ class HwsDataTable extends LitElement {
                     Bestellnummer:
                   </dt>
                   <dd>
-                    ${details[rowId] ? details[rowId].reference : ''}
-                    (${details[rowId] ? details[rowId].subject : ''})
+                    ${items[rowId].details.reference}
+                    (${items[rowId].details.subject})
                   </dd>
                   <dt>
                     Bezeichnung:
                   </dt>
                   <dd>
-                    ${details[rowId] ? details[rowId].name : ''}
+                    ${items[rowId].details.name}
                   </dd>
                   <dt>
                     Beschreibung:
                   </dt>
                   <dd>
-                    ${details[rowId] ? details[rowId].text : ''}
+                    ${items[rowId].details.text}
                   </dd>
                   <dt>
                     Preis:
                   </dt>
                   <dd>
-                    ${details[rowId] ? details[rowId].price : ''}
+                    ${items[rowId].details.price
+                      ? items[rowId].details.price
+                      : html`
+                          <a href="https://www.schweisthal.de/de/login">
+                            Bitte anmelden
+                          </a>
+                        `}
                   </dd>
                 </dl>
               </td>
@@ -628,7 +623,6 @@ class HwsDataTable extends LitElement {
           ${this.colgroup(this.keys)} ${this.thead(this.keys)}
           ${this.tbody({
             builds: this.builds,
-            details: this.details,
             innerLengths: this.innerLengths,
             items: this.items,
             keys: this.keys,

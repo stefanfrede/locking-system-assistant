@@ -8,7 +8,6 @@ import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
 import {
-  deleteDetails,
   addGroup,
   deleteGroup,
   updateGroups,
@@ -28,7 +27,6 @@ import {
 
 import {
   getBuilds,
-  getDetails,
   getGroups,
   getGuard,
   getItems,
@@ -60,7 +58,6 @@ class HwsLsa extends connect(store)(LitElement) {
   static get properties() {
     return {
       builds: { type: Object },
-      details: { type: Object },
       groups: { type: Array },
       guard: { type: Number },
       innerLengths: { type: Object },
@@ -78,7 +75,6 @@ class HwsLsa extends connect(store)(LitElement) {
 
   stateChanged(state) {
     this.builds = state.app.builds;
-    this.details = state.app.details;
     this.groups = state.app.groups;
     this.guard = state.app.guard;
     this.innerLengths = state.app.innerLengths;
@@ -97,7 +93,6 @@ class HwsLsa extends connect(store)(LitElement) {
     super();
 
     this.builds = getBuilds(store.getState());
-    this.details = getDetails(store.getState());
     this.groups = getGroups(store.getState());
     this.guard = getGuard(store.getState());
     this.items = getItems(store.getState());
@@ -155,6 +150,7 @@ class HwsLsa extends connect(store)(LitElement) {
       outerLength: 0,
       quantity: 0,
       keys,
+      details: {},
     };
   }
 
@@ -166,7 +162,6 @@ class HwsLsa extends connect(store)(LitElement) {
 
     store.dispatch(deleteItem(e.detail));
     store.dispatch(deleteRowId(rowIdx, rows));
-    store.dispatch(deleteDetails(e.detail));
   }
 
   _onDismissMessage(e) {
@@ -265,6 +260,7 @@ class HwsLsa extends connect(store)(LitElement) {
     item.build = e.detail.value;
     item.innerLength = 0;
     item.outerLength = 0;
+    item.details = {};
 
     store.dispatch(updateItem({ [rowId]: item }));
 
@@ -273,7 +269,6 @@ class HwsLsa extends connect(store)(LitElement) {
 
     store.dispatch(deleteInnerLength(rowId));
     store.dispatch(deleteOuterLength(rowId));
-    store.dispatch(deleteDetails(rowId));
 
     fetchLengths(item.build, this.model, rowId)(store);
   }
@@ -289,13 +284,13 @@ class HwsLsa extends connect(store)(LitElement) {
 
     item.innerLength = Number(e.detail.value);
     item.outerLength = 0;
+    item.details = {};
 
     store.dispatch(updateItem({ [rowId]: item }));
 
     deselectOption(row.querySelector(`#outer-length-${rowIdx}`));
 
     store.dispatch(deleteOuterLength(rowId));
-    store.dispatch(deleteDetails(rowId));
 
     fetchOuterLengths(item.build, this.model, rowId, item.innerLength)(store);
   }
@@ -308,17 +303,17 @@ class HwsLsa extends connect(store)(LitElement) {
 
     const item = this.items[rowId];
 
-    item.outerLength = Number(e.detail.value);
-
-    store.dispatch(updateItem({ [rowId]: item }));
-
-    fetchDetails({
+    const details = fetchDetails({
       build: this.items[rowId].build,
       model: this.model,
       innerLength: this.items[rowId].innerLength,
-      outerLength: this.items[rowId].outerLength,
-      rowId,
+      outerLength: Number(e.detail.value),
     })(store);
+
+    item.outerLength = Number(e.detail.value);
+    item.details = details;
+
+    store.dispatch(updateItem({ [rowId]: item }));
   }
 
   _onSelectKey(e) {
@@ -349,7 +344,6 @@ class HwsLsa extends connect(store)(LitElement) {
         ></hws-message>
         <hws-data-table
           .builds="${this.builds}"
-          .details="${this.details}"
           .groups="${this.groups}"
           .guard="${this.guard}"
           .innerLengths="${this.innerLengths}"

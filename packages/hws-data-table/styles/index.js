@@ -118,15 +118,15 @@ export const stylesheet = [
     }
 
     dt {
-      flex: 0 0 15%;
+      flex: 0 0 20%;
       font-weight: 700;
-      max-width: 15%;
+      max-width: 20%;
     }
 
     dd {
-      flex: 0 0 75%;
+      flex: 0 0 80%;
       margin-left: 0;
-      max-width: 75%;
+      max-width: 80%;
     }
   `,
 ];
