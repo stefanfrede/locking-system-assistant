@@ -5,8 +5,6 @@ import { getBuilds, getDetails, getReferences } from './lib/products';
 export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
 export const ADD_BUILDS = 'ADD_BUILDS';
-export const ADD_DETAILS = 'ADD_DETAILS';
-export const DELETE_DETAILS = 'DELETE_DETAILS';
 export const ADD_GROUP = 'ADD_GROUP';
 export const DELETE_GROUP = 'DELETE_GROUP';
 export const UPDATE_GROUPS = 'UPDATE_GROUPS';
@@ -32,8 +30,6 @@ export const {
   hideLoader,
   showLoader,
   addBuilds,
-  addDetails,
-  deleteDetails,
   addGroup,
   deleteGroup,
   updateGroups,
@@ -64,8 +60,6 @@ export const {
     LOAD_MODELS: [x => x, (_, msgType) => ({ msgType })],
     UPDATE_MESSAGE: [x => x, (_, msgType) => ({ msgType })],
   },
-  ADD_DETAILS,
-  DELETE_DETAILS,
   ADD_ITEM,
   DELETE_ITEM,
   UPDATE_ITEM,
@@ -214,25 +208,12 @@ export const fetchOuterLengths = (build, model, rowId, innerLength) => {
   };
 };
 
-export const fetchDetails = ({
-  build,
-  model,
-  innerLength,
-  outerLength,
-  rowId,
-}) => {
-  return ({ dispatch, getState }) => {
-    dispatch(showLoader());
-
+export const fetchDetails = ({ build, model, innerLength, outerLength }) => {
+  return ({ getState }) => {
     const {
       cache: { details },
     } = getState();
 
-    dispatch(
-      addDetails({
-        [rowId]: details[`${model}-${build}-${innerLength}-${outerLength}`],
-      }),
-    );
-    dispatch(hideLoader());
+    return details[`${model}-${build}-${innerLength}-${outerLength}`];
   };
 };
