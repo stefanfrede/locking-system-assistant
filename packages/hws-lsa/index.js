@@ -158,6 +158,14 @@ class HwsLsa extends connect(store)(LitElement) {
     e.detail === 'increment' ? addRow()(store) : deleteRow()(store);
   }
 
+  _onReset(e) {
+    e.stopPropagation();
+
+    if (window.confirm(`Wirklich zurücksetzen?`)) {
+      resetApp(e.detail)(store);
+    }
+  }
+
   _onSelectBuild(e) {
     e.stopPropagation();
 
@@ -204,15 +212,6 @@ class HwsLsa extends connect(store)(LitElement) {
 
   _onSelectModel(e) {
     e.stopPropagation();
-
-    if (
-      window.confirm(
-        `Durch das Ändern der Serie werden alle bereits vorgenommenen
-        Einstellung zurück gesetzt. Fortfahren?`,
-      )
-    ) {
-      resetApp(e.detail)(store);
-    }
   }
 
   _onSubmitForm(e) {
@@ -242,6 +241,7 @@ class HwsLsa extends connect(store)(LitElement) {
           @editQuantity="${this._onEditQuantity}"
           @editRows="${this._onEditRows}"
           @deleteRow="${this._onDeleteRow}"
+          @reset="${this._onReset}"
           @selectBuild="${this._onSelectBuild}"
           @selectInnerLength="${this._onSelectInnerLength}"
           @selectOuterLength="${this._onSelectOuterLength}"

@@ -124,6 +124,18 @@ class HwsDataTable extends LitElement {
     return Array.isArray(object[index]) ? object[index] : [];
   }
 
+  reset(e) {
+    e.preventDefault();
+
+    this.dispatchEvent(
+      new CustomEvent('reset', {
+        bubbles: true,
+        composed: true,
+        detail: e.target.closest('button'),
+      }),
+    );
+  }
+
   selectBuild(e) {
     const row = e.target.closest('tbody');
     const id = row.dataset.rowId;
@@ -694,6 +706,9 @@ class HwsDataTable extends LitElement {
           })}
           ${this.tfoot(this.groups, this.keys)}
         </table>
+        <button @click="${this.reset}" class="btn btn-light" type="button">
+          Zurücksetzen
+        </button>
         <button class="btn btn-success">
           Schließplan ausdrucken
         </button>
