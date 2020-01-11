@@ -5,24 +5,22 @@ import {
   SHOW_LOADER,
   ADD_BUILDS,
   ADD_GROUP,
-  DELETE_GROUP,
-  UPDATE_GROUPS,
-  ADD_ITEM,
-  DELETE_ITEM,
-  UPDATE_ITEM,
   ADD_INNER_LENGTH,
-  DELETE_INNER_LENGTH,
+  ADD_ITEM,
+  ADD_MODELS,
   ADD_OUTER_LENGTH,
+  DELETE_GROUP,
+  DELETE_ITEM,
+  DELETE_INNER_LENGTH,
   DELETE_OUTER_LENGTH,
-  ADD_ROW_ID,
-  DELETE_ROW_ID,
+  UPDATE_GROUPS,
+  UPDATE_ITEM,
   UPDATE_MESSAGE,
   UPDATE_MODEL,
 } from '../actions';
 
 const INITIAL_STATE = {
   builds: {},
-  details: {},
   groups: [],
   guard: 3,
   innerLengths: {},
@@ -31,6 +29,7 @@ const INITIAL_STATE = {
   loading: true,
   message: '',
   model: 'R9Plus',
+  models: [],
   msgType: 'info',
   outerLengths: {},
   rowIds: [],
@@ -41,9 +40,6 @@ export default handleActions(
   {
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
       return { ...state, loading: action.payload };
-    },
-    [combineActions(ADD_ITEM, UPDATE_ITEM)]: (state, action) => {
-      return { ...state, items: { ...state.items, ...action.payload } };
     },
     [ADD_BUILDS]: {
       next: (state, action) => {
@@ -64,6 +60,38 @@ export default handleActions(
         keys: action.meta.keys,
       };
     },
+    [ADD_INNER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        innerLengths: { ...state.innerLengths, ...action.payload },
+      };
+    },
+    [ADD_ITEM]: (state, action) => {
+      return {
+        ...state,
+        items: { ...state.items, ...action.payload },
+        rowIds: [...state.rowIds, action.meta.index],
+        rows: action.meta.rows + 1,
+      };
+    },
+    [ADD_OUTER_LENGTH]: (state, action) => {
+      return {
+        ...state,
+        outerLengths: { ...state.outerLengths, ...action.payload },
+      };
+    },
+    [ADD_MODELS]: {
+      next: (state, action) => {
+        return { ...state, models: [...state.models, ...action.payload] };
+      },
+      throw: (state, action) => {
+        return {
+          ...state,
+          message: action.payload.message,
+          msgType: action.meta.msgType,
+        };
+      },
+    },
     [DELETE_GROUP]: (state, action) => {
       return {
         ...state,
@@ -72,28 +100,6 @@ export default handleActions(
           ...state.groups.slice(action.payload + 1),
         ],
         keys: action.meta.keys,
-      };
-    },
-    [UPDATE_GROUPS]: (state, action) => {
-      return {
-        ...state,
-        groups: [...action.payload],
-      };
-    },
-    [DELETE_ITEM]: (state, action) => {
-      return {
-        ...state,
-        items: Object.keys(state.items).reduce(
-          (acc, cur) =>
-            cur !== action.payload ? ((acc[cur] = state.items[cur]), acc) : acc,
-          {},
-        ),
-      };
-    },
-    [ADD_INNER_LENGTH]: (state, action) => {
-      return {
-        ...state,
-        innerLengths: { ...state.innerLengths, ...action.payload },
       };
     },
     [DELETE_INNER_LENGTH]: (state, action) => {
@@ -108,10 +114,19 @@ export default handleActions(
         ),
       };
     },
-    [ADD_OUTER_LENGTH]: (state, action) => {
+    [DELETE_ITEM]: (state, action) => {
       return {
         ...state,
-        outerLengths: { ...state.outerLengths, ...action.payload },
+        items: Object.keys(state.items).reduce(
+          (acc, cur) =>
+            cur !== action.payload ? ((acc[cur] = state.items[cur]), acc) : acc,
+          {},
+        ),
+        rowIds: [
+          ...state.rowIds.slice(0, action.meta.index),
+          ...state.rowIds.slice(action.meta.index + 1),
+        ],
+        rows: action.meta.rows - 1,
       };
     },
     [DELETE_OUTER_LENGTH]: (state, action) => {
@@ -126,29 +141,18 @@ export default handleActions(
         ),
       };
     },
-    [ADD_ROW_ID]: (state, action) => {
-      return {
-        ...state,
-        rowIds: [...state.rowIds, action.payload],
-        rows: action.meta.rows,
-      };
-    },
-    [DELETE_ROW_ID]: (state, action) => {
-      return {
-        ...state,
-        rowIds: [
-          ...state.rowIds.slice(0, action.payload),
-          ...state.rowIds.slice(action.payload + 1),
-        ],
-        rows: action.meta.rows,
-      };
-    },
     [UPDATE_MESSAGE]: (state, action) => {
       return {
         ...state,
         message: action.payload,
         msgType: action.meta.msgType,
       };
+    },
+    [UPDATE_GROUPS]: (state, action) => {
+      return { ...state, groups: [...action.payload] };
+    },
+    [UPDATE_ITEM]: (state, action) => {
+      return { ...state, items: { ...state.items, ...action.payload } };
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };

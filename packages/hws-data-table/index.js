@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit-element';
 import { repeat } from 'lit-html/directives/repeat';
 
+import { deselectOption } from './lib/helpers';
+
 import { stylesheet } from './styles/index.js';
 
 class HwsDataTable extends LitElement {
@@ -50,12 +52,31 @@ class HwsDataTable extends LitElement {
     );
   }
 
+  editGroup(e) {
+    const [, index] = e.target.id.split('-');
+
+    this.groups[Number(index)] = Number(e.target.value);
+
+    this.dispatchEvent(
+      new CustomEvent('edit-group', {
+        bubbles: true,
+        composed: true,
+        detail: this.groups,
+      }),
+    );
+  }
+
   editIdentifier(e) {
+    const id = e.target.closest('tbody').dataset.rowId;
+
+    const item = this.items[id];
+    item.name = e.target.value;
+
     this.dispatchEvent(
       new CustomEvent('editIdentifier', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
@@ -67,17 +88,22 @@ class HwsDataTable extends LitElement {
       new CustomEvent('editKeys', {
         bubbles: true,
         composed: true,
-        detail: e.target.closest('button'),
+        detail: e.target.closest('button').dataset.action,
       }),
     );
   }
 
   editQuantity(e) {
+    const id = e.target.closest('tbody').dataset.rowId;
+
+    const item = this.items[id];
+    item.quantity = Number(e.target.value);
+
     this.dispatchEvent(
       new CustomEvent('editQuantity', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
@@ -89,7 +115,7 @@ class HwsDataTable extends LitElement {
       new CustomEvent('editRows', {
         bubbles: true,
         composed: true,
-        detail: e.target.closest('button'),
+        detail: e.target.closest('button').dataset.action,
       }),
     );
   }
@@ -99,41 +125,81 @@ class HwsDataTable extends LitElement {
   }
 
   selectBuild(e) {
+    const row = e.target.closest('tbody');
+    const id = row.dataset.rowId;
+    const [, index] = e.target.id.split('-');
+
+    const item = this.items[id];
+
+    item.build = e.target.value;
+    item.innerLength = 0;
+    item.outerLength = 0;
+    item.details = {};
+
+    deselectOption(row.querySelector(`#inner-length-${index}`));
+    deselectOption(row.querySelector(`#outer-length-${index}`));
+
     this.dispatchEvent(
       new CustomEvent('selectBuild', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
 
   selectInnerLength(e) {
+    const row = e.target.closest('tbody');
+    const id = row.dataset.rowId;
+    const [, , index] = e.target.id.split('-');
+
+    const item = this.items[id];
+
+    item.innerLength = Number(e.target.value);
+    item.outerLength = 0;
+    item.details = {};
+
+    deselectOption(row.querySelector(`#outer-length-${index}`));
+
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
 
   selectKey(e) {
+    const id = e.target.closest('tbody').dataset.rowId;
+
+    const checked = e.target.checked;
+    const keyNum = Number(e.target.value);
+
+    const item = this.items[id];
+    item.keys[keyNum] = checked;
+
     this.dispatchEvent(
       new CustomEvent('selectKey', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
 
   selectOuterLength(e) {
+    const id = e.target.closest('tbody').dataset.rowId;
+
+    const item = this.items[id];
+
+    item.outerLength = Number(e.target.value);
+
     this.dispatchEvent(
       new CustomEvent('selectOuterLength', {
         bubbles: true,
         composed: true,
-        detail: e.target,
+        detail: { [id]: item },
       }),
     );
   }
@@ -357,7 +423,6 @@ class HwsDataTable extends LitElement {
                 <input
                   @change="${this.editQuantity}"
                   class="js-form-field"
-                  data-type="cylinder"
                   id="quantity-${index}"
                   max=""
                   min="0"
@@ -470,27 +535,7 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tfoot(groups, keys) {
-    const tds = [];
-
-    for (let i = 0; i < keys; i++) {
-      tds.push(html`
-        <td class="lsa__unit">
-          <input
-            @change="${this.editQuantity}"
-            class="js-form-field"
-            data-type="group"
-            id="groups-${i}"
-            max=""
-            min="0"
-            name="groups-${i}"
-            type="number"
-            value="${groups[i]}"
-          />
-        </td>
-      `);
-    }
-
+  tfoot(groups) {
     return html`
       <tfoot>
         <tr>
@@ -609,7 +654,24 @@ class HwsDataTable extends LitElement {
               ></path>
             </svg>
           </td>
-          ${tds}
+          ${repeat(
+            groups,
+            group => group,
+            (group, index) => html`
+              <td class="lsa__unit">
+                <input
+                  @change="${this.editGroup}"
+                  class="js-form-field"
+                  id="groups-${index}"
+                  max=""
+                  min="0"
+                  name="groups-${index}"
+                  type="number"
+                  value="${group}"
+                />
+              </td>
+            `,
+          )}
           <td></td>
         </tr>
       </tfoot>

@@ -3,25 +3,27 @@ import { LitElement, css, html } from 'lit-element';
 import 'hws-data-table';
 import 'hws-loader';
 import 'hws-message';
+import 'hws-select-model';
 
 import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
 import {
-  addGroup,
-  deleteGroup,
-  updateGroups,
-  addItem,
-  deleteItem,
-  updateItem,
+  initApp,
+  resetApp,
+  addKey,
+  addRow,
   deleteInnerLength,
-  updateMessage,
   deleteOuterLength,
-  addRowId,
-  deleteRowId,
+  deleteKey,
+  deleteRow,
+  updateGroups,
+  updateItem,
+  updateMessage,
   fetchBuilds,
   fetchDetails,
   fetchLengths,
+  fetchModels,
   fetchOuterLengths,
 } from './actions';
 
@@ -33,17 +35,20 @@ import {
   getKeys,
   getMessage,
   getModel,
-  getRows,
+  getModels,
   getRowIds,
+  getRows,
 } from './reducers/selectors';
-
-import { deselectOption, uuidv4 } from './lib/helpers';
 
 const store = configureStore();
 
 class HwsLsa extends connect(store)(LitElement) {
   static get styles() {
     return css`
+      :host {
+        display: block;
+      }
+
       :host([hidden]) {
         display: none !important;
       }
@@ -66,10 +71,11 @@ class HwsLsa extends connect(store)(LitElement) {
       loading: { type: Boolean },
       message: { type: String },
       model: { type: String },
+      models: { type: Array },
       msgType: { type: String },
       outerLengths: { type: Object },
-      rows: { type: Number },
       rowIds: { type: Array },
+      rows: { type: Number },
     };
   }
 
@@ -83,10 +89,11 @@ class HwsLsa extends connect(store)(LitElement) {
     this.loading = state.app.loading;
     this.message = state.app.message;
     this.model = state.app.model;
+    this.models = state.app.models;
     this.msgType = state.app.msgType;
     this.outerLengths = state.app.outerLengths;
-    this.rows = state.app.rows;
     this.rowIds = state.app.rowIds;
+    this.rows = state.app.rows;
   }
 
   constructor() {
@@ -99,57 +106,20 @@ class HwsLsa extends connect(store)(LitElement) {
     this.keys = getKeys(store.getState());
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
-    this.rows = getRows(store.getState());
+    this.models = getModels(store.getState());
     this.rowIds = getRowIds(store.getState());
+    this.rows = getRows(store.getState());
 
-    this._initGroups(this.keys);
-    this._initRows(this.keys, this.rows);
+    initApp()(store);
 
+    fetchModels()(store);
     fetchBuilds(this.model)(store);
-  }
-
-  _initGroups(keys) {
-    for (let i = 0; i < keys; i++) {
-      store.dispatch(addGroup(0, i + 1));
-    }
-  }
-
-  _initRows(keys, rows) {
-    for (let i = 0; i < rows; i++) {
-      const rowId = uuidv4();
-      const item = this._getItem(keys);
-
-      store.dispatch(addItem({ [rowId]: item }));
-      store.dispatch(addRowId(rowId, i + 1));
-    }
-  }
-
-  _getItem(num) {
-    const keys = [];
-
-    for (let i = 0; i < num; i++) {
-      keys.push(false);
-    }
-
-    return {
-      name: '',
-      build: '',
-      innerLength: 0,
-      outerLength: 0,
-      quantity: 0,
-      keys,
-      details: {},
-    };
   }
 
   _onDeleteRow(e) {
     e.stopPropagation();
 
-    const rowIdx = this.rowIds.indexOf(e.detail);
-    const rows = this.rows - 1;
-
-    store.dispatch(deleteItem(e.detail));
-    store.dispatch(deleteRowId(rowIdx, rows));
+    deleteRow(e.detail)(store);
   }
 
   _onDismissMessage(e) {
@@ -158,165 +128,91 @@ class HwsLsa extends connect(store)(LitElement) {
     store.dispatch(updateMessage('', 'info'));
   }
 
+  _onEditGroup(e) {
+    e.stopPropagation();
+
+    store.dispatch(updateGroups(e.detail));
+  }
+
   _onEditIdentifier(e) {
     e.stopPropagation();
 
-    const rowId = e.detail.closest('tbody').dataset.rowId;
-
-    const item = this.items[rowId];
-    item.name = e.detail.value;
-
-    store.dispatch(updateItem({ [rowId]: item }));
+    store.dispatch(updateItem(e.detail));
   }
 
   _onEditKeys(e) {
     e.stopPropagation();
 
-    if (e.detail.dataset.action === 'increment') {
-      const keys = this.keys + 1;
-
-      store.dispatch(addGroup(0, keys));
-
-      this.rowIds.forEach(rowId => {
-        const item = this.items[rowId];
-        item.keys.push(false);
-
-        store.dispatch(updateItem({ [rowId]: item }));
-      });
-    } else {
-      const index = this.keys - 1;
-
-      store.dispatch(deleteGroup(index, index));
-
-      this.rowIds.forEach(rowId => {
-        const item = this.items[rowId];
-        item.keys.pop();
-
-        store.dispatch(updateItem({ [rowId]: item }));
-      });
-    }
+    e.detail === 'increment' ? addKey()(store) : deleteKey()(store);
   }
 
   _onEditQuantity(e) {
     e.stopPropagation();
 
-    if (e.detail.dataset.type === 'cylinder') {
-      const rowId = e.detail.closest('tbody').dataset.rowId;
-
-      const item = this.items[rowId];
-      item.quantity = Number(e.detail.value);
-
-      store.dispatch(updateItem({ [rowId]: item }));
-    } else {
-      const [, idx] = e.detail.id.split('-');
-
-      this.groups[Number(idx)] = Number(e.detail.value);
-
-      store.dispatch(updateGroups(this.groups));
-    }
+    store.dispatch(updateItem(e.detail));
   }
 
   _onEditRows(e) {
     e.stopPropagation();
 
-    if (e.detail.dataset.action === 'increment') {
-      const rowId = uuidv4();
-      const rows = this.rows + 1;
-      const item = this._getItem(this.keys);
-
-      store.dispatch(addItem({ [rowId]: item }));
-      store.dispatch(addRowId(rowId, rows));
-    } else {
-      const rowId = this.rowIds[this.rows - 1];
-      const rowIdx = this.rowIds.indexOf(rowId);
-      const rows = this.rows - 1;
-
-      store.dispatch(deleteItem(rowId));
-      store.dispatch(deleteRowId(rowIdx, rows));
-    }
+    e.detail === 'increment' ? addRow()(store) : deleteRow()(store);
   }
 
   _onSelectBuild(e) {
     e.stopPropagation();
 
-    const row = e.detail.closest('tbody');
-    const rowId = row.dataset.rowId;
-    const [, rowIdx] = e.detail.id.split('-');
+    const [[id, item]] = Object.entries(e.detail);
 
-    const item = this.items[rowId];
+    store.dispatch(updateItem(e.detail));
+    store.dispatch(deleteInnerLength(id));
+    store.dispatch(deleteOuterLength(id));
 
-    item.build = e.detail.value;
-    item.innerLength = 0;
-    item.outerLength = 0;
-    item.details = {};
-
-    store.dispatch(updateItem({ [rowId]: item }));
-
-    deselectOption(row.querySelector(`#inner-length-${rowIdx}`));
-    deselectOption(row.querySelector(`#outer-length-${rowIdx}`));
-
-    store.dispatch(deleteInnerLength(rowId));
-    store.dispatch(deleteOuterLength(rowId));
-
-    fetchLengths(item.build, this.model, rowId)(store);
+    fetchLengths(item.build, this.model, id)(store);
   }
 
   _onSelectInnerLength(e) {
     e.stopPropagation();
 
-    const row = e.detail.closest('tbody');
-    const rowId = row.dataset.rowId;
-    const [, , rowIdx] = e.detail.id.split('-');
+    const [[id, item]] = Object.entries(e.detail);
 
-    const item = this.items[rowId];
+    store.dispatch(updateItem(e.detail));
+    store.dispatch(deleteOuterLength(id));
 
-    item.innerLength = Number(e.detail.value);
-    item.outerLength = 0;
-    item.details = {};
+    fetchOuterLengths(item.build, this.model, id, item.innerLength)(store);
+  }
 
-    store.dispatch(updateItem({ [rowId]: item }));
+  _onSelectKey(e) {
+    e.stopPropagation();
 
-    deselectOption(row.querySelector(`#outer-length-${rowIdx}`));
-
-    store.dispatch(deleteOuterLength(rowId));
-
-    fetchOuterLengths(item.build, this.model, rowId, item.innerLength)(store);
+    store.dispatch(updateItem(e.detail));
   }
 
   _onSelectOuterLength(e) {
     e.stopPropagation();
 
-    const row = e.detail.closest('tbody');
-    const rowId = row.dataset.rowId;
+    const [[id, item]] = Object.entries(e.detail);
 
-    const item = this.items[rowId];
-
-    item.outerLength = Number(e.detail.value);
-
-    const details = fetchDetails({
+    item.details = fetchDetails({
       build: item.build,
       model: this.model,
       innerLength: item.innerLength,
       outerLength: item.outerLength,
     })(store);
 
-    item.details = details;
-
-    store.dispatch(updateItem({ [rowId]: item }));
+    store.dispatch(updateItem({ [id]: item }));
   }
 
-  _onSelectKey(e) {
+  _onSelectModel(e) {
     e.stopPropagation();
 
-    const rowId = e.detail.closest('tbody').dataset.rowId;
-
-    const checked = e.detail.checked;
-    const keyNum = Number(e.detail.value);
-
-    const item = this.items[rowId];
-    item.keys[keyNum] = checked;
-
-    store.dispatch(updateItem({ [rowId]: item }));
+    if (
+      window.confirm(
+        `Durch das Ändern der Serie werden alle bereits vorgenommenen
+        Einstellung zurück gesetzt. Fortfahren?`,
+      )
+    ) {
+      resetApp(e.detail)(store);
+    }
   }
 
   _onSubmitForm(e) {
@@ -325,6 +221,13 @@ class HwsLsa extends connect(store)(LitElement) {
 
   render() {
     return html`
+      <p>
+        <hws-select-model
+          @select-model="${this._onSelectModel}"
+          .model="${this.model}"
+          .models="${this.models}"
+        ></hws-select-model>
+      </p>
       <div class="data-table-wrapper">
         <hws-message
           @dismissMessage="${this._onDismissMessage}"
@@ -333,6 +236,7 @@ class HwsLsa extends connect(store)(LitElement) {
           ?hidden="${!this.message}"
         ></hws-message>
         <hws-data-table
+          @edit-group="${this._onEditGroup}"
           @editIdentifier="${this._onEditIdentifier}"
           @editKeys="${this._onEditKeys}"
           @editQuantity="${this._onEditQuantity}"

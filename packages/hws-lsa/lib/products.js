@@ -2,47 +2,51 @@ import { fetchWithTimeout } from './helpers';
 
 const productsUrl = PRODUCTS_API_URL; // eslint-disable-line no-undef
 
-export const getBuilds = async model => {
-  const response = await fetchWithTimeout(productsUrl, {
+const fetchData = async body => {
+  return await fetchWithTimeout(productsUrl, {
     method: 'POST',
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      filter: [
-        { name: 'Hersteller', value: 'Iseo' },
-        { name: 'Serie', value: model },
-      ],
-      selector: 'Bauart',
-    }),
-  });
-
-  return response.json();
+    body: JSON.stringify(body),
+  }).then(r => r.json());
 };
+
+export const getBuilds = model =>
+  fetchData({
+    filter: [
+      { name: 'Hersteller', value: 'Iseo' },
+      { name: 'Serie', value: model },
+    ],
+    selector: 'Bauart',
+  });
 
 export const getDetails = async reference => {
-  const response = await fetch(`${productsUrl}${reference}/?verbose=3`);
-
-  return response.json();
+  return await fetchWithTimeout(
+    `${productsUrl}${reference}/?verbose=3`,
+  ).then(r => r.json());
 };
 
-export const getReferences = async (build, model) => {
-  const response = await fetchWithTimeout(productsUrl, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      filter: [
-        { name: 'Hersteller', value: 'Iseo' },
-        { name: 'Serie', value: model },
-        { name: 'Bauart', value: build },
-      ],
-      selector: 'reference',
+export const getModels = async () => {
+  return await Promise.all([
+    fetchData({
+      filter: [{ name: 'Hersteller', value: 'Iseo' }],
+      selector: 'Serie',
     }),
-  });
-
-  return response.json();
+    fetchData({
+      filter: [{ name: 'Hersteller', value: 'Gera' }],
+      selector: 'Serie',
+    }),
+  ]);
 };
+
+export const getReferences = (build, model) =>
+  fetchData({
+    filter: [
+      { name: 'Hersteller', value: 'Iseo' },
+      { name: 'Serie', value: model },
+      { name: 'Bauart', value: build },
+    ],
+    selector: 'reference',
+  });

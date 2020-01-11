@@ -1,11 +1,10 @@
 import { handleActions } from 'redux-actions';
 
-import { LOAD_DETAILS, LOAD_LENGTHS, LOAD_MODELS } from '../actions';
+import { LOAD_DETAILS, LOAD_LENGTHS } from '../actions';
 
 const INITIAL_STATE = {
   details: {},
   lengths: {},
-  models: ['R9Plus'],
 };
 
 export default handleActions(
@@ -16,18 +15,6 @@ export default handleActions(
     [LOAD_LENGTHS]: {
       next: (state, action) => {
         return { ...state, lengths: { ...state.lengths, ...action.payload } };
-      },
-      throw: (state, action) => {
-        return {
-          ...state,
-          message: action.payload.message,
-          msgType: action.meta.msgType,
-        };
-      },
-    },
-    [LOAD_MODELS]: {
-      next: (state, action) => {
-        return { ...state, models: [...state.models, ...action.payload] };
       },
       throw: (state, action) => {
         return {
