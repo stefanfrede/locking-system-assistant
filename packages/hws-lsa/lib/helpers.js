@@ -1,20 +1,3 @@
-export const deselectOption = target => {
-  const selected = getSelectedOption(target);
-  const options = Array.from(target.options);
-  const option = options.find(option => option.value === selected);
-
-  if (option.value) {
-    option.selected = false;
-  }
-};
-
-export const getSelectedOption = target => {
-  const options = target.options;
-  const selectedIndex = target.selectedIndex;
-  const selected = options[selectedIndex];
-  return selected.value;
-};
-
 export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
   const controller = new AbortController();
   const config = { ...options, signal: controller.signal };
@@ -155,6 +138,17 @@ export const serialize = form => {
   }
 
   return serialized;
+};
+
+export const slugify = str => {
+  return str
+    .split('')
+    .reduce((acc, cur) => {
+      return acc + cur.replace(/\s/g, '-');
+    }, '')
+    .replace(/--/g, '-')
+    .toLowerCase()
+    .trim();
 };
 
 export const uuidv4 = () =>
