@@ -209,6 +209,229 @@ export const deleteRow = id => {
   };
 };
 
+function collectDetails(payload) {
+  const details = {};
+  const lengths = {};
+
+  payload.forEach(data => {
+    const [{ value: model }] = data.specifications.filter(
+      specification => specification.name === 'Serie',
+    );
+
+    const [{ value: build }] = data.specifications.filter(
+      specification => specification.name === 'Bauart',
+    );
+
+    const [{ value: length }] = data.specifications.filter(
+      specification => specification.name === 'Teillänge (C+D)',
+    );
+
+    const [inner, outer] = length
+      .split('+')
+      .map(str => Number(str.trim().replace('mm', '')));
+
+    if (lengths[inner]) {
+      lengths[inner].push(outer);
+    } else {
+      lengths[inner] = [outer];
+    }
+
+    details[slugify(`${model}-${build}-${inner}-${outer}`)] = {
+      name: data.name,
+      price: data.price ?? undefined,
+      reference: data.reference,
+      subject: data.subject,
+      text: data.text,
+    };
+  });
+
+  return {
+    details,
+    lengths,
+  };
+}
+
+//
+// TODO refactor this awful code!!!
+//
+export const cacscadeData = model => {
+  return async ({ dispatch, getState }) => {
+    let {
+      app: { builds, items },
+    } = getState();
+
+    const {
+      cache: { details, lengths },
+    } = getState();
+
+    dispatch(showLoader());
+    dispatch(updateModel(model));
+
+    // Get builds for the model
+    builds = Array.isArray(builds?.[model])
+      ? builds[model]
+      : await getBuilds(model);
+
+    // loop through data
+    for (let [id, item] of Object.entries(items)) {
+      const build = item.build;
+      const hasBuild = !!~builds.indexOf(build);
+
+      if (hasBuild) {
+        const hasLength = lengths[slugify(`${model}-${build}`)];
+
+        if (hasLength) {
+          const lengths = hasLength;
+
+          const innerLengths = Object.keys(lengths).map(Number);
+          const hasInnerLength = !!~innerLengths.indexOf(item.innerLength);
+
+          dispatch(addBuilds({ [model]: builds }));
+
+          if (hasInnerLength) {
+            dispatch(addInnerLength({ [id]: innerLengths }));
+
+            const outerLengths = lengths[item.innerLength].sort(
+              (a, b) => a - b,
+            );
+
+            const hasOuterLength = !!~outerLengths.indexOf(item.outerLength);
+
+            if (hasOuterLength) {
+              dispatch(addOuterLength({ [id]: outerLengths }));
+
+              item.details =
+                details[
+                  slugify(
+                    `${model}-${build}-${item.innerLength}-${item.outerLength}`,
+                  )
+                ];
+
+              dispatch(updateItem({ [id]: item }));
+              dispatch(hideLoader());
+            } else {
+              item.outerLength = 0;
+              item.details = {};
+
+              dispatch(updateItem({ [id]: item }));
+              dispatch(deleteOuterLength(id));
+
+              setTimeout(() => {
+                dispatch(addOuterLength({ [id]: outerLengths }));
+                dispatch(hideLoader());
+              }, 500);
+            }
+          } else {
+            item.innerLength = 0;
+            item.outerLength = 0;
+            item.details = {};
+
+            dispatch(updateItem({ [id]: item }));
+            dispatch(deleteInnerLength(id));
+            dispatch(deleteOuterLength(id));
+
+            setTimeout(() => {
+              dispatch(addInnerLength({ [id]: innerLengths }));
+              dispatch(hideLoader());
+            }, 500);
+          }
+        } else {
+          const references = await getReferences(build, model);
+
+          Promise.all(references.map(reference => getDetails(reference))).then(
+            payload => {
+              const { details, lengths } = collectDetails(payload);
+
+              const innerLengths = Object.keys(lengths).map(Number);
+              const hasInnerLength = !!~innerLengths.indexOf(item.innerLength);
+
+              dispatch(addBuilds({ [model]: builds }));
+
+              if (hasInnerLength) {
+                dispatch(addInnerLength({ [id]: innerLengths }));
+
+                const outerLengths = lengths[item.innerLength].sort(
+                  (a, b) => a - b,
+                );
+
+                const hasOuterLength = !!~outerLengths.indexOf(
+                  item.outerLength,
+                );
+
+                if (hasOuterLength) {
+                  dispatch(addOuterLength({ [id]: outerLengths }));
+
+                  item.details =
+                    details[
+                      slugify(
+                        `${model}-${build}-${item.innerLength}-${item.outerLength}`,
+                      )
+                    ];
+
+                  dispatch(updateItem({ [id]: item }));
+                  dispatch(hideLoader());
+                } else {
+                  item.outerLength = 0;
+                  item.details = {};
+
+                  dispatch(updateItem({ [id]: item }));
+                  dispatch(deleteOuterLength(id));
+
+                  setTimeout(() => {
+                    dispatch(addOuterLength({ [id]: outerLengths }));
+                    dispatch(hideLoader());
+                  }, 500);
+                }
+              } else {
+                item.innerLength = 0;
+                item.outerLength = 0;
+                item.details = {};
+
+                dispatch(updateItem({ [id]: item }));
+                dispatch(deleteInnerLength(id));
+                dispatch(deleteOuterLength(id));
+
+                setTimeout(() => {
+                  dispatch(addInnerLength({ [id]: innerLengths }));
+                  dispatch(hideLoader());
+                }, 500);
+              }
+
+              dispatch(
+                loadLengths({
+                  [slugify(`${model}-${build}`)]: {
+                    ...lengths,
+                  },
+                }),
+              );
+
+              dispatch(
+                loadDetails({
+                  ...details,
+                }),
+              );
+            },
+          );
+        }
+      } else {
+        const item = items[id];
+
+        item.build = '';
+        item.innerLength = 0;
+        item.outerLength = 0;
+        item.details = {};
+
+        dispatch(addBuilds({ [model]: builds }));
+        dispatch(updateItem({ [id]: item }));
+        dispatch(deleteInnerLength(id));
+        dispatch(deleteOuterLength(id));
+
+        dispatch(hideLoader());
+      }
+    }
+  };
+};
+
 export const fetchBuilds = model => {
   return async ({ dispatch, getState }) => {
     dispatch(showLoader());
@@ -309,7 +532,9 @@ export const fetchLengths = (build, model, rowId) => {
       cache: { lengths },
     } = getState();
 
-    if ((lengths = lengths[`${model}-${build}`])) {
+    const hasLength = lengths[slugify(`${model}-${build}`)];
+
+    if (hasLength) {
       fetchInnerLengths(build, model, rowId)({ dispatch, getState });
       dispatch(hideLoader());
     } else {
@@ -317,41 +542,8 @@ export const fetchLengths = (build, model, rowId) => {
         const references = await getReferences(build, model);
 
         Promise.all(references.map(reference => getDetails(reference))).then(
-          products => {
-            const details = {};
-            const lengths = {};
-
-            products.forEach(product => {
-              const [{ value: model }] = product.specifications.filter(
-                specification => specification.name === 'Serie',
-              );
-
-              const [{ value: build }] = product.specifications.filter(
-                specification => specification.name === 'Bauart',
-              );
-
-              const [{ value: length }] = product.specifications.filter(
-                specification => specification.name === 'Teillänge (C+D)',
-              );
-
-              const [inner, outer] = length
-                .split('+')
-                .map(str => Number(str.trim().replace('mm', '')));
-
-              if (lengths[inner]) {
-                lengths[inner].push(outer);
-              } else {
-                lengths[inner] = [outer];
-              }
-
-              details[slugify(`${model}-${build}-${inner}-${outer}`)] = {
-                name: product.name,
-                price: product.price ?? undefined,
-                reference: product.reference,
-                subject: product.subject,
-                text: product.text,
-              };
-            });
+          payload => {
+            const { details, lengths } = collectDetails(payload);
 
             dispatch(
               loadLengths({
