@@ -293,7 +293,12 @@ class HwsDataTable extends LitElement {
         rowIds,
         rowId => rowId,
         (rowId, index) => html`
-          <tbody class="hide-details" data-row-id="${rowId}">
+          <tbody
+            class="${Object.keys(items[rowId].details).length
+              ? ''
+              : 'hide-details'}"
+            data-row-id="${rowId}"
+          >
             <tr>
               <th scope="row">
                 ${index + 1}

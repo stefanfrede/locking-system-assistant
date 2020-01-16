@@ -16,7 +16,7 @@ const fetchData = async body => {
 export const getBuilds = model =>
   fetchData({
     filter: [
-      { name: 'Hersteller', value: 'Iseo' },
+      { name: 'Hersteller', value: 'Iseo*' },
       { name: 'Serie', value: model },
     ],
     selector: 'Bauart',

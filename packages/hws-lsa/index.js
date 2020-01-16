@@ -25,6 +25,7 @@ import {
   fetchLengths,
   fetchModels,
   fetchOuterLengths,
+  cacscadeData,
 } from './actions';
 
 import {
@@ -212,6 +213,8 @@ class HwsLsa extends connect(store)(LitElement) {
 
   _onSelectModel(e) {
     e.stopPropagation();
+
+    cacscadeData(e.detail)(store);
   }
 
   _onSubmitForm(e) {
