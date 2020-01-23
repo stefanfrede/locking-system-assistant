@@ -358,16 +358,17 @@ class HwsTable extends LitElement {
                   <option selected hidden value>
                     Bitte auswählen
                   </option>
-                  ${builds.map(
-                    option =>
-                      html`
-                        <option
-                          ?selected="${option === items[row].build}"
-                          value="${option}"
-                        >
-                          ${option}
-                        </option>
-                      `,
+                  ${repeat(
+                    builds,
+                    option => option,
+                    option => html`
+                      <option
+                        ?selected="${option === items[row].build}"
+                        value="${option}"
+                      >
+                        ${option}
+                      </option>
+                    `,
                   )}
                 </select>
               </td>
@@ -386,19 +387,20 @@ class HwsTable extends LitElement {
                     <option selected hidden value>
                       Innen
                     </option>
-                    ${this.getSelectOptions({
-                      index: row,
-                      object: innerLengths,
-                    }).map(
-                      option =>
-                        html`
-                          <option
-                            ?selected="${option === items[row].innerLength}"
-                            value="${option}"
-                          >
-                            ${option}
-                          </option>
-                        `,
+                    ${repeat(
+                      this.getSelectOptions({
+                        index: row,
+                        object: innerLengths,
+                      }),
+                      option => option,
+                      option => html`
+                        <option
+                          ?selected="${option === items[row].innerLength}"
+                          value="${option}"
+                        >
+                          ${option}
+                        </option>
+                      `,
                     )}
                   </select>
                   <select
@@ -414,19 +416,20 @@ class HwsTable extends LitElement {
                     <option selected hidden value>
                       Außen
                     </option>
-                    ${this.getSelectOptions({
-                      index: row,
-                      object: outerLengths,
-                    }).map(
-                      option =>
-                        html`
-                          <option
-                            ?selected="${option === items[row].outerLength}"
-                            value="${option}"
-                          >
-                            ${option}
-                          </option>
-                        `,
+                    ${repeat(
+                      this.getSelectOptions({
+                        index: row,
+                        object: outerLengths,
+                      }),
+                      option => option,
+                      option => html`
+                        <option
+                          ?selected="${option === items[row].outerLength}"
+                          value="${option}"
+                        >
+                          ${option}
+                        </option>
+                      `,
                     )}
                   </select>
                 </div>
