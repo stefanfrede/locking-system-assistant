@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit-element';
 
-import 'hws-data-table';
+import 'hws-table';
 import 'hws-loader';
 import 'hws-message';
 import 'hws-select-model';
@@ -9,12 +9,10 @@ import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
 import {
-  initApp,
-  resetApp,
+  initAssistant,
+  resetAssistant,
   addKey,
   addRow,
-  deleteInnerLength,
-  deleteOuterLength,
   deleteKey,
   deleteRow,
   updateGroups,
@@ -22,10 +20,10 @@ import {
   updateMessage,
   fetchBuilds,
   fetchDetails,
-  fetchLengths,
+  fetchInnerLengths,
   fetchModels,
   fetchOuterLengths,
-  cacscadeData,
+  reloadData,
 } from './actions';
 
 import {
@@ -37,7 +35,6 @@ import {
   getMessage,
   getModel,
   getModels,
-  getRowIds,
   getRows,
 } from './reducers/selectors';
 
@@ -88,12 +85,11 @@ class HwsLsa extends connect(store)(LitElement) {
     this.items = state.app.items;
     this.keys = state.app.keys;
     this.loading = state.app.loading;
-    this.message = state.app.message;
+    this.message = state.cache.message;
     this.model = state.app.model;
     this.models = state.app.models;
-    this.msgType = state.app.msgType;
+    this.msgType = state.cache.msgType;
     this.outerLengths = state.app.outerLengths;
-    this.rowIds = state.app.rowIds;
     this.rows = state.app.rows;
   }
 
@@ -108,19 +104,21 @@ class HwsLsa extends connect(store)(LitElement) {
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
     this.models = getModels(store.getState());
-    this.rowIds = getRowIds(store.getState());
     this.rows = getRows(store.getState());
 
-    initApp()(store);
+    this._init();
+  }
 
-    fetchModels()(store);
-    fetchBuilds(this.model)(store);
+  async _init() {
+    await store.dispatch(initAssistant());
+    await store.dispatch(fetchModels());
+    await store.dispatch(fetchBuilds(this.model));
   }
 
   _onDeleteRow(e) {
     e.stopPropagation();
 
-    deleteRow(e.detail)(store);
+    store.dispatch(deleteRow(e.detail));
   }
 
   _onDismissMessage(e) {
@@ -144,7 +142,9 @@ class HwsLsa extends connect(store)(LitElement) {
   _onEditKeys(e) {
     e.stopPropagation();
 
-    e.detail === 'increment' ? addKey()(store) : deleteKey()(store);
+    e.detail === 'increment'
+      ? store.dispatch(addKey())
+      : store.dispatch(deleteKey());
   }
 
   _onEditQuantity(e) {
@@ -156,38 +156,29 @@ class HwsLsa extends connect(store)(LitElement) {
   _onEditRows(e) {
     e.stopPropagation();
 
-    e.detail === 'increment' ? addRow()(store) : deleteRow()(store);
+    e.detail === 'increment'
+      ? store.dispatch(addRow())
+      : store.dispatch(deleteRow());
   }
 
   _onReset(e) {
     e.stopPropagation();
 
     if (window.confirm(`Wirklich zurücksetzen?`)) {
-      resetApp(e.detail)(store);
+      store.dispatch(resetAssistant());
     }
   }
 
   _onSelectBuild(e) {
     e.stopPropagation();
 
-    const [[id, item]] = Object.entries(e.detail);
-
-    store.dispatch(updateItem(e.detail));
-    store.dispatch(deleteInnerLength(id));
-    store.dispatch(deleteOuterLength(id));
-
-    fetchLengths(item.build, this.model, id)(store);
+    store.dispatch(fetchInnerLengths(e.detail));
   }
 
   _onSelectInnerLength(e) {
     e.stopPropagation();
 
-    const [[id, item]] = Object.entries(e.detail);
-
-    store.dispatch(updateItem(e.detail));
-    store.dispatch(deleteOuterLength(id));
-
-    fetchOuterLengths(item.build, this.model, id, item.innerLength)(store);
+    store.dispatch(fetchOuterLengths(e.detail));
   }
 
   _onSelectKey(e) {
@@ -199,22 +190,13 @@ class HwsLsa extends connect(store)(LitElement) {
   _onSelectOuterLength(e) {
     e.stopPropagation();
 
-    const [[id, item]] = Object.entries(e.detail);
-
-    item.details = fetchDetails({
-      build: item.build,
-      model: this.model,
-      innerLength: item.innerLength,
-      outerLength: item.outerLength,
-    })(store);
-
-    store.dispatch(updateItem({ [id]: item }));
+    store.dispatch(fetchDetails(e.detail));
   }
 
   _onSelectModel(e) {
     e.stopPropagation();
 
-    cacscadeData(e.detail)(store);
+    store.dispatch(reloadData(e.detail));
   }
 
   _onSubmitForm(e) {
@@ -237,7 +219,7 @@ class HwsLsa extends connect(store)(LitElement) {
           .msgType="${this.msgType}"
           ?hidden="${!this.message}"
         ></hws-message>
-        <hws-data-table
+        <hws-table
           @edit-group="${this._onEditGroup}"
           @editIdentifier="${this._onEditIdentifier}"
           @editKeys="${this._onEditKeys}"
@@ -256,11 +238,9 @@ class HwsLsa extends connect(store)(LitElement) {
           .innerLengths="${this.innerLengths}"
           .items="${this.items}"
           .keys="${this.keys}"
-          .model="${this.model}"
           .outerLengths="${this.outerLengths}"
           .rows="${this.rows}"
-          .rowIds="${this.rowIds}"
-        ></hws-data-table>
+        ></hws-table>
         <hws-loader
           ?message="${this.message}"
           ?hidden="${!this.loading}"
