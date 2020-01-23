@@ -3,36 +3,32 @@ import { handleActions, combineActions } from 'redux-actions';
 import {
   HIDE_LOADER,
   SHOW_LOADER,
-  ADD_BUILDS,
   ADD_GROUP,
   ADD_INNER_LENGTH,
   ADD_ITEM,
-  ADD_MODELS,
   ADD_OUTER_LENGTH,
   DELETE_GROUP,
   DELETE_ITEM,
   DELETE_INNER_LENGTH,
   DELETE_OUTER_LENGTH,
+  UPDATE_BUILDS,
   UPDATE_GROUPS,
   UPDATE_ITEM,
-  UPDATE_MESSAGE,
   UPDATE_MODEL,
+  UPDATE_MODELS,
 } from '../actions';
 
 const INITIAL_STATE = {
-  builds: {},
+  builds: [],
   groups: [],
   guard: 3,
   innerLengths: {},
   items: {},
   keys: 5,
   loading: true,
-  message: '',
   model: 'R9Plus',
   models: [],
-  msgType: 'info',
   outerLengths: {},
-  rowIds: [],
   rows: 5,
 };
 
@@ -40,18 +36,6 @@ export default handleActions(
   {
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
       return { ...state, loading: action.payload };
-    },
-    [ADD_BUILDS]: {
-      next: (state, action) => {
-        return { ...state, builds: { ...state.builds, ...action.payload } };
-      },
-      throw: (state, action) => {
-        return {
-          ...state,
-          message: action.payload.message,
-          msgType: action.meta.msgType,
-        };
-      },
     },
     [ADD_GROUP]: (state, action) => {
       return {
@@ -70,7 +54,6 @@ export default handleActions(
       return {
         ...state,
         items: { ...state.items, ...action.payload },
-        rowIds: [...state.rowIds, action.meta.index],
         rows: action.meta.rows + 1,
       };
     },
@@ -79,18 +62,6 @@ export default handleActions(
         ...state,
         outerLengths: { ...state.outerLengths, ...action.payload },
       };
-    },
-    [ADD_MODELS]: {
-      next: (state, action) => {
-        return { ...state, models: [...state.models, ...action.payload] };
-      },
-      throw: (state, action) => {
-        return {
-          ...state,
-          message: action.payload.message,
-          msgType: action.meta.msgType,
-        };
-      },
     },
     [DELETE_GROUP]: (state, action) => {
       return {
@@ -122,10 +93,6 @@ export default handleActions(
             cur !== action.payload ? ((acc[cur] = state.items[cur]), acc) : acc,
           {},
         ),
-        rowIds: [
-          ...state.rowIds.slice(0, action.meta.index),
-          ...state.rowIds.slice(action.meta.index + 1),
-        ],
         rows: action.meta.rows - 1,
       };
     },
@@ -141,12 +108,8 @@ export default handleActions(
         ),
       };
     },
-    [UPDATE_MESSAGE]: (state, action) => {
-      return {
-        ...state,
-        message: action.payload,
-        msgType: action.meta.msgType,
-      };
+    [UPDATE_BUILDS]: (state, action) => {
+      return { ...state, builds: action.payload };
     },
     [UPDATE_GROUPS]: (state, action) => {
       return { ...state, groups: [...action.payload] };
@@ -156,6 +119,9 @@ export default handleActions(
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };
+    },
+    [UPDATE_MODELS]: (state, action) => {
+      return { ...state, models: action.payload };
     },
   },
   INITIAL_STATE,

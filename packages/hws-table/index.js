@@ -5,7 +5,7 @@ import { deselectOption } from './lib/helpers';
 
 import { stylesheet } from './styles/index.js';
 
-class HwsDataTable extends LitElement {
+class HwsTable extends LitElement {
   static get styles() {
     return [stylesheet];
   }
@@ -18,10 +18,8 @@ class HwsDataTable extends LitElement {
       innerLengths: { type: Object },
       items: { type: Object },
       keys: { type: Number },
-      model: { type: String },
       outerLengths: { type: Object },
       rows: { type: Number },
-      rowIds: { type: Array },
     };
   }
 
@@ -34,10 +32,8 @@ class HwsDataTable extends LitElement {
     this.innerLengths = {};
     this.items = {};
     this.keys = 5;
-    this.model = '';
     this.outerLengths = {};
     this.rows = 5;
-    this.rowIds = [];
   }
 
   deleteRow(e) {
@@ -131,7 +127,7 @@ class HwsDataTable extends LitElement {
       new CustomEvent('reset', {
         bubbles: true,
         composed: true,
-        detail: e.target.closest('button'),
+        detail: e.target,
       }),
     );
   }
@@ -287,17 +283,19 @@ class HwsDataTable extends LitElement {
     `;
   }
 
-  tbody({ builds, innerLengths, items, keys, model, outerLengths, rowIds }) {
+  tbody({ builds, innerLengths, items, keys, outerLengths }) {
+    const rows = Object.keys(items);
+
     return html`
       ${repeat(
-        rowIds,
-        rowId => rowId,
-        (rowId, index) => html`
+        rows,
+        row => row,
+        (row, index) => html`
           <tbody
-            class="${Object.keys(items[rowId].details).length
+            class="${Object.keys(items[row].details).length
               ? ''
               : 'hide-details'}"
-            data-row-id="${rowId}"
+            data-row-id="${row}"
           >
             <tr>
               <th scope="row">
@@ -306,7 +304,7 @@ class HwsDataTable extends LitElement {
               <td>
                 <button
                   @click="${this.showDetails}"
-                  ?disabled=${!Object.keys(items[rowId].details).length}
+                  ?disabled=${!Object.keys(items[row].details).length}
                   class="btn btn-outline-info"
                   type="button"
                 >
@@ -346,16 +344,13 @@ class HwsDataTable extends LitElement {
                   type="text"
                   name="name-${index}"
                   placeholder="Tür- oder Raumbezeichner"
-                  value="${items[rowId].name}"
+                  value="${items[row].name}"
                 />
               </td>
               <td>
                 <select
                   @change="${this.selectBuild}"
-                  ?disabled=${!this.getSelectOptions({
-                    index: model,
-                    object: builds,
-                  }).length}
+                  ?disabled=${!builds.length}
                   class="js-form-field"
                   id="build-${index}"
                   name="build-${index}"
@@ -363,11 +358,11 @@ class HwsDataTable extends LitElement {
                   <option selected hidden value>
                     Bitte auswählen
                   </option>
-                  ${this.getSelectOptions({ index: model, object: builds }).map(
+                  ${builds.map(
                     option =>
                       html`
                         <option
-                          ?selected="${option === items[rowId].build}"
+                          ?selected="${option === items[row].build}"
                           value="${option}"
                         >
                           ${option}
@@ -381,7 +376,7 @@ class HwsDataTable extends LitElement {
                   <select
                     @change="${this.selectInnerLength}"
                     ?disabled=${!this.getSelectOptions({
-                      index: rowId,
+                      index: row,
                       object: innerLengths,
                     }).length}
                     class="js-form-field"
@@ -392,13 +387,13 @@ class HwsDataTable extends LitElement {
                       Innen
                     </option>
                     ${this.getSelectOptions({
-                      index: rowId,
+                      index: row,
                       object: innerLengths,
                     }).map(
                       option =>
                         html`
                           <option
-                            ?selected="${option === items[rowId].innerLength}"
+                            ?selected="${option === items[row].innerLength}"
                             value="${option}"
                           >
                             ${option}
@@ -409,7 +404,7 @@ class HwsDataTable extends LitElement {
                   <select
                     @change="${this.selectOuterLength}"
                     ?disabled=${!this.getSelectOptions({
-                      index: rowId,
+                      index: row,
                       object: outerLengths,
                     }).length}
                     class="js-form-field"
@@ -420,13 +415,13 @@ class HwsDataTable extends LitElement {
                       Außen
                     </option>
                     ${this.getSelectOptions({
-                      index: rowId,
+                      index: row,
                       object: outerLengths,
                     }).map(
                       option =>
                         html`
                           <option
-                            ?selected="${option === items[rowId].outerLength}"
+                            ?selected="${option === items[row].outerLength}"
                             value="${option}"
                           >
                             ${option}
@@ -445,10 +440,10 @@ class HwsDataTable extends LitElement {
                   min="0"
                   name="quantity-${index}"
                   type="number"
-                  value="${items[rowId].quantity}"
+                  value="${items[row].quantity}"
                 />
               </td>
-              ${items[rowId].keys.map(
+              ${items[row].keys.map(
                 (key, idx) => html`
                   <td>
                     <div class="chkb">
@@ -515,27 +510,27 @@ class HwsDataTable extends LitElement {
                     Bestellnummer:
                   </dt>
                   <dd>
-                    ${items[rowId].details.reference}
-                    (${items[rowId].details.subject})
+                    ${items[row].details.reference}
+                    (${items[row].details.subject})
                   </dd>
                   <dt>
                     Bezeichnung:
                   </dt>
                   <dd>
-                    ${items[rowId].details.name}
+                    ${items[row].details.name}
                   </dd>
                   <dt>
                     Beschreibung:
                   </dt>
                   <dd>
-                    ${items[rowId].details.text}
+                    ${items[row].details.text}
                   </dd>
                   <dt>
                     Preis:
                   </dt>
                   <dd>
-                    ${items[rowId].details.price
-                      ? items[rowId].details.price
+                    ${items[row].details.price
+                      ? items[row].details.price
                       : html`
                           <a href="https://www.schweisthal.de/de/login">
                             Bitte anmelden
@@ -705,9 +700,7 @@ class HwsDataTable extends LitElement {
             innerLengths: this.innerLengths,
             items: this.items,
             keys: this.keys,
-            model: this.model,
             outerLengths: this.outerLengths,
-            rowIds: this.rowIds,
           })}
           ${this.tfoot(this.groups, this.keys)}
         </table>
@@ -758,4 +751,4 @@ class HwsDataTable extends LitElement {
   }
 }
 
-customElements.define('hws-data-table', HwsDataTable);
+customElements.define('hws-table', HwsTable);

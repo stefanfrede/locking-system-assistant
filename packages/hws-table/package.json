@@ -1,6 +1,6 @@
 {
-  "name": "hws-data-table",
-  "description": "hws-data-table is a table to configure a locking system.",
+  "name": "hws-table",
+  "description": "hws-table is a table to configure a locking system.",
   "keywords": [
     "table",
     "data-table",
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/stefanfrede/locking-system-assistant",
-    "directory": "packages/hws-data-table"
+    "directory": "packages/hws-table"
   },
   "engines": {
     "node": "10.x.x",
