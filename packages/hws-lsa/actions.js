@@ -300,30 +300,32 @@ export function fetchBuilds(model) {
   };
 }
 
-export function fetchDetails(data) {
+export const fetchDetails = ({ outerLength, id }) => {
   return function(dispatch, getState) {
     dispatch(showLoader());
 
     const {
-      app: { model },
+      app: { items, model },
       cache: { details },
     } = getState();
 
-    const [[row, item]] = Object.entries(data);
-    const { build, innerLength, outerLength } = item;
+    const item = items[id];
+    const { build, innerLength } = item;
+
     const index = slugify(`${model}-${build}-${innerLength}-${outerLength}`);
 
+    item.outerLength = Number(outerLength);
     item.details = details[index];
 
     return Promise.resolve()
       .then(() => {
-        dispatch(updateItem({ [row]: item }));
+        dispatch(updateItem({ [id]: item }));
 
         return details[index];
       })
       .finally(() => dispatch(hideLoader()));
   };
-}
+};
 
 export function fetchModels() {
   return function(dispatch, getState) {
@@ -356,28 +358,39 @@ export function fetchModels() {
   };
 }
 
-export const fetchInnerLengths = data => {
+export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
   return async (dispatch, getState) => {
     dispatch(showLoader());
 
     const {
-      app: { model },
+      app: { items, model },
       cache: { lengths },
     } = getState();
 
-    const [[row, item]] = Object.entries(data);
-    const { build } = item;
+    const item = items[id];
+
+    if (rewrite) {
+      item.build = build;
+      item.innerLength = 0;
+      item.outerLength = 0;
+      item.details = {};
+    }
+
     const lengthData = lengths[slugify(`${model}-${build}`)];
 
     if (lengthData) {
       return Promise.resolve()
-        .then(() => dispatch(updateItem(data)))
-        .then(() => dispatch(deleteInnerLength(row)))
-        .then(() => dispatch(deleteOuterLength(row)))
+        .then(() => {
+          if (rewrite) {
+            dispatch(updateItem({ [id]: item }));
+            dispatch(deleteInnerLength(id));
+            dispatch(deleteOuterLength(id));
+          }
+        })
         .then(() => {
           dispatch(
             addInnerLength({
-              [row]: Object.keys(lengthData).map(Number),
+              [id]: Object.keys(lengthData).map(Number),
             }),
           );
 
@@ -443,21 +456,18 @@ export const fetchInnerLengths = data => {
         return Object.keys(lengths).map(Number);
       })
       .then(innerLengths => {
-        dispatch(updateItem(data));
-        return innerLengths;
-      })
-      .then(innerLengths => {
-        dispatch(deleteInnerLength(row));
-        return innerLengths;
-      })
-      .then(innerLengths => {
-        dispatch(deleteOuterLength(row));
+        if (rewrite) {
+          dispatch(updateItem({ [id]: item }));
+          dispatch(deleteInnerLength(id));
+          dispatch(deleteOuterLength(id));
+        }
+
         return innerLengths;
       })
       .then(innerLengths => {
         dispatch(
           addInnerLength({
-            [row]: innerLengths,
+            [id]: innerLengths,
           }),
         );
 
@@ -468,28 +478,39 @@ export const fetchInnerLengths = data => {
   };
 };
 
-export const fetchOuterLengths = data => {
+export const fetchOuterLengths = ({ innerLength, id, rewrite = true }) => {
   return (dispatch, getState) => {
     dispatch(showLoader());
 
     const {
-      app: { model },
+      app: { items, model },
       cache: { lengths },
     } = getState();
 
-    const [[row, item]] = Object.entries(data);
-    const { build, innerLength } = item;
+    const item = items[id];
+    const { build } = item;
+
     const outerLengths = lengths[slugify(`${model}-${build}`)][
       innerLength
     ].sort((a, b) => a - b);
 
+    if (rewrite) {
+      item.innerLength = Number(innerLength);
+      item.outerLength = 0;
+      item.details = {};
+    }
+
     return Promise.resolve()
-      .then(() => dispatch(updateItem(data)))
-      .then(() => dispatch(deleteOuterLength(row)))
+      .then(() => {
+        if (rewrite) {
+          dispatch(updateItem({ [id]: item }));
+          dispatch(deleteOuterLength(id));
+        }
+      })
       .then(() => {
         dispatch(
           addOuterLength({
-            [row]: outerLengths,
+            [id]: outerLengths,
           }),
         );
 
@@ -500,78 +521,94 @@ export const fetchOuterLengths = data => {
 };
 
 export const reloadData = model => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     dispatch(showLoader());
     dispatch(updateModel(model));
 
-    return dispatch(fetchBuilds(model))
-      .then(builds => {
-        const {
-          app: { items },
-        } = getState();
+    const builds = await dispatch(fetchBuilds(model));
 
-        const rows = Object.keys(items);
+    const {
+      app: { items },
+    } = getState();
 
-        rows.forEach(row => {
-          const item = items[row];
-          const data = { [row]: item };
+    const ids = Object.keys(items);
 
-          if (item.build) {
-            if (!~builds.indexOf(item.build)) {
-              item.build = '';
-              item.innerLength = 0;
-              item.outerLength = 0;
-              item.details = {};
+    ids.forEach(id => {
+      const item = items[id];
 
-              dispatch(updateItem({ [row]: item }));
-              dispatch(deleteInnerLength(row));
-              dispatch(deleteOuterLength(row));
-            } else {
-              dispatch(fetchInnerLengths(data)).then(lengths => {
-                if (item.innerLength) {
-                  if (!~lengths.indexOf(item.innerLength)) {
-                    item.innerLength = 0;
-                    item.outerLength = 0;
-                    item.details = {};
+      if (item.build) {
+        if (!~builds.indexOf(item.build)) {
+          item.build = '';
+          item.innerLength = 0;
+          item.outerLength = 0;
+          item.details = {};
 
-                    dispatch(updateItem({ [row]: item }));
-                    dispatch(deleteInnerLength(row));
-                    dispatch(deleteOuterLength(row));
-                    dispatch(
-                      addInnerLength({
-                        [row]: lengths,
-                      }),
-                    );
-                  } else {
-                    dispatch(fetchOuterLengths(data)).then(lengths => {
-                      if (item.outerLength) {
-                        if (!~lengths.indexOf(item.outerLength)) {
-                          item.outerLength = 0;
-                          item.details = {};
+          dispatch(updateItem({ [id]: item }));
+          dispatch(deleteInnerLength(id));
+          dispatch(deleteOuterLength(id));
+        } else {
+          dispatch(
+            fetchInnerLengths({
+              build: item.build,
+              id,
+              rewrite: false,
+            }),
+          )
+            .then(lengths => {
+              if (item.innerLength) {
+                if (!~lengths.indexOf(item.innerLength)) {
+                  item.innerLength = 0;
+                  item.outerLength = 0;
+                  item.details = {};
 
-                          dispatch(updateItem({ [row]: item }));
-                          dispatch(deleteOuterLength(row));
-                          dispatch(
-                            addOuterLength({
-                              [row]: lengths,
-                            }),
-                          );
-                        } else {
-                          dispatch(fetchDetails(data)).then(details => {
-                            item.details = details;
+                  dispatch(updateItem({ [id]: item }));
+                  dispatch(deleteInnerLength(id));
+                  dispatch(deleteOuterLength(id));
+                  dispatch(
+                    addInnerLength({
+                      [id]: lengths,
+                    }),
+                  );
+                } else {
+                  dispatch(
+                    fetchOuterLengths({
+                      innerLength: item.innerLength,
+                      id,
+                      rewrite: false,
+                    }),
+                  ).then(lengths => {
+                    if (item.outerLength) {
+                      if (!~lengths.indexOf(item.outerLength)) {
+                        item.outerLength = 0;
+                        item.details = {};
 
-                            dispatch(updateItem(data));
-                          });
-                        }
+                        dispatch(updateItem({ [id]: item }));
+                        dispatch(deleteOuterLength(id));
+                        dispatch(
+                          addOuterLength({
+                            [id]: lengths,
+                          }),
+                        );
+                      } else {
+                        dispatch(
+                          fetchDetails({
+                            outerLength: item.outerLength,
+                            id,
+                          }),
+                        ).then(details => {
+                          item.details = details;
+
+                          dispatch(updateItem({ [id]: item }));
+                        });
                       }
-                    });
-                  }
+                    }
+                  });
                 }
-              });
-            }
-          }
-        });
-      })
-      .finally(() => dispatch(hideLoader()));
+              }
+            })
+            .finally(() => dispatch(hideLoader()));
+        }
+      }
+    });
   };
 };

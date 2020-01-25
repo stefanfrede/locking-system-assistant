@@ -250,7 +250,8 @@
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 7521d4c3d418988e2c6fb9a870ee922d": 27,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 4d904a2152afc24e42353e53a83f1206": 44,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js a9bcf12e057c0316d728a1c3a550d8b7": 1,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js fc22c45fd0b6327c558c6250a3cc3234": 26
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js fc22c45fd0b6327c558c6250a3cc3234": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 5f1ae58300df8a02076012a82d27fb51": 26
     },
     "usedIds": {
       "0": 0,
