@@ -1,8 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import { repeat } from 'lit-html/directives/repeat';
 
-import { deselectOption } from './lib/helpers';
-
 import { stylesheet } from './styles/index.js';
 
 class HwsTable extends LitElement {
@@ -133,47 +131,31 @@ class HwsTable extends LitElement {
   }
 
   selectBuild(e) {
-    const row = e.target.closest('tbody');
-    const id = row.dataset.rowId;
-    const [, index] = e.target.id.split('-');
-
-    const item = this.items[id];
-
-    item.build = e.target.value;
-    item.innerLength = 0;
-    item.outerLength = 0;
-    item.details = {};
-
-    deselectOption(row.querySelector(`#inner-length-${index}`));
-    deselectOption(row.querySelector(`#outer-length-${index}`));
+    const id = e.target.closest('tbody').dataset.rowId;
 
     this.dispatchEvent(
       new CustomEvent('selectBuild', {
         bubbles: true,
         composed: true,
-        detail: { [id]: item },
+        detail: {
+          build: e.target.value,
+          id,
+        },
       }),
     );
   }
 
   selectInnerLength(e) {
-    const row = e.target.closest('tbody');
-    const id = row.dataset.rowId;
-    const [, , index] = e.target.id.split('-');
-
-    const item = this.items[id];
-
-    item.innerLength = Number(e.target.value);
-    item.outerLength = 0;
-    item.details = {};
-
-    deselectOption(row.querySelector(`#outer-length-${index}`));
+    const id = e.target.closest('tbody').dataset.rowId;
 
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
         bubbles: true,
         composed: true,
-        detail: { [id]: item },
+        detail: {
+          innerLength: e.target.value,
+          id,
+        },
       }),
     );
   }
@@ -199,15 +181,14 @@ class HwsTable extends LitElement {
   selectOuterLength(e) {
     const id = e.target.closest('tbody').dataset.rowId;
 
-    const item = this.items[id];
-
-    item.outerLength = Number(e.target.value);
-
     this.dispatchEvent(
       new CustomEvent('selectOuterLength', {
         bubbles: true,
         composed: true,
-        detail: { [id]: item },
+        detail: {
+          outerLength: e.target.value,
+          id,
+        },
       }),
     );
   }
@@ -283,7 +264,7 @@ class HwsTable extends LitElement {
     `;
   }
 
-  tbody({ builds, innerLengths, items, keys, outerLengths }) {
+  tbody({ builds, innerLengths, items, outerLengths }) {
     const rows = Object.keys(items);
 
     return html`
@@ -484,7 +465,7 @@ class HwsTable extends LitElement {
               <td>
                 <button
                   @click="${this.deleteRow}"
-                  class="btn btn-outline-danger"
+                  class="btn btn-outline-danger js-btn-delete-row"
                   type="button"
                 >
                   <svg
@@ -507,7 +488,7 @@ class HwsTable extends LitElement {
             </tr>
             <tr class="details">
               <td colspan="2"></td>
-              <td colspan="${4 + keys}">
+              <td colspan="${4 + items[row].keys.length}">
                 <dl>
                   <dt>
                     Bestellnummer:
@@ -702,10 +683,9 @@ class HwsTable extends LitElement {
             builds: this.builds,
             innerLengths: this.innerLengths,
             items: this.items,
-            keys: this.keys,
             outerLengths: this.outerLengths,
           })}
-          ${this.tfoot(this.groups, this.keys)}
+          ${this.tfoot(this.groups)}
         </table>
         <button @click="${this.reset}" class="btn btn-light" type="button">
           Zurücksetzen
@@ -740,14 +720,28 @@ class HwsTable extends LitElement {
           '[data-action=decrement][data-type=row]',
         );
 
+        const btnsDelete = this.shadowRoot.querySelectorAll(
+          '.js-btn-delete-row',
+        );
+
         if (this.rows <= this.guard) {
           btnRow.setAttribute('disabled', '');
           btnRow.setAttribute('aria-disabled', 'true');
+
+          btnsDelete.forEach(btn => {
+            btn.setAttribute('disabled', '');
+            btn.setAttribute('aria-disabled', 'true');
+          });
         }
 
         if (this.rows > this.guard) {
           btnRow.removeAttribute('disabled');
           btnRow.removeAttribute('aria-disabled');
+
+          btnsDelete.forEach(btn => {
+            btn.removeAttribute('disabled');
+            btn.removeAttribute('aria-disabled');
+          });
         }
       }
     });
