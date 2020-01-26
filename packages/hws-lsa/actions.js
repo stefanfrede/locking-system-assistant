@@ -522,7 +522,6 @@ export const fetchOuterLengths = ({ innerLength, id, rewrite = true }) => {
 
 export const reloadData = model => {
   return async (dispatch, getState) => {
-    dispatch(showLoader());
     dispatch(updateModel(model));
 
     const builds = await dispatch(fetchBuilds(model));
@@ -553,60 +552,58 @@ export const reloadData = model => {
               id,
               rewrite: false,
             }),
-          )
-            .then(lengths => {
-              if (item.innerLength) {
-                if (!~lengths.indexOf(item.innerLength)) {
-                  item.innerLength = 0;
-                  item.outerLength = 0;
-                  item.details = {};
+          ).then(lengths => {
+            if (item.innerLength) {
+              if (!~lengths.indexOf(item.innerLength)) {
+                item.innerLength = 0;
+                item.outerLength = 0;
+                item.details = {};
 
-                  dispatch(updateItem({ [id]: item }));
-                  dispatch(deleteInnerLength(id));
-                  dispatch(deleteOuterLength(id));
-                  dispatch(
-                    addInnerLength({
-                      [id]: lengths,
-                    }),
-                  );
-                } else {
-                  dispatch(
-                    fetchOuterLengths({
-                      innerLength: item.innerLength,
-                      id,
-                      rewrite: false,
-                    }),
-                  ).then(lengths => {
-                    if (item.outerLength) {
-                      if (!~lengths.indexOf(item.outerLength)) {
-                        item.outerLength = 0;
-                        item.details = {};
+                dispatch(updateItem({ [id]: item }));
+                dispatch(deleteInnerLength(id));
+                dispatch(deleteOuterLength(id));
+                dispatch(
+                  addInnerLength({
+                    [id]: lengths,
+                  }),
+                );
+              } else {
+                dispatch(
+                  fetchOuterLengths({
+                    innerLength: item.innerLength,
+                    id,
+                    rewrite: false,
+                  }),
+                ).then(lengths => {
+                  if (item.outerLength) {
+                    if (!~lengths.indexOf(item.outerLength)) {
+                      item.outerLength = 0;
+                      item.details = {};
+
+                      dispatch(updateItem({ [id]: item }));
+                      dispatch(deleteOuterLength(id));
+                      dispatch(
+                        addOuterLength({
+                          [id]: lengths,
+                        }),
+                      );
+                    } else {
+                      dispatch(
+                        fetchDetails({
+                          outerLength: item.outerLength,
+                          id,
+                        }),
+                      ).then(details => {
+                        item.details = details;
 
                         dispatch(updateItem({ [id]: item }));
-                        dispatch(deleteOuterLength(id));
-                        dispatch(
-                          addOuterLength({
-                            [id]: lengths,
-                          }),
-                        );
-                      } else {
-                        dispatch(
-                          fetchDetails({
-                            outerLength: item.outerLength,
-                            id,
-                          }),
-                        ).then(details => {
-                          item.details = details;
-
-                          dispatch(updateItem({ [id]: item }));
-                        });
-                      }
+                      });
                     }
-                  });
-                }
+                  }
+                });
               }
-            })
-            .finally(() => dispatch(hideLoader()));
+            }
+          });
         }
       }
     });
