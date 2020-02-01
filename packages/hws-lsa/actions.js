@@ -285,17 +285,13 @@ export function fetchBuilds(model) {
     }
 
     return getBuilds(model)
-      .then(
-        data => {
-          dispatch(loadBuilds({ [model]: data }));
-          dispatch(updateBuilds(data));
+      .then(response => {
+        dispatch(loadBuilds({ [model]: response }));
+        dispatch(updateBuilds(response));
 
-          return data;
-        },
-        error => {
-          dispatch(loadBuilds(error, 'danger'));
-        },
-      )
+        return response;
+      })
+      .catch(reason => dispatch(loadBuilds(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 }
@@ -345,15 +341,11 @@ export function fetchModels() {
     }
 
     return getModels()
-      .then(
-        ([iseo, gera]) => {
-          dispatch(loadModels(iseo.concat(gera)));
-          dispatch(updateModels(iseo.concat(gera)));
-        },
-        error => {
-          dispatch(loadModels(error, 'danger'));
-        },
-      )
+      .then(([iseo, gera]) => {
+        dispatch(loadModels(iseo.concat(gera)));
+        dispatch(updateModels(iseo.concat(gera)));
+      })
+      .catch(reason => dispatch(loadModels(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 }
@@ -473,7 +465,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
 
         return innerLengths;
       })
-      .catch(error => dispatch(loadLengths(error, 'danger')))
+      .catch(reason => dispatch(loadLengths(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 };
