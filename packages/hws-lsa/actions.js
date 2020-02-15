@@ -429,6 +429,24 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
             subject: item.subject,
             text: item.text,
           };
+
+          if (build === 'Doppelzylinder') {
+            if (lengths[outer]) {
+              if (!~lengths[outer].indexOf(inner)) {
+                lengths[outer].push(inner);
+              }
+            } else {
+              lengths[outer] = [inner];
+            }
+
+            details[slugify(`${model}-${build}-${outer}-${inner}`)] = {
+              name: item.name,
+              price: item.price ?? undefined,
+              reference: item.reference,
+              subject: item.subject,
+              text: item.text,
+            };
+          }
         });
 
         dispatch(
