@@ -34,12 +34,14 @@ export const getModels = () =>
     selector: 'Serie',
   });
 
-export const getReferences = (build, model) =>
-  fetchData({
+export const getReferences = (build, model) => {
+  console.log(build, model);
+  return fetchData({
     filter: [
-      { name: 'Hersteller', value: 'Iseo' },
+      { name: 'Hersteller', value: 'Iseo*' },
       { name: 'Serie', value: model },
       { name: 'Bauart', value: build },
     ],
     selector: 'reference',
   });
+};
