@@ -96,10 +96,33 @@ export const stylesheet = [
       display: none;
     }
 
+    .first-row .btn-sort-up {
+      display: none;
+    }
+
+    .last-row .btn-sort-down {
+      display: none;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .last-row .btn-group {
+      justify-content: space-between;
+    }
+
+    .btn-group > .btn + .btn {
+      margin-left: 0.5rem;
+    }
+
+    .btn-group > .btn,
     td > .btn {
       padding: 0.1875rem 0.5rem;
     }
 
+    .btn-group > .btn > svg,
     td > .btn > svg {
       fill: currentcolor;
       height: 0.875rem;

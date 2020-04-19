@@ -24,6 +24,7 @@ import {
   fetchModels,
   fetchOuterLengths,
   reloadData,
+  sortRow,
 } from './actions';
 
 import {
@@ -199,6 +200,12 @@ class HwsLsa extends connect(store)(LitElement) {
     store.dispatch(reloadData(e.detail));
   }
 
+  _onSortRow(e) {
+    e.stopPropagation();
+
+    store.dispatch(sortRow(e.detail));
+  }
+
   _onSubmitForm(e) {
     e.stopPropagation();
   }
@@ -231,6 +238,7 @@ class HwsLsa extends connect(store)(LitElement) {
           @selectInnerLength="${this._onSelectInnerLength}"
           @selectOuterLength="${this._onSelectOuterLength}"
           @selectKey="${this._onSelectKey}"
+          @sortRow="${this._onSortRow}"
           @submitForm="${this._onSubmitForm}"
           .builds="${this.builds}"
           .groups="${this.groups}"

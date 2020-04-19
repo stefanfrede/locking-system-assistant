@@ -6,6 +6,7 @@ import {
   ADD_GROUP,
   ADD_INNER_LENGTH,
   ADD_ITEM,
+  ADD_ITEMS,
   ADD_OUTER_LENGTH,
   DELETE_GROUP,
   DELETE_ITEM,
@@ -55,6 +56,12 @@ export default handleActions(
         ...state,
         items: { ...state.items, ...action.payload },
         rows: action.meta.rows + 1,
+      };
+    },
+    [ADD_ITEMS]: (state, action) => {
+      return {
+        ...state,
+        items: { ...action.payload },
       };
     },
     [ADD_OUTER_LENGTH]: (state, action) => {
