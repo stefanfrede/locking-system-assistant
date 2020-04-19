@@ -7,14 +7,14 @@ export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
   }, time);
 
   return fetch(uri, config)
-    .then(response => {
+    .then((response) => {
       if (!response.ok) {
         throw new Error(`${response.status}: ${response.statusText}`);
       }
 
       return response;
     })
-    .catch(error => {
+    .catch((error) => {
       if (error.name === 'AbortError') {
         throw new Error('Response timed out');
       }
@@ -23,7 +23,7 @@ export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
     });
 };
 
-export const serialize = form => {
+export const serialize = (form) => {
   const serialized = {
     rows: [],
     keys: {
@@ -108,14 +108,14 @@ export const serialize = form => {
       }
     }
 
-    if (!~Object.values(data.keys).findIndex(key => key === true)) {
+    if (!~Object.values(data.keys).findIndex((key) => key === true)) {
       data.errors = [...data.errors, ...keys];
     }
 
     serialized.rows.push(data);
   }
 
-  const keys = serialized.rows.map(row => row.keys);
+  const keys = serialized.rows.map((row) => row.keys);
 
   for (let i = 0; i < footerFields.length; i++) {
     const field = footerFields[i];
@@ -125,7 +125,7 @@ export const serialize = form => {
 
       let hasKey = false;
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key[i + 1]) {
           hasKey = true;
         }
@@ -140,7 +140,7 @@ export const serialize = form => {
   return serialized;
 };
 
-export const slugify = str => {
+export const slugify = (str) => {
   return str
     .split('')
     .reduce((acc, cur) => {
@@ -152,7 +152,7 @@ export const slugify = str => {
 };
 
 export const uuidv4 = () =>
-  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
     (
       c ^
       (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
