@@ -45,7 +45,7 @@ class HwsSelectModel extends LitElement {
           Serie auswählen
         </option>
         ${this.models.map(
-          option =>
+          (option) =>
             html`
               <option ?selected="${option === this.model}" value="${option}">
                 ${option}
