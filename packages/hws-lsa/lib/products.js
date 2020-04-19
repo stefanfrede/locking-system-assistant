@@ -34,8 +34,8 @@ export const getModels = () =>
     selector: 'Serie',
   });
 
-export const getReferences = (build, model) => {
-  return fetchData({
+export const getReferences = (build, model) =>
+  fetchData({
     filter: [
       { name: 'Hersteller', value: 'Iseo*' },
       { name: 'Serie', value: model },
@@ -43,4 +43,3 @@ export const getReferences = (build, model) => {
     ],
     selector: 'reference',
   });
-};
