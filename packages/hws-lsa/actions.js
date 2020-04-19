@@ -18,6 +18,7 @@ export const LOAD_MODELS = 'LOAD_MODELS';
 export const ADD_GROUP = 'ADD_GROUP';
 export const ADD_INNER_LENGTH = 'ADD_INNER_LENGTH';
 export const ADD_ITEM = 'ADD_ITEM';
+export const ADD_ITEMS = 'ADD_ITEMS';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const ADD_MODELS = 'ADD_MODELS';
 export const ADD_OUTER_LENGTH = 'ADD_OUTER_LENGTH';
@@ -43,6 +44,7 @@ export const {
   addGroup,
   addInnerLength,
   addItem,
+  addItems,
   addOuterLength,
   deleteGroup,
   deleteInnerLength,
@@ -58,18 +60,19 @@ export const {
   {
     HIDE_LOADER: () => false,
     SHOW_LOADER: () => true,
-    LOAD_BUILDS: [x => x, (_, msgType) => ({ msgType })],
-    LOAD_LENGTHS: [x => x, (_, msgType) => ({ msgType })],
-    LOAD_MODELS: [x => x, (_, msgType) => ({ msgType })],
-    ADD_GROUP: [x => x, (_, keys) => ({ keys })],
-    ADD_ITEM: [x => x, (_, rows) => ({ rows })],
-    DELETE_GROUP: [x => x, (_, keys) => ({ keys })],
-    DELETE_ITEM: [x => x, (_, rows) => ({ rows })],
-    UPDATE_MESSAGE: [x => x, (_, msgType) => ({ msgType })],
-    UPDATE_ITEM: [x => x, (_, rows) => ({ rows })],
+    LOAD_BUILDS: [(x) => x, (_, msgType) => ({ msgType })],
+    LOAD_LENGTHS: [(x) => x, (_, msgType) => ({ msgType })],
+    LOAD_MODELS: [(x) => x, (_, msgType) => ({ msgType })],
+    ADD_GROUP: [(x) => x, (_, keys) => ({ keys })],
+    ADD_ITEM: [(x) => x, (_, rows) => ({ rows })],
+    DELETE_GROUP: [(x) => x, (_, keys) => ({ keys })],
+    DELETE_ITEM: [(x) => x, (_, rows) => ({ rows })],
+    UPDATE_MESSAGE: [(x) => x, (_, msgType) => ({ msgType })],
+    UPDATE_ITEM: [(x) => x, (_, rows) => ({ rows })],
   },
   LOAD_DETAILS,
   ADD_INNER_LENGTH,
+  ADD_ITEMS,
   ADD_OUTER_LENGTH,
   DELETE_INNER_LENGTH,
   DELETE_OUTER_LENGTH,
@@ -129,7 +132,7 @@ export const resetAssistant = () => {
     return Promise.all(groups.map(() => dispatch(deleteKey())))
       .then(() =>
         Promise.all(
-          rows.map(id => {
+          rows.map((id) => {
             dispatch(deleteRow(id));
           }),
         ),
@@ -159,7 +162,7 @@ export function addKey() {
         const rows = Object.keys(items);
 
         Promise.all(
-          rows.map(row => {
+          rows.map((row) => {
             const item = items[row];
             item.keys.push(false);
 
@@ -191,7 +194,7 @@ export function deleteKey() {
         const rows = Object.keys(items);
 
         Promise.all(
-          rows.map(row => {
+          rows.map((row) => {
             const item = items[row];
             item.keys.pop();
 
@@ -254,12 +257,12 @@ export function deleteRow(id) {
 
         return row;
       })
-      .then(row => {
+      .then((row) => {
         dispatch(deleteInnerLength(row));
 
         return row;
       })
-      .then(row => {
+      .then((row) => {
         dispatch(deleteOuterLength(row));
       })
       .finally(() => dispatch(hideLoader()));
@@ -267,7 +270,7 @@ export function deleteRow(id) {
 }
 
 export function fetchBuilds(model) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(showLoader());
 
     const {
@@ -285,19 +288,19 @@ export function fetchBuilds(model) {
     }
 
     return getBuilds(model)
-      .then(response => {
+      .then((response) => {
         dispatch(loadBuilds({ [model]: response }));
         dispatch(updateBuilds(response));
 
         return response;
       })
-      .catch(reason => dispatch(loadBuilds(reason, 'danger')))
+      .catch((reason) => dispatch(loadBuilds(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 }
 
 export const fetchDetails = ({ outerLength, id }) => {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(showLoader());
 
     const {
@@ -324,7 +327,7 @@ export const fetchDetails = ({ outerLength, id }) => {
 };
 
 export function fetchModels() {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(showLoader());
 
     const {
@@ -341,11 +344,28 @@ export function fetchModels() {
     }
 
     return getModels()
-      .then(([iseo, gera]) => {
-        dispatch(loadModels(iseo.concat(gera)));
-        dispatch(updateModels(iseo.concat(gera)));
+      .then((response) => {
+        // sort the response
+        const responseSorted = response.sort((a, b) => {
+          const itemA = a.toUpperCase(); // ignore upper and lowercase
+          const itemB = b.toUpperCase(); // ignore upper and lowercase
+
+          if (itemA < itemB) {
+            return -1;
+          }
+
+          if (itemA > itemB) {
+            return 1;
+          }
+
+          // items must be equal
+          return 0;
+        });
+
+        dispatch(loadModels(responseSorted));
+        dispatch(updateModels(responseSorted));
       })
-      .catch(reason => dispatch(loadModels(reason, 'danger')))
+      .catch((reason) => dispatch(loadModels(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 }
@@ -392,29 +412,29 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
     }
 
     return getReferences(build, model)
-      .then(references =>
-        Promise.all(references.map(reference => getDetails(reference))),
+      .then((references) =>
+        Promise.all(references.map((reference) => getDetails(reference))),
       )
-      .then(items => {
+      .then((items) => {
         const details = {};
         const lengths = {};
 
-        items.forEach(item => {
+        items.forEach((item) => {
           const [{ value: model }] = item.specifications.filter(
-            specification => specification.name === 'Serie',
+            (specification) => specification.name === 'Serie',
           );
 
           const [{ value: build }] = item.specifications.filter(
-            specification => specification.name === 'Bauart',
+            (specification) => specification.name === 'Bauart',
           );
 
           const [{ value: length }] = item.specifications.filter(
-            specification => specification.name === 'Teillänge (C+D)',
+            (specification) => specification.name === 'Teillänge (C+D)',
           );
 
           const [inner, outer] = length
             .split('+')
-            .map(str => Number(str.trim().replace('mm', '')));
+            .map((str) => Number(str.trim().replace('mm', '')));
 
           if (lengths[inner]) {
             lengths[inner].push(outer);
@@ -430,7 +450,10 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
             text: item.text,
           };
 
-          if (build === 'Doppelzylinder') {
+          if (
+            build === 'Doppelzylinder' ||
+            build === 'Doppelzylinder mit Not- und Gefahrenfunktion'
+          ) {
             if (lengths[outer]) {
               if (!~lengths[outer].indexOf(inner)) {
                 lengths[outer].push(inner);
@@ -465,7 +488,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
 
         return Object.keys(lengths).map(Number);
       })
-      .then(innerLengths => {
+      .then((innerLengths) => {
         if (rewrite) {
           dispatch(updateItem({ [id]: item }));
           dispatch(deleteInnerLength(id));
@@ -474,7 +497,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
 
         return innerLengths;
       })
-      .then(innerLengths => {
+      .then((innerLengths) => {
         dispatch(
           addInnerLength({
             [id]: innerLengths,
@@ -483,7 +506,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
 
         return innerLengths;
       })
-      .catch(reason => dispatch(loadLengths(reason, 'danger')))
+      .catch((reason) => dispatch(loadLengths(reason, 'danger')))
       .finally(() => dispatch(hideLoader()));
   };
 };
@@ -530,7 +553,7 @@ export const fetchOuterLengths = ({ innerLength, id, rewrite = true }) => {
   };
 };
 
-export const reloadData = model => {
+export const reloadData = (model) => {
   return async (dispatch, getState) => {
     dispatch(updateModel(model));
 
@@ -542,7 +565,7 @@ export const reloadData = model => {
 
     const ids = Object.keys(items);
 
-    ids.forEach(id => {
+    ids.forEach((id) => {
       const item = items[id];
 
       if (item.build) {
@@ -562,7 +585,7 @@ export const reloadData = model => {
               id,
               rewrite: false,
             }),
-          ).then(lengths => {
+          ).then((lengths) => {
             if (item.innerLength) {
               if (!~lengths.indexOf(item.innerLength)) {
                 item.innerLength = 0;
@@ -584,7 +607,7 @@ export const reloadData = model => {
                     id,
                     rewrite: false,
                   }),
-                ).then(lengths => {
+                ).then((lengths) => {
                   if (item.outerLength) {
                     if (!~lengths.indexOf(item.outerLength)) {
                       item.outerLength = 0;
@@ -603,7 +626,7 @@ export const reloadData = model => {
                           outerLength: item.outerLength,
                           id,
                         }),
-                      ).then(details => {
+                      ).then((details) => {
                         item.details = details;
 
                         dispatch(updateItem({ [id]: item }));
@@ -617,5 +640,47 @@ export const reloadData = model => {
         }
       }
     });
+  };
+};
+
+export const sortRow = ({ dir, id }) => {
+  return async (dispatch, getState) => {
+    dispatch(showLoader());
+
+    return Promise.resolve()
+      .then(() => {
+        const {
+          app: { items },
+        } = getState();
+
+        const keys = Object.keys(items);
+        const index = keys.findIndex((item) => item === id);
+
+        let newIndex = -1;
+
+        // Get the new index
+        if (dir === 'up') {
+          // Check if item is first in array
+          if (index !== 0) {
+            newIndex = index - 1;
+          }
+        } else {
+          // Check if item is last in array
+          if (index !== keys.length - 1) {
+            newIndex = index + 1;
+          }
+        }
+
+        if (~newIndex) {
+          const [item] = keys.splice(index, 1);
+          const sortedItems = {};
+
+          keys.splice(newIndex, 0, item);
+          keys.forEach((key) => (sortedItems[key] = items[key]));
+
+          dispatch(addItems(sortedItems));
+        }
+      })
+      .finally(() => dispatch(hideLoader()));
   };
 };

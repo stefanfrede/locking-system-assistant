@@ -118,6 +118,12 @@ class HwsTable extends LitElement {
     return Array.isArray(object[index]) ? object[index] : [];
   }
 
+  print(e) {
+    e.preventDefault();
+
+    window.print();
+  }
+
   reset(e) {
     e.preventDefault();
 
@@ -200,6 +206,23 @@ class HwsTable extends LitElement {
     tbody.classList.toggle('hide-details');
   }
 
+  sortRow(e) {
+    e.preventDefault();
+
+    const t = e.target;
+
+    this.dispatchEvent(
+      new CustomEvent('sortRow', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          dir: t.closest('button').dataset.sortDir,
+          id: t.closest('tbody').dataset.rowId,
+        },
+      }),
+    );
+  }
+
   submitForm(e) {
     e.preventDefault();
 
@@ -216,9 +239,7 @@ class HwsTable extends LitElement {
     const cols = [];
 
     for (let i = 0; i < keys; i++) {
-      cols.push(html`
-        <col class="lsa__key" />
-      `);
+      cols.push(html` <col class="lsa__key" /> `);
     }
 
     return html`
@@ -270,7 +291,7 @@ class HwsTable extends LitElement {
     return html`
       ${repeat(
         rows,
-        row => row,
+        (row) => row,
         (row, index) => html`
           <tbody
             class="${Object.keys(items[row].details).length
@@ -278,7 +299,13 @@ class HwsTable extends LitElement {
               : 'hide-details'}"
             data-row-id="${row}"
           >
-            <tr>
+            <tr
+              class="${index === 0
+                ? 'first-row'
+                : index === rows.length - 1
+                ? 'last-row'
+                : ''}"
+            >
               <th scope="row">
                 ${index + 1}
               </th>
@@ -341,8 +368,8 @@ class HwsTable extends LitElement {
                   </option>
                   ${repeat(
                     builds,
-                    option => option,
-                    option => html`
+                    (option) => option,
+                    (option) => html`
                       <option
                         ?selected="${option === items[row].build}"
                         value="${option}"
@@ -373,8 +400,8 @@ class HwsTable extends LitElement {
                         index: row,
                         object: innerLengths,
                       }),
-                      option => option,
-                      option => html`
+                      (option) => option,
+                      (option) => html`
                         <option
                           ?selected="${option === items[row].innerLength}"
                           value="${option}"
@@ -402,8 +429,8 @@ class HwsTable extends LitElement {
                         index: row,
                         object: outerLengths,
                       }),
-                      option => option,
-                      option => html`
+                      (option) => option,
+                      (option) => html`
                         <option
                           ?selected="${option === items[row].outerLength}"
                           value="${option}"
@@ -434,8 +461,9 @@ class HwsTable extends LitElement {
                       <input
                         @change="${this.selectKey}"
                         ?checked="${key}"
-                        aria-label="${`Schlüssel ${key + 1} in Zeile ${index +
-                          1}`}"
+                        aria-label="${`Schlüssel ${key + 1} in Zeile ${
+                          index + 1
+                        }`}"
                         class="chkb__input js-form-field"
                         id="key-${index}-${idx}"
                         name="key-${index}-${idx}"
@@ -463,27 +491,66 @@ class HwsTable extends LitElement {
                 `,
               )}
               <td>
-                <button
-                  @click="${this.deleteRow}"
-                  class="btn btn-outline-danger js-btn-delete-row"
-                  type="button"
-                >
-                  <svg
-                    fill="currentcolor"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 448 512"
+                <div class="btn-group">
+                  <button
+                    @click="${this.sortRow}"
+                    class="btn btn-outline-dark btn-sort-up"
+                    data-sort-dir="up"
+                    type="button"
                   >
-                    <path
-                      d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0
-                          48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0
-                          1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32
-                          0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432
-                          32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72
-                          0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0
-                          0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      fill="currentcolor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 320 512"
+                    >
+                      <path
+                        d="M288.662 352H31.338c-17.818
+                        0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81
+                        20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676
+                        34.142-14.142 34.142z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    @click="${this.sortRow}"
+                    class="btn btn-outline-dark btn-sort-down"
+                    data-sort-dir="down"
+                    type="button"
+                  >
+                    <svg
+                      fill="currentcolor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 320 512"
+                    >
+                      <path
+                        d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1
+                        354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5
+                        192 31.3 192z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    @click="${this.deleteRow}"
+                    class="btn btn-outline-danger js-btn-delete-row"
+                    type="button"
+                  >
+                    <svg
+                      fill="currentcolor"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 448 512"
+                    >
+                      <path
+                        d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0
+                        48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0
+                        1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96
+                        0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432
+                        32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0
+                        0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0
+                        16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr class="details">
@@ -652,7 +719,7 @@ class HwsTable extends LitElement {
           </td>
           ${repeat(
             groups,
-            group => group,
+            (group) => group,
             (group, index) => html`
               <td class="lsa__unit">
                 <input
@@ -690,7 +757,7 @@ class HwsTable extends LitElement {
         <button @click="${this.reset}" class="btn btn-light" type="button">
           Zurücksetzen
         </button>
-        <button class="btn btn-success">
+        <button @click="${this.print}" class="btn btn-success">
           Schließplan ausdrucken
         </button>
       </form>
@@ -728,7 +795,7 @@ class HwsTable extends LitElement {
           btnRow.setAttribute('disabled', '');
           btnRow.setAttribute('aria-disabled', 'true');
 
-          btnsDelete.forEach(btn => {
+          btnsDelete.forEach((btn) => {
             btn.setAttribute('disabled', '');
             btn.setAttribute('aria-disabled', 'true');
           });
@@ -738,7 +805,7 @@ class HwsTable extends LitElement {
           btnRow.removeAttribute('disabled');
           btnRow.removeAttribute('aria-disabled');
 
-          btnsDelete.forEach(btn => {
+          btnsDelete.forEach((btn) => {
             btn.removeAttribute('disabled');
             btn.removeAttribute('aria-disabled');
           });
