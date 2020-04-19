@@ -35,7 +35,6 @@ export const getModels = () =>
   });
 
 export const getReferences = (build, model) => {
-  console.log(build, model);
   return fetchData({
     filter: [
       { name: 'Hersteller', value: 'Iseo*' },
