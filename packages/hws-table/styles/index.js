@@ -135,21 +135,20 @@ export const stylesheet = [
     }
 
     dl {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0;
+      column-gap: 1rem;
+      display: grid;
+      font-size: 0.875rem;
+      grid-template-columns: auto 1fr;
+      line-height: 1.5;
+      margin: 1rem 0;
     }
 
     dt {
-      flex: 0 0 20%;
       font-weight: 700;
-      max-width: 20%;
     }
 
     dd {
-      flex: 0 0 80%;
-      margin-left: 0;
-      max-width: 80%;
+      margin: 0;
     }
   `,
 ];

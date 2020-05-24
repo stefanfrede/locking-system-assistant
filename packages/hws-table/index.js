@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit-element';
 import { repeat } from 'lit-html/directives/repeat';
 
+import Cookies from 'js-cookie';
+
 import { stylesheet } from './styles/index.js';
 
 class HwsTable extends LitElement {
@@ -571,10 +573,40 @@ class HwsTable extends LitElement {
                     ${items[row].details.name}
                   </dd>
                   <dt>
-                    Beschreibung:
+                    Schlüssel:
                   </dt>
                   <dd>
-                    ${items[row].details.text}
+                    ${items[row].details.key}
+                  </dd>
+                  <dt>
+                    Ausführung:
+                  </dt>
+                  <dd>
+                    ${items[row].details.design}
+                  </dd>
+                  <dt>
+                    Sicherheit:
+                  </dt>
+                  <dd>
+                    ${items[row].details.safety}
+                  </dd>
+                  <dt>
+                    Material:
+                  </dt>
+                  <dd>
+                    ${items[row].details.material}
+                  </dd>
+                  <dt>
+                    Teillänge (C+D):
+                  </dt>
+                  <dd>
+                    ${items[row].details.partialLength}
+                  </dd>
+                  <dt>
+                    Gesamtlänge (L):
+                  </dt>
+                  <dd>
+                    ${items[row].details.totalLength}
                   </dd>
                   <dt>
                     Preis:
@@ -583,7 +615,10 @@ class HwsTable extends LitElement {
                     ${items[row].details.price
                       ? items[row].details.price
                       : html`
-                          <a href="https://www.schweisthal.de/de/login">
+                          <a
+                            class="btn btn-info btn-sm"
+                            href="https://www.schweisthal.de/de/login"
+                          >
                             Bitte anmelden
                           </a>
                         `}
@@ -742,6 +777,8 @@ class HwsTable extends LitElement {
   }
 
   render() {
+    const cookie = Cookies.get('brolive_session');
+
     return html`
       <form @submit="${this.submitForm}" class="table-responsive">
         <table>
@@ -760,6 +797,13 @@ class HwsTable extends LitElement {
         <button @click="${this.print}" class="btn btn-success">
           Schließplan ausdrucken
         </button>
+        ${cookie
+          ? html`
+              <button type="submit" class="btn btn-success">
+                In den Warenkorb legen
+              </button>
+            `
+          : ''}
       </form>
     `;
   }

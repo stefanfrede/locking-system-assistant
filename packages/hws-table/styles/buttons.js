@@ -13,6 +13,7 @@ export const buttons = css`
     line-height: 1.5;
     padding: 0.4375rem 0.75rem;
     text-align: center;
+    text-decoration: none;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
       border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     user-select: none;
@@ -29,6 +30,13 @@ export const buttons = css`
     pointer-events: none;
   }
 
+  .btn-sm {
+    border-radius: 0.2rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 0.25rem 0.5rem;
+  }
+
   .btn-success {
     background-color: hsl(134, 61%, 41%);
     border-color: #hsl(134, 61%, 41%);
@@ -38,6 +46,18 @@ export const buttons = css`
   .btn-success:hover {
     background-color: hsl(133, 61%, 33%);
     border-color: hsl(134, 62%, 31%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-info {
+    background-color: hsl(188, 78%, 41%);
+    border-color: hsl(188, 78%, 41%);
+    color: hsl(0, 0%, 100%);
+  }
+
+  .btn-info:hover {
+    background-color: hsl(188, 78%, 33%);
+    border-color: hsl(188, 78%, 31%);
     color: hsl(0, 0%, 100%);
   }
 
