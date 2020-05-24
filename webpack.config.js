@@ -47,7 +47,10 @@ const commonConfig = merge([
       noEmitOnErrors: true,
     },
   },
+  parts.setFreeVariable('AUTH_API_URL', process.env.AUTH_API_URL),
   parts.setFreeVariable('PRODUCTS_API_URL', process.env.PRODUCTS_API_URL),
+  parts.setFreeVariable('HWS_USERNAME', process.env.HWS_USERNAME),
+  parts.setFreeVariable('HWS_PASSWORD', process.env.HWS_PASSWORD),
 ]);
 
 const productionConfig = merge([
@@ -88,7 +91,7 @@ const developmentConfig = merge([
   }),
 ]);
 
-module.exports = mode => {
+module.exports = (mode) => {
   const config = mode === 'production' ? productionConfig : developmentConfig;
 
   return merge([commonConfig, config, { mode }]);

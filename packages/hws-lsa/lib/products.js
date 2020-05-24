@@ -22,10 +22,41 @@ export const getBuilds = (model) =>
     selector: 'Bauart',
   });
 
+const authenticate = async ({
+  username = HWS_USERNAME, // eslint-disable-line no-undef
+  password = HWS_PASSWORD, // eslint-disable-line no-undef
+} = {}) => {
+  // eslint-disable-next-line no-undef
+  return await fetchWithTimeout(AUTH_API_URL, {
+    credentials: 'include',
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  }).then((r) => r.json());
+};
+
 export const getDetails = async (reference) => {
-  return await fetchWithTimeout(
-    `${productsUrl}${reference}/?verbose=3`,
-  ).then((r) => r.json());
+  // Switch to turn on authentification for testing purposes
+  if (sessionStorage.getItem('hws-authenticate')) {
+    await authenticate();
+  }
+
+  return await fetchWithTimeout(`${productsUrl}${reference}/?verbose=4`, {
+    credentials: 'include',
+    method: 'GET',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  }).then((r) => r.json());
 };
 
 export const getModels = () =>

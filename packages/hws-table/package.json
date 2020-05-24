@@ -26,6 +26,7 @@
     "npm": "6.x.x"
   },
   "dependencies": {
+    "js-cookie": "^3.0.0-rc.0",
     "lit-element": "^2.1.0"
   }
 }

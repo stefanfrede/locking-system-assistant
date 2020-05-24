@@ -420,21 +420,86 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
         const lengths = {};
 
         items.forEach((item) => {
-          const [{ value: model }] = item.specifications.filter(
-            (specification) => specification.name === 'Serie',
-          );
-
-          const [{ value: build }] = item.specifications.filter(
+          const buildArr = item.specifications.filter(
             (specification) => specification.name === 'Bauart',
           );
 
-          const [{ value: length }] = item.specifications.filter(
+          const [{ value: build }] = buildArr.length
+            ? buildArr
+            : [{ value: '' }];
+
+          const designArr = item.specifications.filter(
+            (specification) => specification.name === 'Ausführung',
+          );
+
+          const [{ value: design }] = designArr.length
+            ? designArr
+            : [{ value: '' }];
+
+          const keyArr = item.specifications.filter(
+            (specification) => specification.name === 'Schlüssel',
+          );
+
+          const [{ value: key }] = keyArr.length ? keyArr : [{ value: '' }];
+
+          const lengthCArr = item.specifications.filter(
+            (specification) => specification.name === 'Länge C',
+          );
+
+          const [{ value: lengthC }] = lengthCArr.length
+            ? lengthCArr
+            : [{ value: 0 }];
+
+          const lengthDArr = item.specifications.filter(
+            (specification) => specification.name === 'Länge D',
+          );
+
+          const [{ value: lengthD }] = lengthDArr.length
+            ? lengthDArr
+            : [{ value: 0 }];
+
+          const materialArr = item.specifications.filter(
+            (specification) => specification.name === 'Material',
+          );
+
+          const [{ value: material }] = materialArr.length
+            ? materialArr
+            : [{ value: '' }];
+
+          const modelArr = item.specifications.filter(
+            (specification) => specification.name === 'Serie',
+          );
+
+          const [{ value: model }] = modelArr.length
+            ? modelArr
+            : [{ value: '' }];
+
+          const partialLengthArr = item.specifications.filter(
             (specification) => specification.name === 'Teillänge (C+D)',
           );
 
-          const [inner, outer] = length
-            .split('+')
-            .map((str) => Number(str.trim().replace('mm', '')));
+          const [{ value: partialLength }] = partialLengthArr.length
+            ? partialLengthArr
+            : [{ value: '' }];
+
+          const safetyArr = item.specifications.filter(
+            (specification) => specification.name === 'Sicherheit',
+          );
+
+          const [{ value: safety }] = safetyArr.length
+            ? safetyArr
+            : [{ value: '' }];
+
+          const totalLengthArr = item.specifications.filter(
+            (specification) => specification.name === 'Gesamtlänge (L)',
+          );
+
+          const [{ value: totalLength }] = totalLengthArr.length
+            ? totalLengthArr
+            : [{ value: '' }];
+
+          const inner = Number(lengthC);
+          const outer = Number(lengthD);
 
           if (lengths[inner]) {
             lengths[inner].push(outer);
@@ -442,13 +507,30 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
             lengths[inner] = [outer];
           }
 
-          details[slugify(`${model}-${build}-${inner}-${outer}`)] = {
+          let price = void 0;
+
+          if (item.price) {
+            price = new Intl.NumberFormat('de-DE', {
+              style: 'currency',
+              currency: item.price.currency,
+            }).format(item.price.sales_price_4 * (1 - item.price.discount));
+          }
+
+          const specs = {
+            design,
+            key,
+            material,
             name: item.name,
-            price: item.price ?? undefined,
+            partialLength,
+            price,
             reference: item.reference,
+            safety,
             subject: item.subject,
             text: item.text,
+            totalLength,
           };
+
+          details[slugify(`${model}-${build}-${inner}-${outer}`)] = specs;
 
           if (
             build === 'Doppelzylinder' ||
@@ -462,13 +544,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
               lengths[outer] = [inner];
             }
 
-            details[slugify(`${model}-${build}-${outer}-${inner}`)] = {
-              name: item.name,
-              price: item.price ?? undefined,
-              reference: item.reference,
-              subject: item.subject,
-              text: item.text,
-            };
+            details[slugify(`${model}-${build}-${outer}-${inner}`)] = specs;
           }
         });
 
