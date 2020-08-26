@@ -3,7 +3,7 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const { GenerateSW } = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const path = require('path');
 
 const dotenv = require('dotenv').config();
