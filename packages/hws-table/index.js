@@ -262,25 +262,13 @@ class HwsTable extends LitElement {
     return html`
       <thead>
         <tr>
-          <th scope="col">
-            #
-          </th>
+          <th scope="col">#</th>
           <th scope="col"></th>
-          <th scope="col">
-            Bezeichnung
-          </th>
-          <th scope="col">
-            Zylindertyp
-          </th>
-          <th scope="col">
-            Zylinderlänge (mm)
-          </th>
-          <th scope="col">
-            Stück
-          </th>
-          <th colspan="${keys}" scope="col">
-            Schlüssel
-          </th>
+          <th scope="col">Bezeichnung</th>
+          <th scope="col">Zylindertyp</th>
+          <th scope="col">Zylinderlänge (mm)</th>
+          <th scope="col">Stück</th>
+          <th colspan="${keys}" scope="col">Schlüssel</th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -308,9 +296,7 @@ class HwsTable extends LitElement {
                 ? 'last-row'
                 : ''}"
             >
-              <th scope="row">
-                ${index + 1}
-              </th>
+              <th scope="row">${index + 1}</th>
               <td>
                 <button
                   @click="${this.showDetails}"
@@ -365,9 +351,7 @@ class HwsTable extends LitElement {
                   id="build-${index}"
                   name="build-${index}"
                 >
-                  <option selected hidden value>
-                    Bitte auswählen
-                  </option>
+                  <option selected hidden value>Bitte auswählen</option>
                   ${repeat(
                     builds,
                     (option) => option,
@@ -394,9 +378,7 @@ class HwsTable extends LitElement {
                     id="inner-length-${index}"
                     name="inner-length-${index}"
                   >
-                    <option selected hidden value>
-                      Innen
-                    </option>
+                    <option selected hidden value>Innen</option>
                     ${repeat(
                       this.getSelectOptions({
                         index: row,
@@ -423,9 +405,7 @@ class HwsTable extends LitElement {
                     id="outer-length-${index}"
                     name="outer-length-${index}"
                   >
-                    <option selected hidden value>
-                      Außen
-                    </option>
+                    <option selected hidden value>Außen</option>
                     ${repeat(
                       this.getSelectOptions({
                         index: row,
@@ -559,58 +539,26 @@ class HwsTable extends LitElement {
               <td colspan="2"></td>
               <td colspan="${4 + items[row].keys.length}">
                 <dl>
-                  <dt>
-                    Bestellnummer:
-                  </dt>
+                  <dt>Bestellnummer:</dt>
                   <dd>
                     ${items[row].details.reference}
                     (${items[row].details.subject})
                   </dd>
-                  <dt>
-                    Bezeichnung:
-                  </dt>
-                  <dd>
-                    ${items[row].details.name}
-                  </dd>
-                  <dt>
-                    Schlüssel:
-                  </dt>
-                  <dd>
-                    ${items[row].details.key}
-                  </dd>
-                  <dt>
-                    Ausführung:
-                  </dt>
-                  <dd>
-                    ${items[row].details.design}
-                  </dd>
-                  <dt>
-                    Sicherheit:
-                  </dt>
-                  <dd>
-                    ${items[row].details.safety}
-                  </dd>
-                  <dt>
-                    Material:
-                  </dt>
-                  <dd>
-                    ${items[row].details.material}
-                  </dd>
-                  <dt>
-                    Teillänge (C+D):
-                  </dt>
-                  <dd>
-                    ${items[row].details.partialLength}
-                  </dd>
-                  <dt>
-                    Gesamtlänge (L):
-                  </dt>
-                  <dd>
-                    ${items[row].details.totalLength}
-                  </dd>
-                  <dt>
-                    Preis:
-                  </dt>
+                  <dt>Bezeichnung:</dt>
+                  <dd>${items[row].details.name}</dd>
+                  <dt>Schlüssel:</dt>
+                  <dd>${items[row].details.key}</dd>
+                  <dt>Ausführung:</dt>
+                  <dd>${items[row].details.design}</dd>
+                  <dt>Sicherheit:</dt>
+                  <dd>${items[row].details.safety}</dd>
+                  <dt>Material:</dt>
+                  <dd>${items[row].details.material}</dd>
+                  <dt>Teillänge (C+D):</dt>
+                  <dd>${items[row].details.partialLength}</dd>
+                  <dt>Gesamtlänge (L):</dt>
+                  <dd>${items[row].details.totalLength}</dd>
+                  <dt>Preis:</dt>
                   <dd>
                     ${items[row].details.price
                       ? items[row].details.price

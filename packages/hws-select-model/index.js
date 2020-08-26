@@ -41,9 +41,7 @@ class HwsSelectModel extends LitElement {
         id="select-model"
         name="select-model"
       >
-        <option selected hidden value>
-          Serie auswählen
-        </option>
+        <option selected hidden value>Serie auswählen</option>
         ${this.models.map(
           (option) =>
             html`
