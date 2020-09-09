@@ -3,6 +3,7 @@ import { LitElement, css, html } from 'lit-element';
 import 'hws-table';
 import 'hws-loader';
 import 'hws-message';
+import 'hws-price';
 import 'hws-select-model';
 
 import configureStore from './store';
@@ -21,6 +22,7 @@ import {
   fetchBuilds,
   fetchDetails,
   fetchInnerLengths,
+  fetchKeyPrice,
   fetchModels,
   fetchOuterLengths,
   reloadData,
@@ -32,6 +34,7 @@ import {
   getGroups,
   getGuard,
   getItems,
+  getKeyPrice,
   getKeys,
   getMessage,
   getModel,
@@ -53,7 +56,8 @@ class HwsLsa extends connect(store)(LitElement) {
       }
 
       .data-table-wrapper {
-        display: inline-block;
+        display: inline-flex;
+        flex-direction: column;
         position: relative;
       }
     `;
@@ -66,6 +70,7 @@ class HwsLsa extends connect(store)(LitElement) {
       guard: { type: Number },
       innerLengths: { type: Object },
       items: { type: Object },
+      keyPrice: { type: Number },
       keys: { type: Number },
       loading: { type: Boolean },
       message: { type: String },
@@ -84,6 +89,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.guard = state.app.guard;
     this.innerLengths = state.app.innerLengths;
     this.items = state.app.items;
+    this.keyPrice = state.app.keyPrice;
     this.keys = state.app.keys;
     this.loading = state.app.loading;
     this.message = state.cache.message;
@@ -101,6 +107,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.groups = getGroups(store.getState());
     this.guard = getGuard(store.getState());
     this.items = getItems(store.getState());
+    this.keyPrice = getKeyPrice(store.getState());
     this.keys = getKeys(store.getState());
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
@@ -114,6 +121,7 @@ class HwsLsa extends connect(store)(LitElement) {
     await store.dispatch(initAssistant());
     await store.dispatch(fetchModels());
     await store.dispatch(fetchBuilds(this.model));
+    await store.dispatch(fetchKeyPrice(this.model));
   }
 
   _onDeleteRow(e) {
@@ -253,6 +261,11 @@ class HwsLsa extends connect(store)(LitElement) {
           ?message="${this.message}"
           ?hidden="${!this.loading}"
         ></hws-loader>
+        <hws-price
+          .groups="${this.groups}"
+          .keyPrice="${this.keyPrice}"
+          .items="${this.items}"
+        ></hws-price>
       </div>
     `;
   }

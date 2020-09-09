@@ -15,6 +15,7 @@ import {
   UPDATE_BUILDS,
   UPDATE_GROUPS,
   UPDATE_ITEM,
+  UPDATE_KEY_PRICE,
   UPDATE_MODEL,
   UPDATE_MODELS,
 } from '../actions';
@@ -26,6 +27,7 @@ const INITIAL_STATE = {
   innerLengths: {},
   items: {},
   keys: 5,
+  keyPrice: undefined,
   loading: true,
   model: 'R9Plus',
   models: [],
@@ -123,6 +125,9 @@ export default handleActions(
     },
     [UPDATE_ITEM]: (state, action) => {
       return { ...state, items: { ...state.items, ...action.payload } };
+    },
+    [UPDATE_KEY_PRICE]: (state, action) => {
+      return { ...state, keyPrice: action.payload };
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };

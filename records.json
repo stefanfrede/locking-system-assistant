@@ -251,7 +251,16 @@
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 4d904a2152afc24e42353e53a83f1206": 44,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js a9bcf12e057c0316d728a1c3a550d8b7": 1,
       "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js fc22c45fd0b6327c558c6250a3cc3234": 26,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 5f1ae58300df8a02076012a82d27fb51": 26
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 5f1ae58300df8a02076012a82d27fb51": 26,
+      "node_modules/lit-element/lit-element.js 5ed021f3167051bb01ffebcb09e91514": 0,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js a87c48fce1cdfa8ca75c70bc415f44c7": 1,
+      "node_modules/lit-html/lit-html.js 8fd3500e0bb0ea5f299fcf3ec4e00343": 7,
+      "node_modules/pwa-helpers/pwa-helpers.js aab20b396d6eefb47a92273d2baed4dc": 26,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js 5aaebd899081cf447a7b76c51fa534ed": 27,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 79c5a2aa1607d6abd36e0a6b6ecf9486": 28,
+      "node_modules/redux-actions/es/createActions.js 5f6504ab65e2a1d8afb673a4ed725c16": 29,
+      "node_modules/redux-actions/es/handleActions.js 2838e249ae04678040a169ca87758195": 30,
+      "node_modules/redux-actions/es/combineActions.js fe43fc8a1bf0544bc1124dc714d57d27": 34
     },
     "usedIds": {
       "0": 0,
@@ -413,11 +422,38 @@
       "manifest": 1,
       "vendors~main": 2
     },
-    "bySource": {},
+    "bySource": {
+      "2 main": 0,
+      "0 main": 1,
+      "1 main": 2
+    },
     "usedIds": [
       0,
       1,
       2
     ]
-  }
+  },
+  "HtmlWebpackCompiler": [
+    {
+      "modules": {
+        "byIdentifier": {
+          "node_modules/html-webpack-plugin/lib/loader.js!template/index.html": 0
+        },
+        "usedIds": {
+          "0": 0
+        }
+      },
+      "chunks": {
+        "byName": {
+          "HtmlWebpackPlugin_0": 0
+        },
+        "bySource": {
+          "0 HtmlWebpackPlugin_0": 0
+        },
+        "usedIds": [
+          0
+        ]
+      }
+    }
+  ]
 }

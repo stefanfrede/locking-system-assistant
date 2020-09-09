@@ -13,15 +13,6 @@ const fetchData = async (body) => {
   }).then((r) => r.json());
 };
 
-export const getBuilds = (model) =>
-  fetchData({
-    filter: [
-      { name: 'Hersteller', value: 'Iseo*' },
-      { name: 'Serie', value: model },
-    ],
-    selector: 'Bauart',
-  });
-
 const authenticate = async ({
   username = HWS_USERNAME, // eslint-disable-line no-undef
   password = HWS_PASSWORD, // eslint-disable-line no-undef
@@ -34,6 +25,7 @@ const authenticate = async ({
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'Access-Control-Allow-Credentials': true,
     },
     body: JSON.stringify({
       username,
@@ -41,6 +33,15 @@ const authenticate = async ({
     }),
   }).then((r) => r.json());
 };
+
+export const getBuilds = (model) =>
+  fetchData({
+    filter: [
+      { name: 'Hersteller', value: 'Iseo*' },
+      { name: 'Serie', value: model },
+    ],
+    selector: 'Bauart',
+  });
 
 export const getDetails = async (reference) => {
   // Switch to turn on authentification for testing purposes
@@ -63,6 +64,17 @@ export const getModels = () =>
   fetchData({
     filter: [{ name: 'Schließanlagenfähig', value: 'ja' }],
     selector: 'Serie',
+  });
+
+export const getKeyReferences = (model) =>
+  fetchData({
+    filter: [
+      { name: 'Hersteller', value: 'Iseo*' },
+      { name: 'Serie', value: model },
+      { name: 'Schlüsseltyp', value: 'Gruppenschlüssel' },
+      { name: 'Erstbestellung', value: 'ja' },
+    ],
+    selector: 'reference',
   });
 
 export const getReferences = (build, model) =>
