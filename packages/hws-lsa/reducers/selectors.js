@@ -2,6 +2,7 @@ export const getBuilds = (state) => state.app.builds;
 export const getGroups = (state) => state.app.groups;
 export const getGuard = (state) => state.app.guard;
 export const getItems = (state) => state.app.items;
+export const getKeyPrice = (state) => state.app.keyPrice;
 export const getKeys = (state) => state.app.keys;
 export const getModel = (state) => state.app.model;
 export const getModels = (state) => state.app.models;

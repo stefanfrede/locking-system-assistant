@@ -1,10 +1,9 @@
 {
-  "name": "hws-table",
-  "description": "hws-table is a table to configure a locking system.",
+  "name": "hws-price",
+  "description": "hws-price is showing the price total",
   "keywords": [
-    "table",
-    "data-table",
-    "locking-system"
+    "price",
+    "total"
   ],
   "version": "0.0.0",
   "homepage": "https://lsa.frede.io/",
@@ -19,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/stefanfrede/locking-system-assistant",
-    "directory": "packages/hws-table"
+    "directory": "packages/hws-price"
   },
   "engines": {
     "node": "10.x.x",

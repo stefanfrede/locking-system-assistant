@@ -4,6 +4,7 @@ import {
   getBuilds,
   getDetails,
   getModels,
+  getKeyReferences,
   getReferences,
 } from './lib/products';
 
@@ -13,6 +14,7 @@ export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
 export const LOAD_BUILDS = 'LOAD_BUILDS';
 export const LOAD_DETAILS = 'LOAD_DETAILS';
+export const LOAD_KEY_PRICE = 'LOAD_KEY_PRICE';
 export const LOAD_LENGTHS = 'LOAD_LENGTHS';
 export const LOAD_MODELS = 'LOAD_MODELS';
 export const ADD_GROUP = 'ADD_GROUP';
@@ -30,6 +32,7 @@ export const DELETE_OUTER_LENGTH = 'DELETE_OUTER_LENGTH';
 export const UPDATE_BUILDS = 'UPDATE_BUILDS';
 export const UPDATE_GROUPS = 'UPDATE_GROUPS';
 export const UPDATE_ITEM = 'UPDATE_ITEM';
+export const UPDATE_KEY_PRICE = 'UPDATE_KEY_PRICE';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
 export const UPDATE_MODEL = 'UPDATE_MODEL';
 export const UPDATE_MODELS = 'UPDATE_MODELS';
@@ -40,6 +43,7 @@ export const {
   loadBuilds,
   loadDetails,
   loadLengths,
+  loadKeyPrice,
   loadModels,
   addGroup,
   addInnerLength,
@@ -53,6 +57,7 @@ export const {
   updateBuilds,
   updateGroups,
   updateItem,
+  updateKeyPrice,
   updateMessage,
   updateModel,
   updateModels,
@@ -61,6 +66,7 @@ export const {
     HIDE_LOADER: () => false,
     SHOW_LOADER: () => true,
     LOAD_BUILDS: [(x) => x, (_, msgType) => ({ msgType })],
+    LOAD_KEY_PRICE: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_LENGTHS: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_MODELS: [(x) => x, (_, msgType) => ({ msgType })],
     ADD_GROUP: [(x) => x, (_, keys) => ({ keys })],
@@ -78,6 +84,7 @@ export const {
   DELETE_OUTER_LENGTH,
   UPDATE_BUILDS,
   UPDATE_GROUPS,
+  UPDATE_KEY_PRICE,
   UPDATE_MODEL,
   UPDATE_MODELS,
 );
@@ -326,6 +333,41 @@ export const fetchDetails = ({ outerLength, id }) => {
   };
 };
 
+export function fetchKeyPrice(model) {
+  return function (dispatch, getState) {
+    dispatch(showLoader());
+
+    const {
+      cache: { keyPrice },
+    } = getState();
+
+    if (keyPrice[model]) {
+      return Promise.resolve()
+        .then(() => {
+          dispatch(updateBuilds(keyPrice[model]));
+
+          return keyPrice[model];
+        })
+        .finally(() => dispatch(hideLoader()));
+    }
+
+    return getKeyReferences(model)
+      .then((references) => getDetails(references[0]))
+      .then((details) => {
+        let price = details.price
+          ? details.price.sales_price_4 * (1 - details.price.discount)
+          : void 0;
+
+        dispatch(loadKeyPrice({ [model]: price }));
+        dispatch(updateKeyPrice(price));
+
+        return price;
+      })
+      .catch((reason) => dispatch(loadKeyPrice(reason, 'danger')))
+      .finally(() => dispatch(hideLoader()));
+  };
+}
+
 export function fetchModels() {
   return function (dispatch, getState) {
     dispatch(showLoader());
@@ -507,14 +549,9 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
             lengths[inner] = [outer];
           }
 
-          let price = void 0;
-
-          if (item.price) {
-            price = new Intl.NumberFormat('de-DE', {
-              style: 'currency',
-              currency: item.price.currency,
-            }).format(item.price.sales_price_4 * (1 - item.price.discount));
-          }
+          let price = item.price
+            ? item.price.sales_price_4 * (1 - item.price.discount)
+            : void 0;
 
           const specs = {
             design,
@@ -632,6 +669,7 @@ export const fetchOuterLengths = ({ innerLength, id, rewrite = true }) => {
 export const reloadData = (model) => {
   return async (dispatch, getState) => {
     dispatch(updateModel(model));
+    dispatch(fetchKeyPrice(model));
 
     const builds = await dispatch(fetchBuilds(model));
 
