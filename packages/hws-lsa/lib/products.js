@@ -13,27 +13,6 @@ const fetchData = async (body) => {
   }).then((r) => r.json());
 };
 
-const authenticate = async ({
-  username = HWS_USERNAME, // eslint-disable-line no-undef
-  password = HWS_PASSWORD, // eslint-disable-line no-undef
-} = {}) => {
-  // eslint-disable-next-line no-undef
-  return await fetchWithTimeout(AUTH_API_URL, {
-    credentials: 'include',
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Access-Control-Allow-Credentials': true,
-    },
-    body: JSON.stringify({
-      username,
-      password,
-    }),
-  }).then((r) => r.json());
-};
-
 export const getBuilds = (model) =>
   fetchData({
     filter: [
@@ -44,11 +23,6 @@ export const getBuilds = (model) =>
   });
 
 export const getDetails = async (reference) => {
-  // Switch to turn on authentification for testing purposes
-  if (sessionStorage.getItem('hws-authenticate')) {
-    await authenticate();
-  }
-
   return await fetchWithTimeout(`${productsUrl}${reference}/?verbose=4`, {
     credentials: 'include',
     method: 'GET',

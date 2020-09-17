@@ -42,6 +42,8 @@ import {
   getRows,
 } from './reducers/selectors';
 
+import { authenticate, checkForm } from './lib/helpers';
+
 const store = configureStore();
 
 class HwsLsa extends connect(store)(LitElement) {
@@ -118,6 +120,11 @@ class HwsLsa extends connect(store)(LitElement) {
   }
 
   async _init() {
+    // Switch to authenticate with a test user for testing purposes
+    if (sessionStorage.getItem('hws-authenticate') === 'true') {
+      await authenticate();
+    }
+
     await store.dispatch(initAssistant());
     await store.dispatch(fetchModels());
     await store.dispatch(fetchBuilds(this.model));
@@ -216,6 +223,24 @@ class HwsLsa extends connect(store)(LitElement) {
 
   _onSubmitForm(e) {
     e.stopPropagation();
+
+    const errors = checkForm(e.detail);
+
+    if (errors.length) {
+      errors.forEach((item) => item.classList.add('is-invalid'));
+      store.dispatch(
+        updateMessage(
+          'Bitte überprüfen Sie die mit rot markierten Felder.',
+          'danger',
+        ),
+      );
+    } else {
+      const groups = getGroups(store.getState());
+      const items = getItems(store.getState());
+
+      console.log('GROUPS!', groups);
+      console.log('ITEMS!', items);
+    }
   }
 
   render() {

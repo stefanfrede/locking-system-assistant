@@ -47,9 +47,12 @@ class HwsTable extends LitElement {
   }
 
   editGroup(e) {
-    const [, index] = e.target.id.split('-');
+    const target = e.target;
+    const [, index] = target.id.split('-');
 
-    this.groups[Number(index)] = Number(e.target.value);
+    this.groups[Number(index)] = Number(target.value);
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('edit-group', {
@@ -61,10 +64,13 @@ class HwsTable extends LitElement {
   }
 
   editIdentifier(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const id = target.closest('tbody').dataset.rowId;
 
     const item = this.items[id];
-    item.name = e.target.value;
+    item.name = target.value;
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('editIdentifier', {
@@ -88,10 +94,13 @@ class HwsTable extends LitElement {
   }
 
   editQuantity(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const id = target.closest('tbody').dataset.rowId;
 
     const item = this.items[id];
-    item.quantity = Number(e.target.value);
+    item.quantity = Number(target.value);
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('editQuantity', {
@@ -137,7 +146,10 @@ class HwsTable extends LitElement {
   }
 
   selectBuild(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const id = target.closest('tbody').dataset.rowId;
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('selectBuild', {
@@ -152,7 +164,10 @@ class HwsTable extends LitElement {
   }
 
   selectInnerLength(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const id = target.closest('tbody').dataset.rowId;
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('selectInnerLength', {
@@ -167,13 +182,25 @@ class HwsTable extends LitElement {
   }
 
   selectKey(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const tbody = target.closest('tbody');
+    const form = tbody.closest('form');
+    const id = tbody.dataset.rowId;
 
-    const checked = e.target.checked;
-    const keyNum = Number(e.target.value);
+    const checked = target.checked;
+    const keyNum = Number(target.value);
 
     const item = this.items[id];
     item.keys[keyNum] = checked;
+
+    const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox) => {
+      checkbox.classList.remove('is-invalid');
+    });
+
+    const [, , column] = target.id.split('-');
+    const group = form.querySelector(`#groups-${column}`);
+    group.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('selectKey', {
@@ -185,7 +212,10 @@ class HwsTable extends LitElement {
   }
 
   selectOuterLength(e) {
-    const id = e.target.closest('tbody').dataset.rowId;
+    const target = e.target;
+    const id = target.closest('tbody').dataset.rowId;
+
+    target.classList.remove('is-invalid');
 
     this.dispatchEvent(
       new CustomEvent('selectOuterLength', {
@@ -742,7 +772,10 @@ class HwsTable extends LitElement {
           Zurücksetzen
         </button>
         <button @click="${this.print}" class="btn btn-success">
-          Schließplan ausdrucken
+          Ausdrucken
+        </button>
+        <button type="submit" class="btn btn-success">
+          In den Warenkorb legen
         </button>
       </form>
     `;

@@ -61,11 +61,16 @@ class HwsPrice extends LitElement {
   render() {
     let total = 0;
 
-    Object.values(this.items).forEach((item, index) => {
+    Object.values(this.items).forEach((item) => {
       if (item.details) {
         if (item.details.price) {
           const itemPrice = item.details.price * item.quantity;
-          const keyPrice = this.keyPrice * this.groups[index];
+
+          let keyPrice = 0;
+
+          this.groups.forEach((group) => {
+            keyPrice += this.keyPrice * group;
+          });
 
           total += itemPrice + keyPrice;
         }
