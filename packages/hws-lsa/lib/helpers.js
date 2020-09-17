@@ -23,121 +23,100 @@ export const fetchWithTimeout = (uri, options = {}, time = 5000) => {
     });
 };
 
-export const serialize = (form) => {
-  const serialized = {
-    rows: [],
-    keys: {
-      errors: [],
-      quantities: [],
+export const authenticate = async ({
+  username = HWS_USERNAME, // eslint-disable-line no-undef
+  password = HWS_PASSWORD, // eslint-disable-line no-undef
+} = {}) => {
+  // eslint-disable-next-line no-undef
+  return await fetchWithTimeout(AUTH_API_URL, {
+    credentials: 'include',
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'Access-Control-Allow-Credentials': true,
     },
-  };
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  }).then((r) => r.json());
+};
 
-  const rows = form.querySelectorAll('tbody > tr');
+export const checkForm = (form) => {
+  const rows = form.querySelectorAll('tbody > tr:nth-child(odd)');
+  const groups = form.querySelectorAll('tfoot .js-form-field');
 
-  const footerFields = form.querySelectorAll('tfoot .js-form-field');
+  const errors = [];
+  const keys = [];
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+  rows.forEach((row) => {
     const fields = row.querySelectorAll('.js-form-field');
 
-    const data = {
-      errors: [],
-      keys: {},
-      length: {
-        inner: '',
-        outer: '',
-      },
-      name: '',
-      quantity: 0,
-      type: '',
+    const errorData = [];
+
+    const keyData = {
+      nodes: [],
+      checked: [],
     };
 
-    const keys = [];
-
-    for (let i = 0; i < fields.length; i++) {
-      const field = fields[i];
-
-      if (field.name.includes('build')) {
-        data['type'] = field.value;
-
+    fields.forEach((field) => {
+      if (
+        field.name.startsWith('name') ||
+        field.name.startsWith('build') ||
+        field.name.startsWith('inner') ||
+        field.name.startsWith('outer')
+      ) {
         if (!field.value) {
-          data.errors.push(field);
+          errorData.push(field);
         }
       }
 
-      if (field.name.includes('door')) {
-        data['name'] = field.value;
+      if (field.name.startsWith('quantity')) {
+        const value = Number(field.value);
 
-        if (!field.value) {
-          data.errors.push(field);
+        if (value <= 0) {
+          errorData.push(field);
         }
       }
 
-      if (field.name.includes('inner')) {
-        data['length']['inner'] = field.value;
+      if (field.name.startsWith('key')) {
+        const [, , column] = field.name.split('-');
 
-        if (!field.value) {
-          data.errors.push(field);
-        }
+        keyData['checked'][column] = field.checked;
+        keyData['nodes'].push(field);
       }
+    });
 
-      if (field.name.includes('outer')) {
-        data['length']['outer'] = field.value;
-
-        if (!field.value) {
-          data.errors.push(field);
-        }
-      }
-
-      if (field.name.includes('quantity')) {
-        data['quantity'] = field.value;
-
-        if (field.value <= 0) {
-          data.errors.push(field);
-        }
-      }
-
-      if (field.name.includes('key')) {
-        const [, column] = field.name.split('-');
-
-        data['keys'][column] = field.checked;
-
-        if (!field.checked) {
-          keys.push(field);
-        }
-      }
+    if (!~keyData.checked.findIndex((key) => key === true)) {
+      errorData.push(keyData.nodes);
     }
 
-    if (!~Object.values(data.keys).findIndex((key) => key === true)) {
-      data.errors = [...data.errors, ...keys];
-    }
+    errors.push(errorData.flat());
+    keys.push(keyData.checked);
+  });
 
-    serialized.rows.push(data);
-  }
-
-  const keys = serialized.rows.map((row) => row.keys);
-
-  for (let i = 0; i < footerFields.length; i++) {
-    const field = footerFields[i];
-
-    if (field.name.includes('quantity')) {
-      serialized.keys.quantities.push(Number(field.value));
+  groups.forEach((group) => {
+    if (group.name.startsWith('group')) {
+      const [, column] = group.name.split('-');
+      const value = Number(group.value);
 
       let hasKey = false;
 
-      keys.forEach((key) => {
-        if (key[i + 1]) {
+      keys.forEach((row) => {
+        if (row[column]) {
           hasKey = true;
         }
       });
 
-      if ((field.value <= 0 && hasKey) || (field.value > 0 && !hasKey)) {
-        serialized.keys.errors.push(field);
+      if ((value <= 0 && hasKey) || (value > 0 && !hasKey)) {
+        errors.push(group);
       }
     }
-  }
+  });
 
-  return serialized;
+  return errors.flat();
 };
 
 export const slugify = (str) => {
