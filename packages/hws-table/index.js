@@ -16,6 +16,7 @@ class HwsTable extends LitElement {
       innerLengths: { type: Object },
       items: { type: Object },
       keys: { type: Number },
+      loggedIn: { type: Boolean },
       outerLengths: { type: Object },
       rows: { type: Number },
     };
@@ -30,6 +31,7 @@ class HwsTable extends LitElement {
     this.innerLengths = {};
     this.items = {};
     this.keys = 5;
+    this.loggedIn = false;
     this.outerLengths = {};
     this.rows = 5;
   }
@@ -774,9 +776,13 @@ class HwsTable extends LitElement {
         <button @click="${this.print}" class="btn btn-success">
           Ausdrucken
         </button>
-        <button type="submit" class="btn btn-success">
-          In den Warenkorb legen
-        </button>
+        ${this.loggedIn
+          ? html`
+              <button type="submit" class="btn btn-success">
+                In den Warenkorb legen
+              </button>
+            `
+          : html``}
       </form>
     `;
   }

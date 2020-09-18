@@ -33,6 +33,7 @@ export const UPDATE_BUILDS = 'UPDATE_BUILDS';
 export const UPDATE_GROUPS = 'UPDATE_GROUPS';
 export const UPDATE_ITEM = 'UPDATE_ITEM';
 export const UPDATE_KEY_PRICE = 'UPDATE_KEY_PRICE';
+export const UPDATE_LOGIN_STATUS = 'UPDATE_LOGIN_STATUS';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
 export const UPDATE_MODEL = 'UPDATE_MODEL';
 export const UPDATE_MODELS = 'UPDATE_MODELS';
@@ -58,6 +59,7 @@ export const {
   updateGroups,
   updateItem,
   updateKeyPrice,
+  updateLoginStatus,
   updateMessage,
   updateModel,
   updateModels,
@@ -85,6 +87,7 @@ export const {
   UPDATE_BUILDS,
   UPDATE_GROUPS,
   UPDATE_KEY_PRICE,
+  UPDATE_LOGIN_STATUS,
   UPDATE_MODEL,
   UPDATE_MODELS,
 );

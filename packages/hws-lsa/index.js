@@ -18,6 +18,7 @@ import {
   deleteRow,
   updateGroups,
   updateItem,
+  updateLoginStatus,
   updateMessage,
   fetchBuilds,
   fetchDetails,
@@ -36,6 +37,7 @@ import {
   getItems,
   getKeyPrice,
   getKeys,
+  getLoginStatus,
   getMessage,
   getModel,
   getModels,
@@ -75,6 +77,7 @@ class HwsLsa extends connect(store)(LitElement) {
       keyPrice: { type: Number },
       keys: { type: Number },
       loading: { type: Boolean },
+      loggedIn: { type: Boolean },
       message: { type: String },
       model: { type: String },
       models: { type: Array },
@@ -94,6 +97,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.keyPrice = state.app.keyPrice;
     this.keys = state.app.keys;
     this.loading = state.app.loading;
+    this.loggedIn = state.app.loggedIn;
     this.message = state.cache.message;
     this.model = state.app.model;
     this.models = state.app.models;
@@ -111,6 +115,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.items = getItems(store.getState());
     this.keyPrice = getKeyPrice(store.getState());
     this.keys = getKeys(store.getState());
+    this.loggedIn = getLoginStatus(store.getState());
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
     this.models = getModels(store.getState());
@@ -119,10 +124,20 @@ class HwsLsa extends connect(store)(LitElement) {
     this._init();
   }
 
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (name === 'loggedin') {
+      store.dispatch(updateLoginStatus(newVal));
+    }
+
+    super.attributeChangedCallback(name, oldVal, newVal);
+  }
+
   async _init() {
     // Switch to authenticate with a test user for testing purposes
-    if (sessionStorage.getItem('hws-authenticate') === 'true') {
+    if (sessionStorage.getItem('hws-logged-in') === 'true') {
       await authenticate();
+
+      store.dispatch(updateLoginStatus(true));
     }
 
     await store.dispatch(initAssistant());
@@ -279,6 +294,7 @@ class HwsLsa extends connect(store)(LitElement) {
           .innerLengths="${this.innerLengths}"
           .items="${this.items}"
           .keys="${this.keys}"
+          .loggedIn="${this.loggedIn}"
           .outerLengths="${this.outerLengths}"
           .rows="${this.rows}"
         ></hws-table>

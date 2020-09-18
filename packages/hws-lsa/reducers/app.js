@@ -16,6 +16,7 @@ import {
   UPDATE_GROUPS,
   UPDATE_ITEM,
   UPDATE_KEY_PRICE,
+  UPDATE_LOGIN_STATUS,
   UPDATE_MODEL,
   UPDATE_MODELS,
 } from '../actions';
@@ -29,6 +30,7 @@ const INITIAL_STATE = {
   keys: 5,
   keyPrice: undefined,
   loading: true,
+  loggedIn: false,
   model: 'R9Plus',
   models: [],
   outerLengths: {},
@@ -128,6 +130,9 @@ export default handleActions(
     },
     [UPDATE_KEY_PRICE]: (state, action) => {
       return { ...state, keyPrice: action.payload };
+    },
+    [UPDATE_LOGIN_STATUS]: (state, action) => {
+      return { ...state, loggedIn: action.payload };
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };
