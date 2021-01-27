@@ -1,6 +1,5 @@
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
-const { GenerateSW } = require('workbox-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const { merge } = require('webpack-merge');
@@ -28,7 +27,6 @@ const commonConfig = merge([
     plugins: [
       new CaseSensitivePathsPlugin(),
       new FriendlyErrorsWebpackPlugin(),
-      new GenerateSW(),
       new HtmlWebpackPlugin({
         template: './template/index.html',
         title: 'Schweisthal – Schließanlagen Assistent',
