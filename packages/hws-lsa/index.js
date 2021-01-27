@@ -10,6 +10,7 @@ import configureStore from './store';
 import { connect } from 'pwa-helpers';
 
 import {
+  hideModelSelector,
   initAssistant,
   resetAssistant,
   addKey,
@@ -85,6 +86,7 @@ class HwsLsa extends connect(store)(LitElement) {
       outerLengths: { type: Object },
       rowIds: { type: Array },
       rows: { type: Number },
+      choice: { type: Boolean },
     };
   }
 
@@ -104,6 +106,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.msgType = state.cache.msgType;
     this.outerLengths = state.app.outerLengths;
     this.rows = state.app.rows;
+    this.choice = state.app.choice;
   }
 
   constructor() {
@@ -126,7 +129,23 @@ class HwsLsa extends connect(store)(LitElement) {
 
   attributeChangedCallback(name, oldVal, newVal) {
     if (name === 'loggedin') {
-      store.dispatch(updateLoginStatus(newVal));
+      const isTrue = newVal === 'true';
+
+      if (isTrue) {
+        store.dispatch(updateLoginStatus(true));
+      }
+    }
+
+    if (name === 'model') {
+      store.dispatch(reloadData(newVal));
+    }
+
+    if (name === 'choice') {
+      const hide = newVal === 'false';
+
+      if (hide) {
+        store.dispatch(hideModelSelector());
+      }
     }
 
     super.attributeChangedCallback(name, oldVal, newVal);
@@ -265,6 +284,7 @@ class HwsLsa extends connect(store)(LitElement) {
           @select-model="${this._onSelectModel}"
           .model="${this.model}"
           .models="${this.models}"
+          ?hidden="${!this.choice}"
         ></hws-select-model>
       </p>
       <div class="data-table-wrapper">
