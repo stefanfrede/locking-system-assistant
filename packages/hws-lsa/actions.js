@@ -12,6 +12,8 @@ import { slugify, uuidv4 } from './lib/helpers';
 
 export const HIDE_LOADER = 'HIDE_LOADER';
 export const SHOW_LOADER = 'SHOW_LOADER';
+export const HIDE_MODEL_SELECTOR = 'HIDE_MODEL_SELECTOR';
+export const SHOW_MODEL_SELECTOR = 'SHOW_MODEL_SELECTOR';
 export const LOAD_BUILDS = 'LOAD_BUILDS';
 export const LOAD_DETAILS = 'LOAD_DETAILS';
 export const LOAD_KEY_PRICE = 'LOAD_KEY_PRICE';
@@ -41,6 +43,8 @@ export const UPDATE_MODELS = 'UPDATE_MODELS';
 export const {
   hideLoader,
   showLoader,
+  hideModelSelector,
+  showModelSelector,
   loadBuilds,
   loadDetails,
   loadLengths,
@@ -67,6 +71,8 @@ export const {
   {
     HIDE_LOADER: () => false,
     SHOW_LOADER: () => true,
+    HIDE_MODEL_SELECTOR: () => false,
+    SHOW_MODEL_SELECTOR: () => true,
     LOAD_BUILDS: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_KEY_PRICE: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_LENGTHS: [(x) => x, (_, msgType) => ({ msgType })],

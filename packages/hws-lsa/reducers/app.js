@@ -3,6 +3,8 @@ import { handleActions, combineActions } from 'redux-actions';
 import {
   HIDE_LOADER,
   SHOW_LOADER,
+  HIDE_MODEL_SELECTOR,
+  SHOW_MODEL_SELECTOR,
   ADD_GROUP,
   ADD_INNER_LENGTH,
   ADD_ITEM,
@@ -35,12 +37,19 @@ const INITIAL_STATE = {
   models: [],
   outerLengths: {},
   rows: 5,
+  choice: true,
 };
 
 export default handleActions(
   {
     [combineActions(HIDE_LOADER, SHOW_LOADER)]: (state, action) => {
       return { ...state, loading: action.payload };
+    },
+    [combineActions(HIDE_MODEL_SELECTOR, SHOW_MODEL_SELECTOR)]: (
+      state,
+      action,
+    ) => {
+      return { ...state, choice: action.payload };
     },
     [ADD_GROUP]: (state, action) => {
       return {
