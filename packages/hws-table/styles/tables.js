@@ -8,7 +8,7 @@ export const tables = css`
   table {
     background-color: var(--table-bg, initial);
     color: var(--table-color, hsl(210, 11%, 15%));
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
     vertical-align: top;
     width: 100%;
   }
@@ -20,7 +20,7 @@ export const tables = css`
   th,
   td {
     border-bottom: 1px solid var(--table-border-color, hsl(210, 14%, 89%));
-    padding: var(--table-cell-padding, 0.25rem);
+    padding: var(--table-cell-padding, 4px);
   }
 
   thead th {
@@ -48,7 +48,7 @@ export const tables = css`
   tbody tr td,
   tbody tr th {
     border-bottom: none;
-    padding-bottom: 0.1875rem;
+    padding-bottom: 3px;
   }
 
   tfoot tr td {

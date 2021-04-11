@@ -4,14 +4,14 @@ export const buttons = css`
   .btn {
     background-color: transparent;
     border: 1px solid transparent;
-    border-radius: 0.25rem;
+    border-radius: 4px;
     color: hsl(210, 11%, 15%);
     cursor: pointer;
     display: inline-block;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.5;
-    padding: 0.4375rem 0.75rem;
+    padding: 7px 12px;
     text-align: center;
     text-decoration: none;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
@@ -31,10 +31,10 @@ export const buttons = css`
   }
 
   .btn-sm {
-    border-radius: 0.2rem;
-    font-size: 0.875rem;
+    border-radius: 3.2px;
+    font-size: 14px;
     line-height: 1.5;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
   }
 
   .btn-success {
@@ -83,7 +83,7 @@ export const buttons = css`
   }
 
   .btn-outline-danger:focus {
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
+    box-shadow: 0 0 0 3.2px rgba(220, 53, 69, 0.5);
   }
 
   .btn-outline-dark {
@@ -99,7 +99,7 @@ export const buttons = css`
   }
 
   .btn-outline-dark:focus {
-    box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, 0.5);
+    box-shadow: 0 0 0 3.2px rgba(52, 58, 64, 0.5);
   }
 
   .btn-outline-info {
@@ -115,6 +115,6 @@ export const buttons = css`
   }
 
   .btn-outline-info:focus {
-    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5);
+    box-shadow: 0 0 0 3.2px rgba(23, 162, 184, 0.5);
   }
 `;

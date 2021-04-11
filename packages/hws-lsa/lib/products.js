@@ -1,5 +1,7 @@
 import { fetchWithTimeout } from './helpers';
 
+const cartUrl = CART_API_URL; // eslint-disable-line no-undef
+const printUrl = PRINT_API_URL; // eslint-disable-line no-undef
 const productsUrl = PRODUCTS_API_URL; // eslint-disable-line no-undef
 
 const fetchData = async (body) => {
@@ -45,7 +47,8 @@ export const getKeyReferences = (model) =>
     filter: [
       { name: 'Hersteller', value: 'Iseo*' },
       { name: 'Serie', value: model },
-      { name: 'Schlüsseltyp', value: 'Gruppenschlüssel' },
+      { name: 'Produktart', value: 'Hauptschlüssel' },
+      { name: 'Produktgruppe', value: 'Schlüssel' },
       { name: 'Erstbestellung', value: 'ja' },
     ],
     selector: 'reference',
@@ -60,3 +63,14 @@ export const getReferences = (build, model) =>
     ],
     selector: 'reference',
   });
+
+export const postData = async ({ body, endpoint = 'print' }) => {
+  return await fetchWithTimeout(endpoint === 'print' ? printUrl : cartUrl, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  }).then((r) => r.json());
+};

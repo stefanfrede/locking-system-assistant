@@ -46,6 +46,8 @@ const commonConfig = merge([
     },
   },
   parts.setFreeVariable('AUTH_API_URL', process.env.AUTH_API_URL),
+  parts.setFreeVariable('CART_API_URL', process.env.CART_API_URL),
+  parts.setFreeVariable('PRINT_API_URL', process.env.PRINT_API_URL),
   parts.setFreeVariable('PRODUCTS_API_URL', process.env.PRODUCTS_API_URL),
   parts.setFreeVariable('HWS_USERNAME', process.env.HWS_USERNAME),
   parts.setFreeVariable('HWS_PASSWORD', process.env.HWS_PASSWORD),

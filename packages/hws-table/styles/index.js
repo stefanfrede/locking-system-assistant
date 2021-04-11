@@ -22,19 +22,19 @@ export const stylesheet = [
     }
 
     .lsa__pos {
-      width: 3rem;
+      width: 48px;
     }
 
     .lsa__id {
-      width: 14rem;
+      width: 224px;
     }
 
     .lsa__type {
-      width: 11rem;
+      width: 176px;
     }
 
     .lsa__length {
-      width: 11rem;
+      width: 176px;
     }
 
     .lsa__length__inner {
@@ -43,13 +43,13 @@ export const stylesheet = [
     }
 
     .lsa__length__inner > select {
-      width: 5rem;
+      width: 80px;
     }
 
     .lsa__actions,
     .lsa__key,
     .lsa__unit {
-      width: 4rem;
+      width: 64px;
     }
 
     .lsa__key-icon {
@@ -58,7 +58,7 @@ export const stylesheet = [
 
     .lsa__controls {
       display: flex;
-      padding-left: calc(1px + 0.5rem);
+      padding-left: calc(1px + 8px);
     }
 
     .lsa__control {
@@ -67,17 +67,17 @@ export const stylesheet = [
     }
 
     .lsa__control + .lsa__control {
-      margin-left: 1rem;
+      margin-left: 16px;
     }
 
     .lsa__control > button {
-      margin-left: 0.5rem;
-      padding: 0.1875rem 0.4375rem;
+      margin-left: 8px;
+      padding: 3px 7px;
     }
 
     .lsa__control > button > svg {
-      height: 1rem;
-      width: 1rem;
+      height: 16px;
+      width: 16px;
     }
 
     .btn > .down {
@@ -114,33 +114,33 @@ export const stylesheet = [
     }
 
     .btn-group > .btn + .btn {
-      margin-left: 0.5rem;
+      margin-left: 8px;
     }
 
     .btn-group > .btn,
     td > .btn {
-      padding: 0.1875rem 0.5rem;
+      padding: 3px 8px;
     }
 
     .btn-group > .btn > svg,
     td > .btn > svg {
       fill: currentcolor;
-      height: 0.875rem;
-      width: 0.875rem;
+      height: 14px;
+      width: 14px;
     }
 
     [data-icon='key'] {
-      height: 1.5rem;
-      width: 1.5rem;
+      height: 24px;
+      width: 24px;
     }
 
     dl {
-      column-gap: 1rem;
+      column-gap: 16px;
       display: grid;
-      font-size: 0.875rem;
+      font-size: 14px;
       grid-template-columns: auto 1fr;
       line-height: 1.5;
-      margin: 1rem 0;
+      margin: 16px 0;
     }
 
     dt {

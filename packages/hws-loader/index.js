@@ -10,17 +10,17 @@ class HwsLoader extends LitElement {
       span {
         align-items: center;
         background-color: rgba(234, 237, 240, 0.35);
-        bottom: 6.5rem;
+        bottom: 104px;
         display: flex;
         justify-content: center;
         left: 0;
         position: absolute;
         right: 0;
-        top: 2rem;
+        top: 32px;
       }
 
       span.with-message {
-        top: 6rem;
+        top: 96px;
       }
 
       @keyframes spinner {
@@ -31,8 +31,8 @@ class HwsLoader extends LitElement {
 
       svg {
         animation: spinner 1s linear infinite;
-        height: 4rem;
-        width: 4rem;
+        height: 64px;
+        width: 64px;
       }
     `;
   }

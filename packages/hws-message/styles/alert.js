@@ -7,15 +7,15 @@ export const alert = css`
 
   .alert {
     border: var(--alert-border-width, 1px) solid transparent;
-    border-radius: var(--alert-border-radius, 0.25rem);
-    margin-bottom: var(--alert-margin-bottom-x, 1rem);
-    padding: var(--alert-padding-y, 0.75rem) var(--alert-padding-x, 1.25rem);
+    border-radius: var(--alert-border-radius, 4px);
+    margin-bottom: var(--alert-margin-bottom-x, 16px);
+    padding: var(--alert-padding-y, 12px) var(--alert-padding-x, 20px);
     position: relative;
   }
 
   .alert-dismissible {
     padding-right: calc(
-      var(--close-font-size, calc(1rem * 1.5)) + var(--alert-padding-x, 1.25rem) *
+      var(--close-font-size, calc(16px * 1.5)) + var(--alert-padding-x, 20px) *
         2
     );
   }
@@ -26,7 +26,7 @@ export const alert = css`
     border: 0;
     color: inherit;
     opacity: 0.5;
-    padding: var(--alert-padding-y, 0.75rem) var(--alert-padding-x, 1.25rem);
+    padding: var(--alert-padding-y, 12px) var(--alert-padding-x, 20px);
     position: absolute;
     right: 0;
     top: 0;
@@ -37,8 +37,8 @@ export const alert = css`
   }
 
   .alert-dismissible .close svg {
-    height: 1rem;
-    width: 1rem;
+    height: 16px;
+    width: 16px;
   }
 
   .alert-danger {

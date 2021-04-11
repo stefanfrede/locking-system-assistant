@@ -40,8 +40,8 @@ export const reboot = css`
   caption {
     caption-side: bottom;
     color: var(--table-caption-color, hsl(208, 7%, 46%));
-    padding-bottom: var(--table-cell-padding, 0.5rem);
-    padding-top: var(--table-cell-padding, 0.5rem);
+    padding-bottom: var(--table-cell-padding, 8px);
+    padding-top: var(--table-cell-padding, 8px);
     text-align: left;
   }
 
@@ -62,7 +62,7 @@ export const reboot = css`
 
   label {
     display: inline-block; /* 1 */
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
   }
 
   /**
@@ -218,9 +218,9 @@ export const reboot = css`
   legend {
     color: inherit; /* 2 */
     float: left; /* 1 */
-    font-size: 1.5rem;
+    font-size: 24px;
     line-height: inherit;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     padding: 0;
     white-space: normal; /* 3 */
     width: 100%;
