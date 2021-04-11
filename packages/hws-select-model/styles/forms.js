@@ -6,14 +6,14 @@ export const forms = css`
     background-clip: padding-box;
     background-color: var(--input-bg, hsl(0, 0%, 100%));
     border: 1px solid var(--input-border-color, hsl(210, 14%, 83%));
-    border-radius: 0.2rem;
+    border-radius: 3.2px;
     color: var(--input-color, hsl(210, 9%, 31%));
     display: block;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 400;
-    height: 2rem;
+    height: 32px;
     line-height: 1.5;
-    padding: 0.1875rem 0.5rem;
+    padding: 3px 8px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     width: 100%;
   }
@@ -43,7 +43,7 @@ export const forms = css`
   select:focus {
     background-color: var(--input-focus-bg, hsl(0, 0%, 100%));
     border-color: var(--input-focus-border-color, hsl(215, 98%, 77%));
-    box-shadow: 0 0 0 0.2rem
+    box-shadow: 0 0 0 3.2px
       var(--input-focus-box-shadow, rgba(13, 110, 253, 0.25));
     color: var(--input-focus-color, hsl(210, 9%, 31%));
     outline: 0;
@@ -100,7 +100,7 @@ export const forms = css`
   input.is-invalid:focus,
   select.is-invalid:focus {
     border-color: hsl(354, 70%, 54%);
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 3.2px rgba(220, 53, 69, 0.25);
   }
 
   .chkb {
@@ -126,15 +126,15 @@ export const forms = css`
     align-items: center;
     background-color: var(--input-bg, hsl(0, 0%, 100%));
     border: 1px solid var(--input-border-color, hsl(210, 14%, 83%));
-    border-radius: 0.2rem;
+    border-radius: 3.2px;
     cursor: pointer;
     display: flex;
-    height: 1.5rem;
+    height: 24px;
     justify-content: center;
     margin-bottom: 0;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     user-select: none;
-    width: 1.5rem;
+    width: 24px;
   }
 
   .chkb__label:before {
@@ -143,7 +143,7 @@ export const forms = css`
 
   .chkb__label > svg {
     pointer-events: none;
-    width: 1rem;
+    width: 16px;
   }
 
   .chkb__label > svg > path {
@@ -153,7 +153,7 @@ export const forms = css`
 
   .chkb__input:focus + .chkb__label {
     border-color: var(--input-focus-border-color, hsl(215, 98%, 77%));
-    box-shadow: 0 0 0 0.2rem
+    box-shadow: 0 0 0 3.2px
       var(--input-focus-box-shadow, rgba(13, 110, 253, 0.25));
     outline: 0;
   }
@@ -168,6 +168,6 @@ export const forms = css`
 
   .chkb__input.is-invalid:focus + .chkb__label {
     border-color: hsl(354, 70%, 54%);
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    box-shadow: 0 0 0 3.2px rgba(220, 53, 69, 0.25);
   }
 `;

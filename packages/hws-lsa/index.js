@@ -46,6 +46,7 @@ import {
 } from './reducers/selectors';
 
 import { authenticate, checkForm } from './lib/helpers';
+import { postData } from './lib/products';
 
 const store = configureStore();
 
@@ -78,7 +79,7 @@ class HwsLsa extends connect(store)(LitElement) {
       keyPrice: { type: Number },
       keys: { type: Number },
       loading: { type: Boolean },
-      loggedIn: { type: Boolean },
+      showCartBtn: { type: Boolean },
       message: { type: String },
       model: { type: String },
       models: { type: Array },
@@ -86,7 +87,7 @@ class HwsLsa extends connect(store)(LitElement) {
       outerLengths: { type: Object },
       rowIds: { type: Array },
       rows: { type: Number },
-      choice: { type: Boolean },
+      selectable: { type: Boolean },
     };
   }
 
@@ -99,14 +100,14 @@ class HwsLsa extends connect(store)(LitElement) {
     this.keyPrice = state.app.keyPrice;
     this.keys = state.app.keys;
     this.loading = state.app.loading;
-    this.loggedIn = state.app.loggedIn;
+    this.showCartBtn = state.app.showCartBtn;
     this.message = state.cache.message;
     this.model = state.app.model;
     this.models = state.app.models;
     this.msgType = state.cache.msgType;
     this.outerLengths = state.app.outerLengths;
     this.rows = state.app.rows;
-    this.choice = state.app.choice;
+    this.selectable = state.app.selectable;
   }
 
   constructor() {
@@ -118,7 +119,7 @@ class HwsLsa extends connect(store)(LitElement) {
     this.items = getItems(store.getState());
     this.keyPrice = getKeyPrice(store.getState());
     this.keys = getKeys(store.getState());
-    this.loggedIn = getLoginStatus(store.getState());
+    this.showCartBtn = getLoginStatus(store.getState());
     this.message = getMessage(store.getState());
     this.model = getModel(store.getState());
     this.models = getModels(store.getState());
@@ -128,7 +129,7 @@ class HwsLsa extends connect(store)(LitElement) {
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
-    if (name === 'loggedin') {
+    if (name === 'showCartBtn') {
       const isTrue = newVal === 'true';
 
       if (isTrue) {
@@ -140,7 +141,7 @@ class HwsLsa extends connect(store)(LitElement) {
       store.dispatch(reloadData(newVal));
     }
 
-    if (name === 'choice') {
+    if (name === 'selectable') {
       const hide = newVal === 'false';
 
       if (hide) {
@@ -211,6 +212,29 @@ class HwsLsa extends connect(store)(LitElement) {
       : store.dispatch(deleteRow());
   }
 
+  _onPrintForm(e) {
+    e.stopPropagation();
+
+    const errors = checkForm(e.detail);
+
+    if (errors.length) {
+      errors.forEach((item) => item.classList.add('is-invalid'));
+      store.dispatch(
+        updateMessage(
+          'Bitte überprüfen Sie die mit rot markierten Felder.',
+          'danger',
+        ),
+      );
+    } else {
+      const groups = getGroups(store.getState());
+      const items = getItems(store.getState());
+
+      const body = { groups, items };
+
+      postData({ body });
+    }
+  }
+
   _onReset(e) {
     e.stopPropagation();
 
@@ -272,8 +296,9 @@ class HwsLsa extends connect(store)(LitElement) {
       const groups = getGroups(store.getState());
       const items = getItems(store.getState());
 
-      console.log('GROUPS!', groups);
-      console.log('ITEMS!', items);
+      const body = { groups, items };
+
+      postData({ body, endpoint: 'cart' });
     }
   }
 
@@ -284,7 +309,7 @@ class HwsLsa extends connect(store)(LitElement) {
           @select-model="${this._onSelectModel}"
           .model="${this.model}"
           .models="${this.models}"
-          ?hidden="${!this.choice}"
+          ?hidden="${!this.selectable}"
         ></hws-select-model>
       </p>
       <div class="data-table-wrapper">
@@ -301,6 +326,7 @@ class HwsLsa extends connect(store)(LitElement) {
           @editQuantity="${this._onEditQuantity}"
           @editRows="${this._onEditRows}"
           @deleteRow="${this._onDeleteRow}"
+          @printForm="${this._onPrintForm}"
           @reset="${this._onReset}"
           @selectBuild="${this._onSelectBuild}"
           @selectInnerLength="${this._onSelectInnerLength}"
@@ -314,7 +340,7 @@ class HwsLsa extends connect(store)(LitElement) {
           .innerLengths="${this.innerLengths}"
           .items="${this.items}"
           .keys="${this.keys}"
-          .loggedIn="${this.loggedIn}"
+          .showCartBtn="${this.showCartBtn}"
           .outerLengths="${this.outerLengths}"
           .rows="${this.rows}"
         ></hws-table>

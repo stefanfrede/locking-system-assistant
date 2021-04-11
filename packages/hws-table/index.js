@@ -16,7 +16,7 @@ class HwsTable extends LitElement {
       innerLengths: { type: Object },
       items: { type: Object },
       keys: { type: Number },
-      loggedIn: { type: Boolean },
+      showCartBtn: { type: Boolean },
       outerLengths: { type: Object },
       rows: { type: Number },
     };
@@ -31,7 +31,7 @@ class HwsTable extends LitElement {
     this.innerLengths = {};
     this.items = {};
     this.keys = 5;
-    this.loggedIn = false;
+    this.showCartBtn = false;
     this.outerLengths = {};
     this.rows = 5;
   }
@@ -129,10 +129,16 @@ class HwsTable extends LitElement {
     return Array.isArray(object[index]) ? object[index] : [];
   }
 
-  print(e) {
+  printForm(e) {
     e.preventDefault();
 
-    window.print();
+    this.dispatchEvent(
+      new CustomEvent('printForm', {
+        bubbles: true,
+        composed: true,
+        detail: e.target,
+      }),
+    );
   }
 
   reset(e) {
@@ -773,10 +779,10 @@ class HwsTable extends LitElement {
         <button @click="${this.reset}" class="btn btn-light" type="button">
           Zurücksetzen
         </button>
-        <button @click="${this.print}" class="btn btn-success">
+        <button @click="${this.printForm}" class="btn btn-success">
           Ausdrucken
         </button>
-        ${this.loggedIn
+        ${this.showCartBtn
           ? html`
               <button type="submit" class="btn btn-success">
                 In den Warenkorb legen

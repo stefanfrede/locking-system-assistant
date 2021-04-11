@@ -8,19 +8,19 @@ export const stylesheet = [
   alert,
   css`
     .lsa__pos {
-      width: 3rem;
+      width: 48px;
     }
 
     .lsa__id {
-      width: 14rem;
+      width: 224px;
     }
 
     .lsa__type {
-      width: 11rem;
+      width: 176px;
     }
 
     .lsa__length {
-      width: 11rem;
+      width: 176px;
     }
 
     .lsa__length__inner {
@@ -29,12 +29,12 @@ export const stylesheet = [
     }
 
     .lsa__length__inner > select {
-      width: 5rem;
+      width: 80px;
     }
 
     .lsa__key,
     .lsa__unit {
-      width: 4rem;
+      width: 64px;
     }
 
     .lsa__key-icon {
@@ -42,8 +42,8 @@ export const stylesheet = [
     }
 
     [data-icon='key'] {
-      height: 1.5rem;
-      width: 1.5rem;
+      height: 24px;
+      width: 24px;
     }
   `,
 ];

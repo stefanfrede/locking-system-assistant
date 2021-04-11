@@ -32,12 +32,12 @@ const INITIAL_STATE = {
   keys: 5,
   keyPrice: undefined,
   loading: true,
-  loggedIn: false,
+  showCartBtn: false,
   model: 'R9Plus',
   models: [],
   outerLengths: {},
   rows: 5,
-  choice: true,
+  selectable: true,
 };
 
 export default handleActions(
@@ -49,7 +49,7 @@ export default handleActions(
       state,
       action,
     ) => {
-      return { ...state, choice: action.payload };
+      return { ...state, selectable: action.payload };
     },
     [ADD_GROUP]: (state, action) => {
       return {
@@ -141,7 +141,7 @@ export default handleActions(
       return { ...state, keyPrice: action.payload };
     },
     [UPDATE_LOGIN_STATUS]: (state, action) => {
-      return { ...state, loggedIn: action.payload };
+      return { ...state, showCartBtn: action.payload };
     },
     [UPDATE_MODEL]: (state, action) => {
       return { ...state, model: action.payload };

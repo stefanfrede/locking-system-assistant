@@ -29,7 +29,7 @@ class HwsPrice extends LitElement {
       dt {
         line-height: 1.5;
         margin: 0;
-        padding: 0.4375rem 0.75rem;
+        padding: 7px 12px;
       }
 
       dt {
