@@ -46,7 +46,7 @@ import {
 } from './reducers/selectors';
 
 import { authenticate, checkForm } from './lib/helpers';
-import { postData } from './lib/products';
+import { getPdf, addToCart } from './lib/products';
 
 const store = configureStore();
 
@@ -231,7 +231,7 @@ class HwsLsa extends connect(store)(LitElement) {
 
       const body = { groups, items };
 
-      postData({ body });
+      getPdf({ body });
     }
   }
 
@@ -298,7 +298,7 @@ class HwsLsa extends connect(store)(LitElement) {
 
       const body = { groups, items };
 
-      postData({ body, endpoint: 'cart' });
+      addToCart({ body, endpoint: 'cart' });
     }
   }
 
