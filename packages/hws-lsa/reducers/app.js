@@ -17,6 +17,7 @@ import {
   UPDATE_BUILDS,
   UPDATE_GROUPS,
   UPDATE_ITEM,
+  UPDATE_KEY_DETAILS,
   UPDATE_KEY_PRICE,
   UPDATE_LOGIN_STATUS,
   UPDATE_MODEL,
@@ -136,6 +137,9 @@ export default handleActions(
     },
     [UPDATE_ITEM]: (state, action) => {
       return { ...state, items: { ...state.items, ...action.payload } };
+    },
+    [UPDATE_KEY_DETAILS]: (state, action) => {
+      return { ...state, keyDetails: action.payload };
     },
     [UPDATE_KEY_PRICE]: (state, action) => {
       return { ...state, keyPrice: action.payload };
