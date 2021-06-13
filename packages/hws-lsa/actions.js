@@ -364,7 +364,7 @@ export function fetchKeyPrice(model) {
       .then((references) => getDetails(references[0]))
       .then((details) => {
         let price = details.price
-          ? details.price.sales_price_4 * (1 - details.price.discount)
+          ? details.price.sales_price_4 * (1 - details.price.discount / 100)
           : void 0;
 
         dispatch(loadKeyPrice({ [model]: price }));
@@ -559,7 +559,7 @@ export const fetchInnerLengths = ({ build, id, rewrite = true }) => {
           }
 
           let price = item.price
-            ? item.price.sales_price_4 * (1 - item.price.discount)
+            ? item.price.sales_price_4 * (1 - item.price.discount / 100)
             : void 0;
 
           const specs = {
