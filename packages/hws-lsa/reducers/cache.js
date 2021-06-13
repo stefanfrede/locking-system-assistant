@@ -4,6 +4,7 @@ import {
   LOAD_BUILDS,
   LOAD_DETAILS,
   LOAD_LENGTHS,
+  LOAD_KEY_DETAILS,
   LOAD_KEY_PRICE,
   LOAD_MODELS,
   UPDATE_MESSAGE,
@@ -12,6 +13,7 @@ import {
 const INITIAL_STATE = {
   builds: {},
   details: {},
+  keyDetails: {},
   keyPrice: {},
   lengths: {},
   message: '',
@@ -35,6 +37,21 @@ export default handleActions(
     },
     [LOAD_DETAILS]: (state, action) => {
       return { ...state, details: { ...state.details, ...action.payload } };
+    },
+    [LOAD_KEY_DETAILS]: {
+      next: (state, action) => {
+        return {
+          ...state,
+          keyDetails: { ...state.keyDetails, ...action.payload },
+        };
+      },
+      throw: (state, action) => {
+        return {
+          ...state,
+          message: action.payload.message,
+          msgType: action.meta.msgType,
+        };
+      },
     },
     [LOAD_KEY_PRICE]: {
       next: (state, action) => {

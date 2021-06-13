@@ -16,6 +16,7 @@ export const HIDE_MODEL_SELECTOR = 'HIDE_MODEL_SELECTOR';
 export const SHOW_MODEL_SELECTOR = 'SHOW_MODEL_SELECTOR';
 export const LOAD_BUILDS = 'LOAD_BUILDS';
 export const LOAD_DETAILS = 'LOAD_DETAILS';
+export const LOAD_KEY_DETAILS = 'LOAD_KEY_DETAILS';
 export const LOAD_KEY_PRICE = 'LOAD_KEY_PRICE';
 export const LOAD_LENGTHS = 'LOAD_LENGTHS';
 export const LOAD_MODELS = 'LOAD_MODELS';
@@ -34,6 +35,7 @@ export const DELETE_OUTER_LENGTH = 'DELETE_OUTER_LENGTH';
 export const UPDATE_BUILDS = 'UPDATE_BUILDS';
 export const UPDATE_GROUPS = 'UPDATE_GROUPS';
 export const UPDATE_ITEM = 'UPDATE_ITEM';
+export const UPDATE_KEY_DETAILS = 'UPDATE_KEY_DETAILS';
 export const UPDATE_KEY_PRICE = 'UPDATE_KEY_PRICE';
 export const UPDATE_LOGIN_STATUS = 'UPDATE_LOGIN_STATUS';
 export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
@@ -48,6 +50,7 @@ export const {
   loadBuilds,
   loadDetails,
   loadLengths,
+  loadKeyDetails,
   loadKeyPrice,
   loadModels,
   addGroup,
@@ -62,6 +65,7 @@ export const {
   updateBuilds,
   updateGroups,
   updateItem,
+  updateKeyDetails,
   updateKeyPrice,
   updateLoginStatus,
   updateMessage,
@@ -74,6 +78,7 @@ export const {
     HIDE_MODEL_SELECTOR: () => false,
     SHOW_MODEL_SELECTOR: () => true,
     LOAD_BUILDS: [(x) => x, (_, msgType) => ({ msgType })],
+    LOAD_KEY_DETAILS: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_KEY_PRICE: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_LENGTHS: [(x) => x, (_, msgType) => ({ msgType })],
     LOAD_MODELS: [(x) => x, (_, msgType) => ({ msgType })],
@@ -92,6 +97,7 @@ export const {
   DELETE_OUTER_LENGTH,
   UPDATE_BUILDS,
   UPDATE_GROUPS,
+  UPDATE_KEY_DETAILS,
   UPDATE_KEY_PRICE,
   UPDATE_LOGIN_STATUS,
   UPDATE_MODEL,
@@ -341,6 +347,37 @@ export const fetchDetails = ({ outerLength, id }) => {
       .finally(() => dispatch(hideLoader()));
   };
 };
+
+export function fetchKeyDetails(model) {
+  return function (dispatch, getState) {
+    dispatch(showLoader());
+
+    const {
+      cache: { keyDetails },
+    } = getState();
+
+    if (keyDetails[model]) {
+      return Promise.resolve()
+        .then(() => {
+          dispatch(updateBuilds(keyDetails[model]));
+
+          return keyDetails[model];
+        })
+        .finally(() => dispatch(hideLoader()));
+    }
+
+    return getKeyReferences(model)
+      .then((references) => getDetails(references[0]))
+      .then((details) => {
+        dispatch(loadKeyDetails({ [model]: details }));
+        dispatch(updateKeyDetails(details));
+
+        return details;
+      })
+      .catch((reason) => dispatch(loadKeyPrice(reason, 'danger')))
+      .finally(() => dispatch(hideLoader()));
+  };
+}
 
 export function fetchKeyPrice(model) {
   return function (dispatch, getState) {

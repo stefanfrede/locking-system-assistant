@@ -24,6 +24,7 @@ import {
   fetchBuilds,
   fetchDetails,
   fetchInnerLengths,
+  fetchKeyDetails,
   fetchKeyPrice,
   fetchModels,
   fetchOuterLengths,
@@ -36,6 +37,7 @@ import {
   getGroups,
   getGuard,
   getItems,
+  getKeyDetails,
   getKeyPrice,
   getKeys,
   getLoginStatus,
@@ -163,6 +165,7 @@ class HwsLsa extends connect(store)(LitElement) {
     await store.dispatch(initAssistant());
     await store.dispatch(fetchModels());
     await store.dispatch(fetchBuilds(this.model));
+    await store.dispatch(fetchKeyDetails(this.model));
     await store.dispatch(fetchKeyPrice(this.model));
   }
 
@@ -295,8 +298,11 @@ class HwsLsa extends connect(store)(LitElement) {
     } else {
       const groups = getGroups(store.getState());
       const items = getItems(store.getState());
+      const { reference: keyReference } = getKeyDetails(store.getState());
 
-      const body = { groups, items };
+      const body = { groups, items, keyReference };
+
+      console.log('BODY: ', body);
 
       addToCart({ body, endpoint: 'cart' });
     }
