@@ -26,6 +26,6 @@
     "npm": "6.x.x"
   },
   "dependencies": {
-    "lit-element": "^2.4.0"
+    "lit-element": "^2.5.1"
   }
 }

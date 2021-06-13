@@ -25,11 +25,10 @@
     "npm": "6.x.x"
   },
   "dependencies": {
-    "lit-element": "^2.4.0",
+    "lit-element": "^2.5.1",
     "pwa-helpers": "^0.9.1",
-    "redux": "^4.0.5",
+    "redux": "^4.1.0",
     "redux-actions": "^2.6.5",
     "redux-thunk": "^2.3.0"
-  },
-  "devDependencies": {}
+  }
 }
