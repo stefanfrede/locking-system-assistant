@@ -1,0 +1,9 @@
+[build]
+  command = "yarn run build"
+  publish = "dist"
+
+[context.production]
+  environment = { NODE_VERSION = "14.17.1", RUBY_VERSION = "2.7.1" }
+
+[context.deploy-preview]
+  environment = { NODE_VERSION = "14.17.1", RUBY_VERSION = "2.7.1" }
