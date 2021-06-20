@@ -816,9 +816,8 @@ class HwsTable extends LitElement {
           '[data-action=decrement][data-type=row]',
         );
 
-        const btnsDelete = this.shadowRoot.querySelectorAll(
-          '.js-btn-delete-row',
-        );
+        const btnsDelete =
+          this.shadowRoot.querySelectorAll('.js-btn-delete-row');
 
         if (this.rows <= this.guard) {
           btnRow.setAttribute('disabled', '');

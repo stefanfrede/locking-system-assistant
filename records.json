@@ -261,7 +261,18 @@
       "node_modules/redux-actions/es/createActions.js 5f6504ab65e2a1d8afb673a4ed725c16": 29,
       "node_modules/redux-actions/es/handleActions.js 2838e249ae04678040a169ca87758195": 30,
       "node_modules/redux-actions/es/combineActions.js fe43fc8a1bf0544bc1124dc714d57d27": 34,
-      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js 922f71323ef499058a4b1dbd1a8da537": 1
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js 922f71323ef499058a4b1dbd1a8da537": 1,
+      "node_modules/lit-element/lit-element.js d12ed46aef784a01dcb33f1e17fd8586": 0,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/actions.js": 1,
+      "node_modules/lit-html/lit-html.js bad522ed67623db35233cb66abf810ec": 2,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/lib/products.js": 3,
+      "node_modules/redux/es/redux.js 3f58774a61cd786691d02b4659ad1c7e": 5,
+      "node_modules/pwa-helpers/pwa-helpers.js c8e69ffb79c60eef44f0635896cdec8e": 7,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/index.js dd557b059bd90e1e198838144ab32fe5": 8,
+      "node_modules/babel-loader/lib/index.js!packages/hws-lsa/store/configure-store-prod.js 261ac5718d0e7b60e9ccc55de11030d7": 27,
+      "node_modules/redux-actions/es/createActions.js 032097ec8cf09752bf1cd20decd8e0b4": 28,
+      "node_modules/redux-actions/es/handleActions.js 6060c26d3d93894299d7cec8a4eb570f": 29,
+      "node_modules/redux-actions/es/combineActions.js 9e32ac57d47ae72c10785d6db15d62e0": 30
     },
     "usedIds": {
       "0": 0,
