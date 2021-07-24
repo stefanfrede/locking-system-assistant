@@ -390,7 +390,7 @@ export function fetchKeyPrice(model) {
     if (keyPrice[model]) {
       return Promise.resolve()
         .then(() => {
-          dispatch(updateBuilds(keyPrice[model]));
+          dispatch(updateKeyPrice(keyPrice[model]));
 
           return keyPrice[model];
         })
