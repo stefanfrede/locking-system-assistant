@@ -300,9 +300,27 @@ class HwsLsa extends connect(store)(LitElement) {
       const items = getItems(store.getState());
       const { reference: keyReference } = getKeyDetails(store.getState());
 
-      const body = { groups, items, keyReference };
+      const cylinders = [];
 
-      console.log('BODY: ', body);
+      Object.values(items).forEach((item) => {
+        const {
+          details: { reference },
+          index,
+          keys,
+          name,
+          quantity,
+        } = item;
+
+        cylinders.push({
+          index,
+          keys,
+          name,
+          quantity,
+          reference,
+        });
+      });
+
+      const body = { groups, cylinders, keyReference };
 
       addToCart({ body, endpoint: 'cart' });
     }
