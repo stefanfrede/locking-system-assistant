@@ -124,6 +124,7 @@ export const initAssistant = (keys = 5, rows = 5) => {
             addItem(
               {
                 [id]: {
+                  index: i,
                   name: '',
                   build: '',
                   innerLength: 0,
@@ -814,29 +815,42 @@ export const sortRow = ({ dir, id }) => {
         } = getState();
 
         const keys = Object.keys(items);
-        const index = keys.findIndex((item) => item === id);
 
-        let newIndex = -1;
+        let oldIndex = void 0;
+        let newIndex = void 0;
 
-        // Get the new index
-        if (dir === 'up') {
-          // Check if item is first in array
-          if (index !== 0) {
-            newIndex = index - 1;
-          }
-        } else {
-          // Check if item is last in array
-          if (index !== keys.length - 1) {
-            newIndex = index + 1;
+        // Get current index
+        for (const [key, value] of Object.entries(items)) {
+          if (key === id) {
+            oldIndex = value.index;
+            break;
           }
         }
 
-        if (~newIndex) {
-          const [item] = keys.splice(index, 1);
+        // Set the new index
+        if (dir === 'up') {
+          // Check if item is first in array
+          if (oldIndex !== 0) {
+            newIndex = oldIndex - 1;
+          }
+        } else {
+          // Check if item is last in array
+          if (oldIndex !== keys.length - 1) {
+            newIndex = oldIndex + 1;
+          }
+        }
+
+        if (newIndex) {
+          const [item] = keys.splice(oldIndex, 1);
           const sortedItems = {};
 
           keys.splice(newIndex, 0, item);
-          keys.forEach((key) => (sortedItems[key] = items[key]));
+          keys.forEach((key, index) => {
+            const item = items[key];
+            item.index = index;
+
+            sortedItems[key] = item;
+          });
 
           dispatch(addItems(sortedItems));
         }
