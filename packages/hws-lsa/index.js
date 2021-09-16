@@ -231,8 +231,29 @@ class HwsLsa extends connect(store)(LitElement) {
     } else {
       const groups = getGroups(store.getState());
       const items = getItems(store.getState());
+      const { reference: keyReference } = getKeyDetails(store.getState());
 
-      const body = { groups, items };
+      const cylinders = [];
+
+      Object.values(items).forEach((item) => {
+        const {
+          details: { reference },
+          index,
+          keys,
+          name,
+          quantity,
+        } = item;
+
+        cylinders.push({
+          index,
+          keys,
+          name,
+          quantity,
+          reference,
+        });
+      });
+
+      const body = { groups, cylinders, keyReference };
 
       getPdf({ body });
     }
