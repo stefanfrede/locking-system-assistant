@@ -319,12 +319,7 @@ class HwsTable extends LitElement {
         rows,
         (row) => row,
         (row, index) => html`
-          <tbody
-            class="${Object.keys(items[row].details).length
-              ? ''
-              : 'hide-details'}"
-            data-row-id="${row}"
-          >
+          <tbody class="hide-details" data-row-id="${row}">
             <tr
               class="${index === 0
                 ? 'first-row'
