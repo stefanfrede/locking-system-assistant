@@ -50,7 +50,7 @@ import {
 import { authenticate, checkForm } from './lib/helpers';
 import { getPdf, addToCart } from './lib/products';
 
-const store = configureStore();
+const { store } = configureStore();
 
 class HwsLsa extends connect(store)(LitElement) {
   static get styles() {
