@@ -169,6 +169,48 @@ class HwsLsa extends connect(store)(LitElement) {
     await store.dispatch(fetchKeyPrice(this.model));
   }
 
+  _getRequestBody(e) {
+    e.stopPropagation();
+
+    const errors = checkForm(e.detail);
+
+    if (errors.length) {
+      errors.forEach((item) => item.classList.add('is-invalid'));
+      store.dispatch(
+        updateMessage(
+          'Bitte überprüfen Sie die mit rot markierten Felder.',
+          'danger',
+        ),
+      );
+    } else {
+      const groups = getGroups(store.getState());
+      const items = getItems(store.getState());
+      const { reference: keyReference } = getKeyDetails(store.getState());
+
+      const cylinders = [];
+
+      Object.values(items).forEach((item) => {
+        const {
+          details: { reference },
+          index,
+          keys,
+          name,
+          quantity,
+        } = item;
+
+        cylinders.push({
+          index,
+          keys,
+          name,
+          quantity,
+          reference,
+        });
+      });
+
+      return { groups, cylinders, keyReference };
+    }
+  }
+
   _onDeleteRow(e) {
     e.stopPropagation();
 
@@ -216,45 +258,9 @@ class HwsLsa extends connect(store)(LitElement) {
   }
 
   _onPrintForm(e) {
-    e.stopPropagation();
+    const body = this._getRequestBody(e);
 
-    const errors = checkForm(e.detail);
-
-    if (errors.length) {
-      errors.forEach((item) => item.classList.add('is-invalid'));
-      store.dispatch(
-        updateMessage(
-          'Bitte überprüfen Sie die mit rot markierten Felder.',
-          'danger',
-        ),
-      );
-    } else {
-      const groups = getGroups(store.getState());
-      const items = getItems(store.getState());
-      const { reference: keyReference } = getKeyDetails(store.getState());
-
-      const cylinders = [];
-
-      Object.values(items).forEach((item) => {
-        const {
-          details: { reference },
-          index,
-          keys,
-          name,
-          quantity,
-        } = item;
-
-        cylinders.push({
-          index,
-          keys,
-          name,
-          quantity,
-          reference,
-        });
-      });
-
-      const body = { groups, cylinders, keyReference };
-
+    if (body) {
       getPdf({ body });
     }
   }
@@ -304,45 +310,9 @@ class HwsLsa extends connect(store)(LitElement) {
   }
 
   _onSubmitForm(e) {
-    e.stopPropagation();
+    const body = this._getRequestBody(e);
 
-    const errors = checkForm(e.detail);
-
-    if (errors.length) {
-      errors.forEach((item) => item.classList.add('is-invalid'));
-      store.dispatch(
-        updateMessage(
-          'Bitte überprüfen Sie die mit rot markierten Felder.',
-          'danger',
-        ),
-      );
-    } else {
-      const groups = getGroups(store.getState());
-      const items = getItems(store.getState());
-      const { reference: keyReference } = getKeyDetails(store.getState());
-
-      const cylinders = [];
-
-      Object.values(items).forEach((item) => {
-        const {
-          details: { reference },
-          index,
-          keys,
-          name,
-          quantity,
-        } = item;
-
-        cylinders.push({
-          index,
-          keys,
-          name,
-          quantity,
-          reference,
-        });
-      });
-
-      const body = { groups, cylinders, keyReference };
-
+    if (body) {
       addToCart({ body, endpoint: 'cart' });
     }
   }
